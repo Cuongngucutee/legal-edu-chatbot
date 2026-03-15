@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+qdrant-client
+sentence-transformers
+groq
+pydantic
+rank_bm25
+python-dotenv
+streamlit
+requests

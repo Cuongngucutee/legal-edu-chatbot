@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # --- Lớp 1: Vector Database (Qdrant) ---
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant_db
+    ports:
+      - "6333:6333" # Cổng API & Dashboard
+      - "6334:6334" # Cổng gRPC (tốc độ cao)
+    volumes:
+      - ./qdrant_data:/qdrant/storage # Lưu dữ liệu luật vĩnh viễn ở ổ D
+
+  # --- Lớp 2: AI Server (FastAPI + Streamlit) ---
+  legal-ai:
+    build: ./backend # Trỏ đến thư mục chứa Dockerfile
+    container_name: legal_server
+    ports:
+      - "8000:8000"
+      - "8501:8501"
+    volumes:
+      - ./backend:/app # Mount code để sửa bên ngoài là bên trong đổi luôn
+    environment:
+      - QDRANT_HOST=qdrant # Tên service Qdrant ở trên
+      - QDRANT_PORT=6333
+      - GROQ_API_KEY=${GROQ_API_KEY} # Lấy key từ file .env ở ổ D
+    depends_on:
+      - qdrant # Chờ Qdrant chạy xong mới bật Server

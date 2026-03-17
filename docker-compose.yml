@@ -1,0 +1,21 @@
+services:
+  legal-rag-app:
+    image: legal-rag-app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: legal-rag-app
+    ports:
+      - "8501:8501"
+    environment:
+      - PROJECT_ROOT=/app
+      - DATA_DIR=/app/data/final
+      - INDEX_DIR=/app/outputs/indexes/faiss
+      - LOGS_DIR=/app/logs
+      - EMBEDDING_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+      - RETRIEVAL_TOP_K=5
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+      - ./logs:/app/logs
+    restart: unless-stopped

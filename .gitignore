@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+.env
+
+# macOS
+.DS_Store
+
+# Runtime artifacts
+logs/*.log
+outputs/indexes/faiss/*.index
+outputs/indexes/faiss/*metadata*.json
+cache/
+
+# Editor
+.vscode/
+.idea/

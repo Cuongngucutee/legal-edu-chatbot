@@ -2,7 +2,7 @@
   "knowledge_graph": {
     "version": "2.0",
     "domain": "phap_luat_giao_duc_viet_nam",
-    "generated_from": "Final_data",
+    "generated_from": "/Users/manhcuong/work/legal-edu-chatbot/data/final",
     "entity_types": [
       "LegalDocument",
       "Article",

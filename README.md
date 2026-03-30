@@ -1,50 +1,56 @@
-# Legal Edu RAG (Retrieval Only)
+# Legal Knowledge Graph Full
 
-Du an hien tai da duoc don sach theo huong retrieval-only.
+Workspace nay da duoc toi gian de tap trung vao:
+- Xay dung `knowledge_graph_full.json` tu du lieu trong `data/final`
+- Test truy van/relevance tren do thi da build
 
-Giữ lại:
-- Nap du lieu luat tu `data/final`
-- Build embedding + FAISS index
-- Truy xuat top-k dieu khoan lien quan
-- Streamlit UI de kiem tra retrieval quality
-- Logging va retrieval trace
+## Cau truc hien tai
 
-Da loai bo:
-- Tat ca thanh phan sinh cau tra loi bang model LLM
-- Ollama service, script pull model, cache model
+- `data/final`: du lieu luat JSON dau vao (giu nguyen)
+- `scripts/build_knowledge_graph.py`: build KG full
+- `scripts/test_graphrag_kg_full.py`: test truy van tren KG full
+- `outputs/knowledge_graph/knowledge_graph_full.json`: file KG output
 
-## 1. Chay Nhanh
+## Chay nhanh
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-export PYTHONPATH=src
-python scripts/build_faiss_index.py
-streamlit run src/app/ui/streamlit_app.py
-```
-
-Mo UI: `http://localhost:8501`
-
-## 2. Chay Bang Docker
+Khong can thu vien ngoai cho 2 script hien tai (chi dung Python standard library).
 
 ```bash
-docker compose up -d --build
+python scripts/build_knowledge_graph.py
+python scripts/test_graphrag_kg_full.py
 ```
 
-Lan sau khong can build lai:
+## Benchmark va cham diem tu dong
+
+- Bo benchmark mac dinh: `benchmarks/kg_query_benchmark.json`
+- Script danh gia: `scripts/evaluate_kg_benchmark.py`
+
+Chay danh gia tong the:
 
 ```bash
-docker compose up -d
+python scripts/evaluate_kg_benchmark.py
 ```
 
-## 3. Logging
+Chi hien thi case fail:
 
-- Runtime log: `logs/app.log`
-- Retrieval trace: `logs/retrieval_trace.log`
+```bash
+python scripts/evaluate_kg_benchmark.py --fail-only
+```
 
-Moi trace gom:
-- timestamp
-- question
-- elapsed_ms
-- danh sach top-k chunks (source/article/score/text)
+Xuat report JSON de theo doi qua cac lan tinh chinh:
+
+```bash
+python scripts/evaluate_kg_benchmark.py --json-output outputs/benchmark/benchmark_report.json
+```
+
+Test voi cau hoi tuy chinh:
+
+```bash
+python scripts/test_graphrag_kg_full.py --question "Ai co tham quyen quy dinh chi tiet ve van bang, chung chi?" --top-k 5
+```
+
+In ket qua JSON:
+
+```bash
+python scripts/test_graphrag_kg_full.py --json
+```

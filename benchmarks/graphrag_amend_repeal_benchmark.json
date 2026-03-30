@@ -1,0 +1,294 @@
+{
+  "name": "graphrag-amend-repeal-benchmark-v1",
+  "description": "Benchmark 20 cau hoi tap trung vao sua doi, bo sung, bai bo de danh gia GraphRAG theo 4 nhom cau hoi.",
+  "top_k": 7,
+  "evaluation_matrix": [
+    {
+      "question_type": "single-hop",
+      "primary_metric": "precision_recall_entity",
+      "why_important": "Kiem tra truy xuat dung dieu sua doi/bo sung cu the."
+    },
+    {
+      "question_type": "multi-hop",
+      "primary_metric": "path_accuracy",
+      "why_important": "Kiem tra kha nang noi ket nhieu dieu trong chuoi sua doi, bai bo."
+    },
+    {
+      "question_type": "tong_hop",
+      "primary_metric": "faithfulness",
+      "why_important": "Dam bao tom tat ve noi dung sua doi bám sat nguon luat."
+    },
+    {
+      "question_type": "tinh_huong",
+      "primary_metric": "context_relevance",
+      "why_important": "Danh gia kha nang hieu y dinh thuc te khi tra cuu dieu sua doi/bai bo."
+    }
+  ],
+  "cases": [
+    {
+      "id": "SHA01",
+      "question_type": "single-hop",
+      "question": "Dieu nao sua doi, bo sung mot so dieu cua Luat Giao duc dai hoc trong Luat 34/2018/QH14?",
+      "gold": [
+        {
+          "article_number": "1",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục đại học"
+        }
+      ]
+    },
+    {
+      "id": "SHA02",
+      "question_type": "single-hop",
+      "question": "Dieu nao sua doi, bo sung mot so dieu cua Luat Giao duc nghe nghiep theo Luat 43/2019/QH14?",
+      "gold": [
+        {
+          "article_number": "113",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục nghề nghiệp"
+        }
+      ]
+    },
+    {
+      "id": "SHA03",
+      "question_type": "single-hop",
+      "question": "Trong Luat 73/2025/QH15, dieu nao sua doi, bo sung Dieu 66 cua Luat Bao hiem xa hoi so 41/2024/QH15?",
+      "gold": [
+        {
+          "article_number": "40",
+          "title_contains": "Sửa đổi, bổ sung Điều 66 của Luật Bảo hiểm xã hội"
+        }
+      ]
+    },
+    {
+      "id": "SHA04",
+      "question_type": "single-hop",
+      "question": "Dieu 76 trong Luat Giao duc nghe nghiep 2014 quy dinh noi dung sua doi, bo sung nao?",
+      "gold": [
+        {
+          "article_number": "76",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục"
+        }
+      ]
+    },
+    {
+      "id": "SHA05",
+      "question_type": "single-hop",
+      "question": "Dieu 77 trong Luat Giao duc nghe nghiep 2014 sua doi, bo sung van ban nao?",
+      "gold": [
+        {
+          "article_number": "77",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục đại học"
+        }
+      ]
+    },
+    {
+      "id": "SHA06",
+      "question_type": "single-hop",
+      "question": "Dieu 1 cua Luat 123/2025/QH15 sua doi, bo sung van ban nao?",
+      "gold": [
+        {
+          "article_number": "1",
+          "title_contains": "Điều 1. Sửa đổi, bổ sung một số điều của Luật Giáo dục"
+        }
+      ]
+    },
+    {
+      "id": "MHA01",
+      "question_type": "multi-hop",
+      "question": "Nhung dieu nao trong Luat Giao duc nghe nghiep 2014 dong vai tro sua doi, bo sung Luat Giao duc va Luat Giao duc dai hoc?",
+      "requires_all_gold": true,
+      "gold": [
+        {
+          "article_number": "76",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục"
+        },
+        {
+          "article_number": "77",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục đại học"
+        }
+      ]
+    },
+    {
+      "id": "MHA02",
+      "question_type": "multi-hop",
+      "question": "Hay lien ket cac quy dinh sua doi Luat Giao duc dai hoc qua hai moc 2018 va 2014, do la nhung dieu nao?",
+      "requires_all_gold": true,
+      "gold": [
+        {
+          "article_number": "1",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục đại học"
+        },
+        {
+          "article_number": "77",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục đại học"
+        }
+      ]
+    },
+    {
+      "id": "MHA03",
+      "question_type": "multi-hop",
+      "question": "Trong nhom quy dinh sua doi, dieu nao tac dong den Dieu 32 va Dieu 33 (sach giao khoa va co so giao duc pho thong)?",
+      "requires_all_gold": true,
+      "gold": [
+        {
+          "article_number": "113",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục nghề nghiệp"
+        }
+      ]
+    },
+    {
+      "id": "MHA04",
+      "question_type": "multi-hop",
+      "question": "Neu can tra cuu ca sua doi Luat Giao duc va sua doi Bao hiem xa hoi trong bo du lieu hien tai, can den nhung dieu nao?",
+      "requires_all_gold": true,
+      "gold": [
+        {
+          "article_number": "1",
+          "title_contains": "Điều 1. Sửa đổi, bổ sung một số điều của Luật Giáo dục"
+        },
+        {
+          "article_number": "40",
+          "title_contains": "Sửa đổi, bổ sung Điều 66 của Luật Bảo hiểm xã hội"
+        }
+      ]
+    },
+    {
+      "id": "MHA05",
+      "question_type": "multi-hop",
+      "question": "Nhung dieu nao vua co quan he dan chieu den cac dieu khac, vua co tac dong den dieu khac trong nhom sua doi, bo sung?",
+      "requires_all_gold": true,
+      "gold": [
+        {
+          "article_number": "1",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục"
+        },
+        {
+          "article_number": "1",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục đại học"
+        },
+        {
+          "article_number": "76",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục"
+        },
+        {
+          "article_number": "77",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục đại học"
+        },
+        {
+          "article_number": "113",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục nghề nghiệp"
+        }
+      ]
+    },
+    {
+      "id": "THA01",
+      "question_type": "tong_hop",
+      "question": "Tom tat cac quy dinh sua doi, bo sung lien quan den Luat Giao duc dai hoc trong bo du lieu hien tai.",
+      "gold": [
+        {
+          "article_number": "1",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục đại học"
+        },
+        {
+          "article_number": "77",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục đại học"
+        }
+      ]
+    },
+    {
+      "id": "THA02",
+      "question_type": "tong_hop",
+      "question": "Tom tat nhom dieu sua doi, bo sung lien quan den Luat Giao duc trong cac van ban duoc index.",
+      "gold": [
+        {
+          "article_number": "1",
+          "title_contains": "Điều 1. Sửa đổi, bổ sung một số điều của Luật Giáo dục"
+        },
+        {
+          "article_number": "76",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục"
+        }
+      ]
+    },
+    {
+      "id": "THA03",
+      "question_type": "tong_hop",
+      "question": "Tom tat quy dinh sua doi trong Luat 43/2019/QH14 co tac dong den cac dieu 32 va 33.",
+      "gold": [
+        {
+          "article_number": "113",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục nghề nghiệp"
+        }
+      ]
+    },
+    {
+      "id": "THA04",
+      "question_type": "tong_hop",
+      "question": "Tom tat quy dinh sua doi, bo sung Dieu 66 cua Luat Bao hiem xa hoi trong bo du lieu.",
+      "gold": [
+        {
+          "article_number": "40",
+          "title_contains": "Sửa đổi, bổ sung Điều 66 của Luật Bảo hiểm xã hội"
+        }
+      ]
+    },
+    {
+      "id": "THA05",
+      "question_type": "tong_hop",
+      "question": "Tong hop cac dieu co vai tro sua doi, bo sung va dong thoi co quan he bai bo trong KG.",
+      "gold": [
+        {
+          "article_number": "76",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục"
+        },
+        {
+          "article_number": "77",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục đại học"
+        }
+      ]
+    },
+    {
+      "id": "TGA01",
+      "question_type": "tinh_huong",
+      "question": "Toi can tim dieu phap ly de xac dinh viec bai bo lien quan den Dieu 11 trong nhom sua doi Luat Giao duc dai hoc. Can tra dieu nao?",
+      "gold": [
+        {
+          "article_number": "77",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục đại học"
+        }
+      ]
+    },
+    {
+      "id": "TGA02",
+      "question_type": "tinh_huong",
+      "question": "Don vi nghiep vu can doi chieu thong tin bai bo lien quan den Dieu 30 va Dieu 32 trong nhom sua doi Luat Giao duc. Nen tra cuu dieu nao?",
+      "gold": [
+        {
+          "article_number": "76",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục"
+        }
+      ]
+    },
+    {
+      "id": "TGA03",
+      "question_type": "tinh_huong",
+      "question": "Mot nhom nghien cuu muon tim dieu sua doi lien quan truc tiep den Dieu 66 Bao hiem xa hoi de danh gia tac dong lien nganh. Can tra dieu nao?",
+      "gold": [
+        {
+          "article_number": "40",
+          "title_contains": "Sửa đổi, bổ sung Điều 66 của Luật Bảo hiểm xã hội"
+        }
+      ]
+    },
+    {
+      "id": "TGA04",
+      "question_type": "tinh_huong",
+      "question": "Toi can tim dieu sua doi, bo sung Luat Giao duc nghe nghiep co lien he den cac dieu 32 va 33 de trich dan trong bao cao. Nen chon dieu nao?",
+      "gold": [
+        {
+          "article_number": "113",
+          "title_contains": "Sửa đổi, bổ sung một số điều của Luật Giáo dục nghề nghiệp"
+        }
+      ]
+    }
+  ]
+}

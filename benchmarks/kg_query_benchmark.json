@@ -43,7 +43,7 @@
       "gold": [
         {
           "article_number": "16",
-          "title_contains": "Hội đồng trường của trường đại học công lập"
+          "title_contains": "Hội đồng trường"
         }
       ]
     },
@@ -94,23 +94,79 @@
     {
       "id": "MH01",
       "question_type": "multi-hop",
-      "question": "Nếu một trường đại học muốn mở ngành mới thì cần tra cứu điều nào về mở ngành và điều nào về chỉ tiêu, tổ chức tuyển sinh?",
+      "question": "Sự khác biệt về trình độ chuẩn được đào tạo giữa giáo viên mầm non và giáo viên tiểu học là gì? Cần liên kết từ khái niệm nhà giáo đến quy định chuẩn tương ứng.",
       "requires_all_gold": true,
       "gold": [
         {
-          "article_number": "33",
-          "title_contains": "Mở ngành, chuyên ngành đào tạo"
+          "article_number": "66",
+          "title_contains": "Vị trí, vai trò của nhà giáo"
         },
         {
-          "article_number": "34",
-          "title_contains": "Chỉ tiêu tuyển sinh và tổ chức tuyển sinh"
+          "article_number": "72",
+          "title_contains": "Trình độ chuẩn được đào tạo của nhà giáo"
         }
       ]
     },
     {
       "id": "MH02",
       "question_type": "multi-hop",
-      "question": "Để vận hành cơ sở giáo dục đại học theo cơ chế tự chủ và bảo đảm tài chính, cần tra cứu điều nào về quyền tự chủ và điều nào về nguồn tài chính?",
+      "question": "Người học có hoàn cảnh khó khăn có thể tiếp cận những cơ chế hỗ trợ tài chính nào theo luật hiện hành ?",
+      "requires_all_gold": true,
+      "gold": [
+        {
+          "article_number": "84",
+          "title_contains": "Tín dụng giáo dục"
+        },
+        {
+          "article_number": "85",
+          "title_contains": "Học bổng, trợ cấp xã hội , miễn, giảm học phí"
+        },
+        {
+          "article_number": "86",
+          "title_contains": "Miễn, giảm giá vé dịch vụ công cộng cho học sinh, sinh viên"
+        }
+      ]
+    },
+    {
+      "id": "MH03",
+      "question_type": "multi-hop",
+      "question": "Nếu cần đánh giá toàn diện vị thế pháp lý của người học, phải đối chiếu những điều nào về nhiệm vụ và quyền để so sánh hai chiều trách nhiệm - quyền lợi?",
+      "requires_all_gold": true,
+      "gold": [
+        {
+          "article_number": "82",
+          "title_contains": "Nhiệm vụ của người học"
+        },
+        {
+          "article_number": "83",
+          "title_contains": "Quyền của người học"
+        }
+      ]
+    },
+    {
+      "id": "MH04",
+      "question_type": "multi-hop",
+      "question": "Khi mời giảng viên thỉnh giảng, cần đi qua các điều nào để kiểm tra tiêu chuẩn đầu vào và nhóm nhiệm vụ phải thực hiện?",
+      "requires_all_gold": true,
+      "gold": [
+        {
+          "article_number": "71",
+          "title_contains": "Thỉnh giảng"
+        },
+        {
+          "article_number": "67",
+          "title_contains": "Tiêu chuẩn của nhà giáo"
+        },
+        {
+          "article_number": "69",
+          "title_contains": "Nhiệm vụ của nhà giáo"
+        }
+      ]
+    },
+    {
+      "id": "MH05",
+      "question_type": "multi-hop",
+      "question": "Để phân tích cơ chế tự chủ đại học gắn với thực thi quản trị, cần kết nối điều nào về quyền tự chủ, điều nào về chính sách của Nhà nước và điều nào về vai trò hội đồng trường công lập?",
       "requires_all_gold": true,
       "gold": [
         {
@@ -118,52 +174,8 @@
           "title_contains": "Quyền tự chủ của cơ sở giáo dục đại học"
         },
         {
-          "article_number": "64",
-          "title_contains": "Nguồn tài chính của cơ sở giáo dục đại học"
-        }
-      ]
-    },
-    {
-      "id": "MH03",
-      "question_type": "multi-hop",
-      "question": "Khi thiết kế chương trình và triển khai đào tạo, điều nào quy định về chương trình, giáo trình và điều nào quy định về tổ chức, quản lý đào tạo?",
-      "requires_all_gold": true,
-      "gold": [
-        {
-          "article_number": "36",
-          "title_contains": "Chương trình, giáo trình giáo dục đại học"
-        },
-        {
-          "article_number": "37",
-          "title_contains": "Tổ chức và quản lý đào tạo"
-        }
-      ]
-    },
-    {
-      "id": "MH04",
-      "question_type": "multi-hop",
-      "question": "Việc thành lập cơ sở giáo dục đại học và thủ tục, thẩm quyền thực hiện được quy định ở những điều nào?",
-      "requires_all_gold": true,
-      "gold": [
-        {
-          "article_number": "22",
-          "title_contains": "Điều kiện thành lập hoặc cho phép thành lập cơ sở giáo dục đại học"
-        },
-        {
-          "article_number": "27",
-          "title_contains": "Thủ tục và thẩm quyền thành lập hoặc cho phép thành lập"
-        }
-      ]
-    },
-    {
-      "id": "MH05",
-      "question_type": "multi-hop",
-      "question": "Trong quản trị trường đại học công lập, cần tra cứu điều nào về cơ cấu tổ chức và điều nào về hội đồng trường?",
-      "requires_all_gold": true,
-      "gold": [
-        {
-          "article_number": "14",
-          "title_contains": "Cơ cấu tổ chức của trường đại học"
+          "article_number": "12",
+          "title_contains": "Chính sách của Nhà nước về phát triển giáo dục đại học"
         },
         {
           "article_number": "16",

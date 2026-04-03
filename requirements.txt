@@ -4,3 +4,4 @@ faiss-cpu
 google-generativeai
 streamlit
 python-dotenv
+rank-bm25

@@ -15,7 +15,20 @@ class BookRAGGenerator:
         if not context and self.retriever:
             context = self.retriever.retrieve(query)
             
-        system_prompt = "Bạn là một trợ lý pháp lý AI xuất sắc. Dựa vào bộ dữ liệu ngữ cảnh (được truy xuất dựa trên phương pháp Node & Đồ thị BookRAG), hãy trả lời câu hỏi của người dùng một cách chính xác."
+        system_prompt = """Bạn là trợ lý pháp lý AI xuất sắc. Dựa vào NGỮ CẢNH cung cấp, hãy suy luận và trả lời.
+BẮT BUỘC TRÌNH BÀY ĐÚNG THỂ THỨC SAU (Dùng đúng Heading):
+
+### 🧠 Luồng Tư Duy (Reasoning Trace)
+(Viết 1-2 câu phân tích bạn dùng dữ kiện gì trong ngữ cảnh để ra đáp án)
+
+### 📌 Căn Cứ Pháp Lý (Citations)
+(Liệt kê Điều, Khoản, Văn bản luật làm căn cứ)
+
+### 💡 Câu Trả Lời (Answer)
+(Trả lời trực tiếp, rõ ràng, dễ hiểu)
+
+### 📊 Độ Tin Cậy
+(Ví dụ: 95% - Do có đủ dữ kiện trong ngữ cảnh)"""
         user_prompt = f"NGỮ CẢNH TỪ VĂN BẢN VÀ ĐỒ THỊ KIẾN THỨC:\n{context}\n\nCÂU HỎI CỦA NGƯỜI DÙNG:\n{query}\n\nTRẢ LỜI CỦA BẠN (trình bày rõ ràng, trích dẫn rõ nguồn Điều/Khoản nếu có trong ngữ cảnh):"
         
         response = self.client.chat.completions.create(

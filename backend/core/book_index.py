@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import string
 import unicodedata
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
@@ -9,6 +10,7 @@ import faiss
 import networkx as nx
 import numpy as np
 from sentence_transformers import SentenceTransformer
+from rank_bm25 import BM25Okapi
 
 class BookIndex:
     def __init__(self, data_dir: str, kg_path: str, embed_model_name: str = "namnguyenba2003/Vietnamese_Law_Embedding_finetuned_v3_256dims"):
@@ -26,6 +28,15 @@ class BookIndex:
         # Vector index for nodes
         self.faiss_index = faiss.IndexFlatIP(self.embed_dim) # Inner product (Cosine sim if normalized)
         self.node_mapping = {} # index in faiss -> node_id
+        
+        # Lexical (BM25) index
+        self.bm25_index = None
+        self.bm25_nodes = [] # align with BM25 corpus
+
+    def _tokenize(self, text: str) -> List[str]:
+        text = text.lower()
+        text = text.translate(str.maketrans('', '', string.punctuation))
+        return text.split()
         
     def _slug(self, text: str) -> str:
         text = str(text).lower().strip()
@@ -160,13 +171,19 @@ class BookIndex:
         if not texts_to_embed:
             return
             
+        print(" -> Generating Dense Embeddings (FAISS)...")
         embeddings = self.encoder.encode(texts_to_embed, show_progress_bar=True, normalize_embeddings=True)
         embeddings = np.array(embeddings).astype('float32')
         
         self.faiss_index.add(embeddings)
         self.node_mapping = {i: node_id for i, node_id in enumerate(nodes_to_embed)}
         
-        print(f"Added {len(nodes_to_embed)} nodes to the Vector Index.")
+        print(" -> Generating Lexical Embeddings (BM25)...")
+        tokenized_corpus = [self._tokenize(doc) for doc in texts_to_embed]
+        self.bm25_index = BM25Okapi(tokenized_corpus)
+        self.bm25_nodes = nodes_to_embed
+        
+        print(f"Added {len(nodes_to_embed)} nodes to the Hybrid Index (FAISS + BM25).")
 
 if __name__ == "__main__":
     import sys

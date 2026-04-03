@@ -1,0 +1,1430 @@
+[
+  {
+    "concept": "đại học",
+    "node_id": "concept:đại học",
+    "in_degree": 798,
+    "out_degree": 0,
+    "total_connections": 798,
+    "connected_chunks_count": 798,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D3",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K1",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K2",
+        "relation": "DEFINES"
+      }
+    ]
+  },
+  {
+    "concept": "giáo dục đại học",
+    "node_id": "concept:giáo dục đại học",
+    "in_degree": 623,
+    "out_degree": 0,
+    "total_connections": 623,
+    "connected_chunks_count": 623,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D3",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K1",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K2",
+        "relation": "DEFINES"
+      }
+    ]
+  },
+  {
+    "concept": "giáo dục nghề nghiệp",
+    "node_id": "concept:giáo dục nghề nghiệp",
+    "in_degree": 478,
+    "out_degree": 0,
+    "total_connections": 478,
+    "connected_chunks_count": 478,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật123_D1_Mod_D6",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật123_D1_Mod_D12_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D1_Mod_D28",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D1_Mod_D34_K2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D1_Mod_D44",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "cơ sở giáo dục đại học",
+    "node_id": "concept:cơ sở giáo dục đại học",
+    "in_degree": 466,
+    "out_degree": 0,
+    "total_connections": 466,
+    "connected_chunks_count": 466,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D3",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K1",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K2",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K7",
+        "relation": "DEFINES"
+      }
+    ]
+  },
+  {
+    "concept": "nhà giáo",
+    "node_id": "concept:nhà giáo",
+    "in_degree": 411,
+    "out_degree": 0,
+    "total_connections": 411,
+    "connected_chunks_count": 411,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D55_K8",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D58_K3",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D1_Mod_D66_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D1_Mod_D66_K1_Pa",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật123_D1_Mod_D66_K1_Pb",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "người học",
+    "node_id": "concept:người học",
+    "in_degree": 308,
+    "out_degree": 0,
+    "total_connections": 308,
+    "connected_chunks_count": 308,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K2",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K5",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K6",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D5_K1",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "cao đẳng",
+    "node_id": "concept:cao đẳng",
+    "in_degree": 190,
+    "out_degree": 0,
+    "total_connections": 190,
+    "connected_chunks_count": 190,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K2",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K8",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2_Pa",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "công lập",
+    "node_id": "concept:công lập",
+    "in_degree": 187,
+    "out_degree": 0,
+    "total_connections": 187,
+    "connected_chunks_count": 187,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D7_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D7_K2_Pa",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D14_K1",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D16_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D20_K2",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "chương trình đào tạo",
+    "node_id": "concept:chương trình đào tạo",
+    "in_degree": 178,
+    "out_degree": 0,
+    "total_connections": 178,
+    "connected_chunks_count": 178,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D4_K1",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K2",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K6",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D19_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D19_K1_Pc",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "kiểm định chất lượng",
+    "node_id": "concept:kiểm định chất lượng",
+    "in_degree": 148,
+    "out_degree": 0,
+    "total_connections": 148,
+    "connected_chunks_count": 148,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D9_K3",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D9_K3_Pđ",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D28_K6",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D31_K1",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "hiệu trưởng",
+    "node_id": "concept:hiệu trưởng",
+    "in_degree": 139,
+    "out_degree": 0,
+    "total_connections": 139,
+    "connected_chunks_count": 139,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D14_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D14_K1_Pb",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D16_K3",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D16_K3_Pa",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D16_K4",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "giảng viên",
+    "node_id": "concept:giảng viên",
+    "in_degree": 133,
+    "out_degree": 0,
+    "total_connections": 133,
+    "connected_chunks_count": 133,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D11_K3",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D11_K3_Pc",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D12_K6",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D12_K7",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "hội đồng trường",
+    "node_id": "concept:hội đồng trường",
+    "in_degree": 132,
+    "out_degree": 0,
+    "total_connections": 132,
+    "connected_chunks_count": 132,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D14_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D14_K1_Pa",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D16_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D16_K2",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D16_K2_Pa",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "tài chính",
+    "node_id": "concept:tài chính",
+    "in_degree": 131,
+    "out_degree": 0,
+    "total_connections": 131,
+    "connected_chunks_count": 131,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D8_K2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D17_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D17_K2_Pd",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D20_K4",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "tư thục",
+    "node_id": "concept:tư thục",
+    "in_degree": 124,
+    "out_degree": 0,
+    "total_connections": 124,
+    "connected_chunks_count": 124,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D4_K7",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D7_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D7_K2_Pb",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D9_K5",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D12_K3",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "trường đại học",
+    "node_id": "concept:trường đại học",
+    "in_degree": 112,
+    "out_degree": 0,
+    "total_connections": 112,
+    "connected_chunks_count": 112,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K8",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D7_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D7_K1_Pb",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D9_K5",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "nghiên cứu khoa học",
+    "node_id": "concept:nghiên cứu khoa học",
+    "in_degree": 103,
+    "out_degree": 0,
+    "total_connections": 103,
+    "connected_chunks_count": 103,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K8",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D5_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D5_K1_Pa",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "giáo dục phổ thông",
+    "node_id": "concept:giáo dục phổ thông",
+    "in_degree": 101,
+    "out_degree": 0,
+    "total_connections": 101,
+    "connected_chunks_count": 101,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật123_D1_Mod_D28",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D1_Mod_D32_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D1_Mod_D32_K1_Pa",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật123_D1_Mod_D32_K1_Pb",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D1_Mod_D32_K1_Pd",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "hợp tác quốc tế",
+    "node_id": "concept:hợp tác quốc tế",
+    "in_degree": 86,
+    "out_degree": 0,
+    "total_connections": 86,
+    "connected_chunks_count": 86,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D16_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D16_K2_Pb",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D17_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D17_K2_Pc",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "lĩnh vực",
+    "node_id": "concept:lĩnh vực",
+    "in_degree": 83,
+    "out_degree": 0,
+    "total_connections": 83,
+    "connected_chunks_count": 83,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D4_K3",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K8",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2_Pc",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D8_K1",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "tuyển sinh",
+    "node_id": "concept:tuyển sinh",
+    "in_degree": 81,
+    "out_degree": 0,
+    "total_connections": 81,
+    "connected_chunks_count": 81,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D34_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D34_K1_Pa",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D34_K1_Pb",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D34_K1_Pc",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D34_K2",
+        "relation": "DEFINES"
+      }
+    ]
+  },
+  {
+    "concept": "tài sản",
+    "node_id": "concept:tài sản",
+    "in_degree": 75,
+    "out_degree": 0,
+    "total_connections": 75,
+    "connected_chunks_count": 75,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K7",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D17_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D17_K2_Pd",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D20_K4",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "văn bằng",
+    "node_id": "concept:văn bằng",
+    "in_degree": 73,
+    "out_degree": 0,
+    "total_connections": 73,
+    "connected_chunks_count": 73,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D31_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D38_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D38_K1_Pa",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D38_K1_Pb",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D38_K1_Pc",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "tự chủ",
+    "node_id": "concept:tự chủ",
+    "in_degree": 71,
+    "out_degree": 0,
+    "total_connections": 71,
+    "connected_chunks_count": 71,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D14_K4",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D20_K4",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D32_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D32_K2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D33_K2",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "hội đồng đại học",
+    "node_id": "concept:hội đồng đại học",
+    "in_degree": 66,
+    "out_degree": 0,
+    "total_connections": 66,
+    "connected_chunks_count": 66,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D8_K3",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D15_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D18_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D18_K1_Pa",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D18_K1_Pb",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "giáo dục thường xuyên",
+    "node_id": "concept:giáo dục thường xuyên",
+    "in_degree": 64,
+    "out_degree": 0,
+    "total_connections": 64,
+    "connected_chunks_count": 64,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D4_K2",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D6_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D35_K3",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D36_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D36_K1_Pe",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "chứng chỉ",
+    "node_id": "concept:chứng chỉ",
+    "in_degree": 62,
+    "out_degree": 0,
+    "total_connections": 62,
+    "connected_chunks_count": 62,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D31_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D45_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D68_K3",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D71_K4",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D1_Mod_D12_K3",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "học phí",
+    "node_id": "concept:học phí",
+    "in_degree": 59,
+    "out_degree": 0,
+    "total_connections": 59,
+    "connected_chunks_count": 59,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D62_K2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D64_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D65_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D65_K2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D65_K3",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "giáo dục mầm non",
+    "node_id": "concept:giáo dục mầm non",
+    "in_degree": 59,
+    "out_degree": 0,
+    "total_connections": 59,
+    "connected_chunks_count": 59,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật123_D1_Mod_D14",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D66b_K2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D66b_K31",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D66b_K31_Pc",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật123_D2_K1",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "tiến sĩ",
+    "node_id": "concept:tiến sĩ",
+    "in_degree": 57,
+    "out_degree": 0,
+    "total_connections": 57,
+    "connected_chunks_count": 57,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2_Pd",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D6_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D7_K1",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "giám đốc",
+    "node_id": "concept:giám đốc",
+    "in_degree": 56,
+    "out_degree": 0,
+    "total_connections": 56,
+    "connected_chunks_count": 56,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D8_K2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D8_K3",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D14_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D14_K1_Pb",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D15_K2",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "chuyên ngành",
+    "node_id": "concept:chuyên ngành",
+    "in_degree": 50,
+    "out_degree": 0,
+    "total_connections": 50,
+    "connected_chunks_count": 50,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D4_K3",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K4",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2_Pc",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D19_K1",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "cán bộ quản lý giáo dục",
+    "node_id": "concept:cán bộ quản lý giáo dục",
+    "in_degree": 46,
+    "out_degree": 0,
+    "total_connections": 46,
+    "connected_chunks_count": 46,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D11_K3",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D11_K3_Pc",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D61_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D66_K3",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D66_K3_Pa",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "sinh viên",
+    "node_id": "concept:sinh viên",
+    "in_degree": 43,
+    "out_degree": 0,
+    "total_connections": 43,
+    "connected_chunks_count": 43,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D5_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2_Pa",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2_Pb",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D23_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D23_K1_Pb",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "ngành đào tạo",
+    "node_id": "concept:ngành đào tạo",
+    "in_degree": 40,
+    "out_degree": 0,
+    "total_connections": 40,
+    "connected_chunks_count": 40,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D4_K3",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K4",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D4_K5",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D19_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D19_K1_Pc",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "ngân sách nhà nước",
+    "node_id": "concept:ngân sách nhà nước",
+    "in_degree": 40,
+    "out_degree": 0,
+    "total_connections": 40,
+    "connected_chunks_count": 40,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D9_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D9_K5",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D12_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D64_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D66_K2",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "học viện",
+    "node_id": "concept:học viện",
+    "in_degree": 39,
+    "out_degree": 0,
+    "total_connections": 39,
+    "connected_chunks_count": 39,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D7_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D7_K1_Pb",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D11_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D14_K1",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "không vì lợi nhuận",
+    "node_id": "concept:không vì lợi nhuận",
+    "in_degree": 39,
+    "out_degree": 0,
+    "total_connections": 39,
+    "connected_chunks_count": 39,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D4_K7",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D12_K3",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật34_D1_sub7_K2",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật34_D1_sub7_K2_Pb",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật34_D1_sub7_K5",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "thạc sĩ",
+    "node_id": "concept:thạc sĩ",
+    "in_degree": 39,
+    "out_degree": 0,
+    "total_connections": 39,
+    "connected_chunks_count": 39,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D5_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2_Pc",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D6_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D20_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D20_K2_Pb",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "trách nhiệm giải trình",
+    "node_id": "concept:trách nhiệm giải trình",
+    "in_degree": 37,
+    "out_degree": 0,
+    "total_connections": 37,
+    "connected_chunks_count": 37,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật123_D66b_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật34_D1_sub4_K11",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật34_D1_sub4_K12",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật34_D1_sub12_K5",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật34_D1_sub16_K2",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "quyền tự chủ",
+    "node_id": "concept:quyền tự chủ",
+    "in_degree": 33,
+    "out_degree": 0,
+    "total_connections": 33,
+    "connected_chunks_count": 33,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D20_K4",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D32_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D32_K2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D53",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật34_D1_sub4_K11",
+        "relation": "DEFINES"
+      }
+    ]
+  },
+  {
+    "concept": "tín chỉ",
+    "node_id": "concept:tín chỉ",
+    "in_degree": 26,
+    "out_degree": 0,
+    "total_connections": 26,
+    "connected_chunks_count": 26,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D35_K2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D37_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D38_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D38_K1_Pa",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D38_K1_Pb",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "liên thông",
+    "node_id": "concept:liên thông",
+    "in_degree": 23,
+    "out_degree": 0,
+    "total_connections": 23,
+    "connected_chunks_count": 23,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D4_K5",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D28_K3",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D33_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D33_K1_Pd",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D36_K1",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "đại học quốc gia",
+    "node_id": "concept:đại học quốc gia",
+    "in_degree": 10,
+    "out_degree": 0,
+    "total_connections": 10,
+    "connected_chunks_count": 10,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D7_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D7_K1_Pc",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D8_K1",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D8_K2",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "giáo dục chính quy",
+    "node_id": "concept:giáo dục chính quy",
+    "in_degree": 8,
+    "out_degree": 0,
+    "total_connections": 8,
+    "connected_chunks_count": 8,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D4_K1",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật08_D6_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D35_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D35_K3",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D36_K1",
+        "relation": "MENTIONS"
+      }
+    ]
+  },
+  {
+    "concept": "nghiên cứu sinh",
+    "node_id": "concept:nghiên cứu sinh",
+    "in_degree": 8,
+    "out_degree": 0,
+    "total_connections": 8,
+    "connected_chunks_count": 8,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D5_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D5_K2_Pd",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D36_K1",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D36_K1_Pb",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D38_K1",
+        "relation": "REGULATES"
+      }
+    ]
+  },
+  {
+    "concept": "đại học vùng",
+    "node_id": "concept:đại học vùng",
+    "in_degree": 5,
+    "out_degree": 0,
+    "total_connections": 5,
+    "connected_chunks_count": 5,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D2",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D7_K1",
+        "relation": "REGULATES"
+      },
+      {
+        "chunk_id": "Luật08_D7_K1_Pc",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật08_D29_K2",
+        "relation": "MENTIONS"
+      },
+      {
+        "chunk_id": "Luật34_D1_sub7_K1",
+        "relation": "DEFINES"
+      }
+    ]
+  },
+  {
+    "concept": "đào tạo từ xa",
+    "node_id": "concept:đào tạo từ xa",
+    "in_degree": 2,
+    "out_degree": 0,
+    "total_connections": 2,
+    "connected_chunks_count": 2,
+    "sample_chunks": [
+      {
+        "chunk_id": "Luật08_D4_K2",
+        "relation": "DEFINES"
+      },
+      {
+        "chunk_id": "Luật34_D1_sub6_K2",
+        "relation": "MENTIONS"
+      }
+    ]
+  }
+]

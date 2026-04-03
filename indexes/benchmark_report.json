@@ -1,0 +1,251 @@
+{
+  "total_questions": 12,
+  "avg_precision": 0.685515873015873,
+  "avg_recall": 0.8541666666666666,
+  "avg_keyword_coverage": 0.9583333333333334,
+  "intent_accuracy": 0.75,
+  "avg_retrieval_time_ms": 543.5977975527445,
+  "avg_total_time_ms": 517.1829064687093,
+  "avg_confidence": 0.5,
+  "results_by_category": {
+    "definition": {
+      "count": 4,
+      "avg_precision": 0.2232142857142857,
+      "avg_recall": 0.6875,
+      "avg_keyword_coverage": 1.0,
+      "intent_accuracy": 1.0
+    },
+    "condition": {
+      "count": 3,
+      "avg_precision": 0.7777777777777778,
+      "avg_recall": 0.9166666666666666,
+      "avg_keyword_coverage": 1.0,
+      "intent_accuracy": 0.3333333333333333
+    },
+    "procedure": {
+      "count": 1,
+      "avg_precision": 1.0,
+      "avg_recall": 1.0,
+      "avg_keyword_coverage": 1.0,
+      "intent_accuracy": 1.0
+    },
+    "comparison": {
+      "count": 1,
+      "avg_precision": 1.0,
+      "avg_recall": 0.75,
+      "avg_keyword_coverage": 0.5,
+      "intent_accuracy": 1.0
+    },
+    "general": {
+      "count": 3,
+      "avg_precision": 1.0,
+      "avg_recall": 1.0,
+      "avg_keyword_coverage": 1.0,
+      "intent_accuracy": 0.6666666666666666
+    }
+  },
+  "individual_results": [
+    {
+      "question": "Giáo dục chính quy là gì?",
+      "intent_correct": true,
+      "precision_at_k": 0.3333333333333333,
+      "recall_at_k": 1.0,
+      "keyword_coverage": 1.0,
+      "confidence": 0.5,
+      "retrieval_time_ms": 438.0910396575928,
+      "total_time_ms": 335.10494232177734,
+      "retrieved_articles": [
+        "Điều 11",
+        "Điều 3",
+        "Điều 6",
+        "Điều 4",
+        "Điều 35",
+        "Điều 5"
+      ]
+    },
+    {
+      "question": "Cơ sở giáo dục đại học là gì?",
+      "intent_correct": true,
+      "precision_at_k": 0.25,
+      "recall_at_k": 0.75,
+      "keyword_coverage": 1.0,
+      "confidence": 0.5,
+      "retrieval_time_ms": 402.94504165649414,
+      "total_time_ms": 364.16006088256836,
+      "retrieved_articles": [
+        "Điều 12",
+        "Điều 10",
+        "Điều 4",
+        "Điều 7"
+      ]
+    },
+    {
+      "question": "Liên thông trong giáo dục là gì?",
+      "intent_correct": true,
+      "precision_at_k": 0.16666666666666666,
+      "recall_at_k": 0.5,
+      "keyword_coverage": 1.0,
+      "confidence": 0.5,
+      "retrieval_time_ms": 384.19032096862793,
+      "total_time_ms": 380.6262016296387,
+      "retrieved_articles": [
+        "Điều 8",
+        "Điều 6",
+        "Điều 9",
+        "Điều 4",
+        "Điều 1",
+        "Điều 10"
+      ]
+    },
+    {
+      "question": "Kiểm định chất lượng giáo dục là gì?",
+      "intent_correct": true,
+      "precision_at_k": 0.14285714285714285,
+      "recall_at_k": 0.5,
+      "keyword_coverage": 1.0,
+      "confidence": 0.5,
+      "retrieval_time_ms": 575.2158164978027,
+      "total_time_ms": 547.0728874206543,
+      "retrieved_articles": [
+        "Điều 67",
+        "Điều 53",
+        "Điều 52",
+        "Điều 111",
+        "Điều 51",
+        "Điều 49",
+        "Điều 5"
+      ]
+    },
+    {
+      "question": "Điều kiện thành lập trường đại học là gì?",
+      "intent_correct": false,
+      "precision_at_k": 0.3333333333333333,
+      "recall_at_k": 0.75,
+      "keyword_coverage": 1.0,
+      "confidence": 0.5,
+      "retrieval_time_ms": 641.787052154541,
+      "total_time_ms": 574.7818946838379,
+      "retrieved_articles": [
+        "Điều 49",
+        "Điều 16",
+        "Điều 22"
+      ]
+    },
+    {
+      "question": "Điều kiện để được tuyển sinh đại học?",
+      "intent_correct": true,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "keyword_coverage": 1.0,
+      "confidence": 0.5,
+      "retrieval_time_ms": 512.7391815185547,
+      "total_time_ms": 513.6702060699463,
+      "retrieved_articles": [
+        "Điều 29",
+        "Điều 34",
+        "Điều 65",
+        "Điều 33",
+        "Điều 87"
+      ]
+    },
+    {
+      "question": "Tiêu chuẩn của giảng viên đại học là gì?",
+      "intent_correct": false,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "keyword_coverage": 1.0,
+      "confidence": 0.5,
+      "retrieval_time_ms": 647.3658084869385,
+      "total_time_ms": 641.9961452484131,
+      "retrieved_articles": [
+        "Điều 54",
+        "Điều 16",
+        "Điều 39",
+        "Điều 56",
+        "Điều 20",
+        "Điều 68"
+      ]
+    },
+    {
+      "question": "Quy trình mở ngành đào tạo mới như thế nào?",
+      "intent_correct": true,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "keyword_coverage": 1.0,
+      "confidence": 0.5,
+      "retrieval_time_ms": 415.0357246398926,
+      "total_time_ms": 397.13215827941895,
+      "retrieved_articles": [
+        "Điều 33",
+        "Điều 6"
+      ]
+    },
+    {
+      "question": "So sánh quy định về tự chủ đại học giữa Luật 08/2012 và Luật 34/2018?",
+      "intent_correct": true,
+      "precision_at_k": 1.0,
+      "recall_at_k": 0.75,
+      "keyword_coverage": 0.5,
+      "confidence": 0.5,
+      "retrieval_time_ms": 495.55206298828125,
+      "total_time_ms": 491.95122718811035,
+      "retrieved_articles": [
+        "Điều 34",
+        "Điều 67",
+        "Điều 32",
+        "Điều 1",
+        "Điều 20"
+      ]
+    },
+    {
+      "question": "Quyền và nghĩa vụ của người học theo Luật Giáo dục được quy định như thế nào?",
+      "intent_correct": false,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "keyword_coverage": 1.0,
+      "confidence": 0.5,
+      "retrieval_time_ms": 628.4918785095215,
+      "total_time_ms": 594.9549674987793,
+      "retrieved_articles": [
+        "Điều 13",
+        "Điều 31",
+        "Điều 47",
+        "Điều 9",
+        "Điều 1",
+        "Điều 60"
+      ]
+    },
+    {
+      "question": "Hội đồng trường đại học có những quyền hạn gì?",
+      "intent_correct": true,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "keyword_coverage": 1.0,
+      "confidence": 0.5,
+      "retrieval_time_ms": 682.3329925537109,
+      "total_time_ms": 674.5772361755371,
+      "retrieved_articles": [
+        "Điều 18",
+        "Điều 17",
+        "Điều 16",
+        "Điều 31"
+      ]
+    },
+    {
+      "question": "Chính sách học phí và hỗ trợ tài chính cho sinh viên?",
+      "intent_correct": true,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "keyword_coverage": 1.0,
+      "confidence": 0.5,
+      "retrieval_time_ms": 699.4266510009766,
+      "total_time_ms": 690.1669502258301,
+      "retrieved_articles": [
+        "Điều 62",
+        "Điều 32",
+        "Điều 66b",
+        "Điều 85"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "total_nodes": 5553,
+  "total_edges": 12508,
+  "node_types": {
+    "chunk": 2490,
+    "clause": 1481,
+    "point": 890,
+    "article": 434,
+    "reference": 93,
+    "chapter": 53,
+    "concept": 48,
+    "section": 47,
+    "organization": 9,
+    "document": 8
+  },
+  "relation_types": {
+    "REGULATES": 3171,
+    "MENTIONS": 3170,
+    "PARENT_OF": 2905,
+    "CONTAINS": 2490,
+    "REFERENCES": 393,
+    "DEFINES": 344,
+    "POTENTIALLY_AMENDS": 35
+  },
+  "density": 0.00040570535645244077,
+  "weakly_connected_components": 1
+}

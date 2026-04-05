@@ -76,7 +76,7 @@ class LawCrawlerUltimate:
             print(f"❌ Lỗi trang {page_number}: {e}")
             return []
 
-    # 2. FIX HÀM RUN: Nhận vào start_page để chạy linh hoạt
+    # 2. 
     def run(self, start_page=60, max_page=65):
         output_dir = 'legal_data_json1'
         if not os.path.exists(output_dir): os.makedirs(output_dir)

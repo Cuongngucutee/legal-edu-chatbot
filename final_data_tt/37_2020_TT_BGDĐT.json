@@ -1,0 +1,269 @@
+[
+  {
+    "id": "37_2020_TT_BGDĐT_CAN_CU",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Căn cứ pháp lý",
+      "section": "",
+      "article_number": "CAN_CU",
+      "article_title": "Các căn cứ ban hành văn bản",
+      "is_base": true
+    },
+    "content": {
+      "full_text": "Căn cứ Luật Giao dịch điện tử ngày 29/11/2005;\nCăn cứ Luật Công nghệ thông tin ngày 29/6/2006;\nCăn cứ Nghị định số 69/2017/NĐ-CP ngày 25/5/2017 của Chính phủ quy định chức năng, nhiệm vụ, quyền hạn và cơ cấu tổ chức của Bộ Giáo dục và Đào tạo;\nCăn cứ Nghị định số 64/2007/NĐ-CP ngày 10/4/2007 của Chính phủ về Ứng dụng công nghệ thông tin trong hoạt động của cơ quan nhà nước;\nCăn cứ Nghị định số 43/2011/NĐ-CP ngày 13/6/2011 của Chính phủ về việc cung cấp thông tin và dịch vụ công trực tuyến trên trang thông tin điện tử hoặc cổng thông tin điện tử của cơ quan nhà nước;\nCăn cứ Nghị định số 72/2013/NĐ-CP ngày 15/7/2013 của Chính phủ về quản lý, cung cấp, sử dụng dịch vụ Internet và thông tin trên mạng; Nghị định số 27/2018/NĐ-CP sửa đổi, bổ sung một số điều của Nghị định số 72/2013/NĐ-CP ngày 15/7/2013 của Chính phủ về quản lý, cung cấp, sử dụng dịch vụ Internet và thông tin trên mạng;\nCăn cứ Chỉ thị số 34/2008/CT-TTg ngày 03/12/2008 về việc tăng cường sử dụng hệ thống thư điện tử trong hoạt động của cơ quan nhà nước ;\nTheo đề nghị của Cục trưởng Cục công nghệ thông tin,\nBộ trưởng Bộ Giáo dục và Đào tạo ban hành Thông tư quy định về tổ chức hoạt động, sử dụng thư điện tử và cổng thông tin điện tử tại sở giáo dục và đào tạo, phòng giáo dục và đào tạo và các cơ sở giáo dục mầm non, giáo dục phổ thông và giáo dục thường xuyên ."
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D1",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương I",
+      "section": "",
+      "article_number": "1",
+      "article_title": "Điều 1. Phạm vi điều chỉnh và đối tượng áp dụng"
+    },
+    "content": {
+      "full_text": "Điều 1. Phạm vi điều chỉnh và đối tượng áp dụng"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D2",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương I",
+      "section": "",
+      "article_number": "2",
+      "article_title": "Điều 2. Giải thích từ ngữ"
+    },
+    "content": {
+      "full_text": "Điều 2. Giải thích từ ngữ\nTrong văn bản này các từ ngữ dưới đây được hiểu như sau:\n1. Cổng thông tin điện tử là điểm truy cập duy nhất của cơ quan quản lý giáo dục, cơ sở giáo dục trên môi trường mạng, liên kết, tích hợp các kênh thông tin, các dịch vụ và các ứng dụng mà qua đó người dùng có thể khai thác, sử dụng.\n2. Đơn vị chủ quản hệ thống thư điện tử, cổng thông tin điện tử là cơ quan quản lý giáo dục, cơ sở giáo dục quy định tại khoản 2 Điều 1 Thông tư này (sau đây gọi tắt là đơn vị chủ quản).\n3. Thủ trưởng đơn vị là giám đốc sở giáo dục và đào tạo, trưởng phòng giáo dục và đào tạo, hiệu trưởng hoặc người đứng đầu các cơ sở giáo dục.\n4. Tên miền của cơ quan quản lý giáo dục và cơ sở giáo dục là tên đăng ký sở hữu của cơ quan, đơn vị đó trên mạng Internet; tên miền được dùng để tạo lập, truy cập thư điện tử và cổng thông tin điện tử theo quy định hiện hành.\n5. Nhóm thư điện tử (email group) là các địa chỉ thư điện tử được tập hợp dưới một tên thư điện tử chung ở đó các địa chỉ thành viên sẽ nhận được thông tin gửi tới nhóm."
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D3",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương II",
+      "section": "",
+      "article_number": "3",
+      "article_title": "Điều 3. Yêu cầu chung của thư điện tử và cổng thông tin điện tử"
+    },
+    "content": {
+      "full_text": "Điều 3. Yêu cầu chung của thư điện tử và cổng thông tin điện tử\n1. Việc triển khai thư điện tử và cổng thông tin điện tử phải đáp ứng các yêu cầu sau:\n2. Phương thức triển khai hệ thống thư điện tử, cổng thông tin điện tử\n3. Yêu cầu của công tác quản lý thư điện tử và cổng thông tin điện tử\n4. Thủ trưởng đơn vị đảm bảo duy trì, vận hành ổn định hệ thống thư điện tử và cổng thông tin điện tử, an toàn thông tin, đảm bảo an toàn thông tin cá nhân; chịu trách nhiệm về thông tin đăng tải trên cổng thông tin điện tử.\nTHƯ ĐIỆN TỬ"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D4",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương II",
+      "section": "",
+      "article_number": "4",
+      "article_title": "Điều 4. Cung cấp, quản lý, vận hành, sử dụng thư điện tử"
+    },
+    "content": {
+      "full_text": "Điều 4. Cung cấp, quản lý, vận hành, sử dụng thư điện tử"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D5",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "5",
+      "article_title": "Điều 5. Nhóm thư điện tử"
+    },
+    "content": {
+      "full_text": "Điều 5. Nhóm thư điện tử\nGiamdocso@moet.gov.vn.\nVanthuso@moet.gov.vn.\nCỔNG THÔNG TIN ĐIỆN TỬ"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D6",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "6",
+      "article_title": "Điều 6. Vai trò của cổng thông tin điện tử"
+    },
+    "content": {
+      "full_text": "Điều 6. Vai trò của cổng thông tin điện tử"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D7",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "7",
+      "article_title": "Điều 7. Nguyên tắc cung cấp thông tin"
+    },
+    "content": {
+      "full_text": "Điều 7. Nguyên tắc cung cấp thông tin"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D8",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "8",
+      "article_title": "Điều 8. Thông tin chủ yếu trên cổng thông tin điện tử của cơ quan quản lý giáo dục"
+    },
+    "content": {
+      "full_text": "Điều 8. Thông tin chủ yếu trên cổng thông tin điện tử của cơ quan quản lý giáo dục"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D9",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "9",
+      "article_title": "Điều 9. Thông tin chủ yếu trên cổng thông tin điện tử của cơ sở giáo dục"
+    },
+    "content": {
+      "full_text": "Điều 9. Thông tin chủ yếu trên cổng thông tin điện tử của cơ sở giáo dục"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D10",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "10",
+      "article_title": "Điều 10. Thông tin khác"
+    },
+    "content": {
+      "full_text": "Điều 10. Thông tin khác\nNgoài các thông tin quy định tại Điều 8, Điều 9 của Thông tư này, cơ quan quản lý giáo dục, cơ sở giáo dục cung cấp các thông tin khác phù hợp điều kiện và nhu cầu cụ thể gồm:"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D11",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "11",
+      "article_title": "Điều 11. Quản lý, vận hành, sử dụng cổng thông tin điện tử"
+    },
+    "content": {
+      "full_text": "Điều 11. Quản lý, vận hành, sử dụng cổng thông tin điện tử\na) Nội dung đăng tải trên cổng thông tin điện tử;\nb) Quy trình tiếp nhận, xử lý, biên tập, cập nhật và xử lý thông tin đăng tải trên cổng thông tin điện tử;\nc) Thời hạn cung cấp, cập nhật thông tin trên cổng thông tin điện tử;\nd) Trách nhiệm của các đơn vị, cá nhân trong việc cung cấp, tổng hợp, thẩm định và duyệt nội dung đăng tải trên cổng thông tin điện tử;\nđ) Quy định về trách nhiệm quản lý, vận hành kỹ thuật cổng thông tin điện tử;\ne) Chế độ làm việc của các thành viên Ban Biên tập."
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D12",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương IV",
+      "section": "",
+      "article_number": "12",
+      "article_title": "Điều 12. Sử dụng công nghệ và áp dụng tiêu chuẩn kỹ thuật"
+    },
+    "content": {
+      "full_text": "Điều 12. Sử dụng công nghệ và áp dụng tiêu chuẩn kỹ thuật\nCổng thông tin điện tử của cơ quan quản lý giáo dục, cơ sở giáo dục sử dụng các công nghệ, tiêu chuẩn, giải pháp kỹ thuật sau:\nTỔ CHỨC THỰC HIỆN"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D13",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương IV",
+      "section": "",
+      "article_number": "13",
+      "article_title": "Điều 13. Trách nhiệm của sở giáo dục và đào tạo"
+    },
+    "content": {
+      "full_text": "Điều 13. Trách nhiệm của sở giáo dục và đào tạo"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D14",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương IV",
+      "section": "",
+      "article_number": "14",
+      "article_title": "Điều 14. Trách nhiệm của phòng giáo dục và đào tạo"
+    },
+    "content": {
+      "full_text": "Điều 14. Trách nhiệm của phòng giáo dục và đào tạo"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D15",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương IV",
+      "section": "",
+      "article_number": "15",
+      "article_title": "Điều 15. Trách nhiệm của các cơ sở giáo dục"
+    },
+    "content": {
+      "full_text": "Điều 15. Trách nhiệm của các cơ sở giáo dục"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D16",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương IV",
+      "section": "",
+      "article_number": "16",
+      "article_title": "Điều 16. Kiểm tra, đánh giá hoạt động của hệ thống thư điện tử và cổng thông tin điện tử của cơ quan quản lý giáo dục và cơ sở giáo dục"
+    },
+    "content": {
+      "full_text": "Điều 16. Kiểm tra, đánh giá hoạt động của hệ thống thư điện tử và cổng thông tin điện tử của cơ quan quản lý giáo dục và cơ sở giáo dục"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D17",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương IV",
+      "section": "",
+      "article_number": "17",
+      "article_title": "Điều 17. Hiệu lực thi hành"
+    },
+    "content": {
+      "full_text": "Điều 17. Hiệu lực thi hành"
+    }
+  },
+  {
+    "id": "37_2020_TT_BGDĐT_D18",
+    "metadata": {
+      "source": "Thông tư 37/2020/TT-BGDĐT",
+      "so_hieu": "37/2020/TT-BGDĐT",
+      "chapter": "Chương IV",
+      "section": "",
+      "article_number": "18",
+      "article_title": "Điều 18. Trách nhiệm thi hành"
+    },
+    "content": {
+      "full_text": "Điều 18. Trách nhiệm thi hành\nChánh Văn phòng, Cục trưởng Cục Công nghệ thông tin, Thủ trưởng các đơn vị liên quan thuộc Bộ Giáo dục và Đào tạo; Giám đốc các sở giáo dục và đào tạo, Trưởng phòng các phòng giáo dục và đào tạo, Thủ trưởng các cơ sở giáo dục chịu trách nhiệm thi hành Thông tư này./."
+    }
+  }
+]

@@ -1,0 +1,297 @@
+[
+  {
+    "id": "15_2018_TT_BGDĐT_CAN_CU",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Căn cứ pháp lý",
+      "section": "",
+      "article_number": "CAN_CU",
+      "article_title": "Các căn cứ ban hành văn bản",
+      "is_base": true
+    },
+    "content": {
+      "full_text": "Căn cứ Nghị định số 69/2017/NĐ-CP ngày 25 tháng 5 năm 2017 của Chính phủ quy định chức năng, nhiệm vụ, quyền hạn và cơ cấu tổ chức của Bộ Giáo dục và Đào tạo;\nCăn cứ Nghị định số 64/2007/NĐ-CP ngày 10 tháng 4 năm 2007 của Chính phủ về ứng dụng công nghệ thông tin trong hoạt động của cơ quan nhà nước ;\nCăn cứ Nghị định số 43/2011/NĐ-CP ngày 13 tháng 6 năm 2011 của Chính phủ về việc cung cấp thông tin và dịch vụ công trực tuyến trên trang thông tin điện tử hoặc cổng thông tin điện tử của cơ quan nhà nước;\nCăn cứ Nghị định số 72/2013/NĐ-CP ngày 15 tháng 7 năm 2013 của Chính phủ về quản lý, cung cấp, sử dụng dịch vụ Internet và thông tin trên mạng;\nCăn cứ Nghị định số 27/2018/NĐ-CP ngày 01 tháng 3 năm 2018 của Chính phủ sửa đổi, bổ sung một số Điều của Nghị định số 72/2013/NĐ-CP ngày 15 tháng 7 năm 2013 của Chính phủ về quản lý, cung cấp, sử dụng dịch vụ Internet và thông tin trên mạng;\nCăn cứ Chỉ thị số 34/2008/CT-TTg ngày 03 tháng 12 năm 2008 về việc tăng cường sử dụng hệ thống thư điện tử trong hoạt động của cơ quan nhà nước;\nTheo đề nghị của Cục trưởng Cục công nghệ thông tin,\nBộ trưởng Bộ Giáo dục và Đào tạo ban hành Thông tư quy định tổ chức hoạt động, sử dụng thư điện tử và trang thông tin điện tử của các cơ sở giáo dục đại học, các trường cao đẳng sư phạm."
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D1",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương I",
+      "section": "",
+      "article_number": "1",
+      "article_title": "Điều 1. Phạm vi điều chỉnh và đối tượng áp dụng"
+    },
+    "content": {
+      "full_text": "Điều 1. Phạm vi điều chỉnh và đối tượng áp dụng"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D2",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương I",
+      "section": "",
+      "article_number": "2",
+      "article_title": "Điều 2. Giải thích từ ngữ"
+    },
+    "content": {
+      "full_text": "Điều 2. Giải thích từ ngữ\nTrong văn bản này các từ ngữ dưới đây được hiểu như sau:\n1. Nhóm thư điện tử (email group) là tập hợp các địa chỉ thư điện tử được lập để chia sẻ thông tin nội bộ giữa các địa chỉ thư điện tử tham gia nhóm. Khi một thành viên trong nhóm gửi đến địa chỉ chung của nhóm thì các thành viên trong nhóm đều nhận được.\n2. RSS (Really Simple Syndication) là một chuẩn định dạng nhằm mục đích chia sẻ nội dung trên mạng máy tính.\n3. Chuẩn Dublin Core về dữ liệu đặc tả là một tập bao gồm 15 yếu tố dữ liệu đặc tả cơ bản được sử dụng để mô tả tài nguyên. Trong đó, dữ liệu đặc tả (metadata) là những thông tin mô tả các đặc tính của dữ liệu như nội dung, định dạng, chất lượng, điều kiện và các đặc tính khác nhằm tạo thuận lợi cho quá trình tìm kiếm, truy cập, quản lý và lưu trữ dữ liệu."
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D3",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương II",
+      "section": "",
+      "article_number": "3",
+      "article_title": "Điều 3. Yêu cầu chung về hệ thống thư điện tử và trang thông tin điện tử"
+    },
+    "content": {
+      "full_text": "Điều 3. Yêu cầu chung về hệ thống thư điện tử và trang thông tin điện tử\n1. Việc thiết kế, xây dựng thư điện tử và trang thông tin điện tử phải đáp ứng các yêu cầu sau:\n2. Hệ thống thư điện tử, trang thông tin điện tử của cơ sở giáo dục đại học được thiết lập theo một trong các phương thức sau:\n3. Việc quản lý thư điện tử và trang thông tin điện tử tại các cơ sở giáo dục đại học đảm bảo các nội dung sau:\n4. Việc đầu tư xây dựng và bố trí nhân lực quản lý, vận hành hệ thống thư điện tử và trang thông tin điện tử do cơ sở giáo dục đại học thực hiện. Kinh phí triển khai, vận hành hệ thống thư điện tử và trang thông tin điện tử được cân đối trong dự toán chi của cơ sở giáo dục đại học.\nTHƯ ĐIỆN TỬ"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D4",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương II",
+      "section": "",
+      "article_number": "4",
+      "article_title": "Điều 4. Quản lý, vận hành, sử dụng thư điện tử"
+    },
+    "content": {
+      "full_text": "Điều 4. Quản lý, vận hành, sử dụng thư điện tử"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D5",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "5",
+      "article_title": "Điều 5. Nhóm thư điện tử dùng chung"
+    },
+    "content": {
+      "full_text": "Điều 5. Nhóm thư điện tử dùng chung\nHieutruong.Daihoc@moet.gov.vn.\nVanthu.Daihoc@moet.gov.vn.\nTRANG THÔNG TIN ĐIỆN TỬ"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D6",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "6",
+      "article_title": "Điều 6. Chức năng và nhiệm vụ của trang thông tin điện tử"
+    },
+    "content": {
+      "full_text": "Điều 6. Chức năng và nhiệm vụ của trang thông tin điện tử"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D7",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "7",
+      "article_title": "Điều 7. Nguyên tắc cung cấp thông tin lên trang thông tin điện tử"
+    },
+    "content": {
+      "full_text": "Điều 7. Nguyên tắc cung cấp thông tin lên trang thông tin điện tử"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D8",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "8",
+      "article_title": "Điều 8. Quản lý, vận hành, sử dụng trang thông tin điện tử"
+    },
+    "content": {
+      "full_text": "Điều 8. Quản lý, vận hành, sử dụng trang thông tin điện tử\nđ) Quy định về quản lý, vận hành kỹ thuật trang thông tin điện tử."
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D9",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "9",
+      "article_title": "Điều 9. Áp dụng công nghệ, tiêu chuẩn kỹ thuật"
+    },
+    "content": {
+      "full_text": "Điều 9. Áp dụng công nghệ, tiêu chuẩn kỹ thuật\nTrang thông tin điện tử của cơ sở giáo dục đại học áp dụng các công nghệ, tiêu chuẩn, giải pháp kỹ thuật sau:"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D10",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "10",
+      "article_title": "Điều 10. Thông tin chung về tổ chức, hành chính"
+    },
+    "content": {
+      "full_text": "Điều 10. Thông tin chung về tổ chức, hành chính\nCác cơ sở giáo dục đại học cung cấp, cập nhật thường xuyên, chính xác các thông tin chung về tổ chức, hành chính trên trang thông tin điện tử, bao gồm:"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D11",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "11",
+      "article_title": "Điều 11. Thông tin công khai đối với cơ sở giáo dục đại học"
+    },
+    "content": {
+      "full_text": "Điều 11. Thông tin công khai đối với cơ sở giáo dục đại học\nThông tin công khai của cơ sở giáo dục đại học và thời hạn đăng tin lên trang thông tin điện tử của cơ sở giáo dục đại học thực hiện theo quy định tại Thông tư số 36/2017/TT-BGDĐT ngày 28 tháng 12 năm 2017 ban hành quy chế thực hiện công khai đối với cơ sở giáo dục và đào tạo thuộc hệ thống giáo dục quốc dân, bao gồm:"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D12",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "12",
+      "article_title": "Điều 12. Thông tin về tuyển sinh trình độ đại học, cao đẳng sư phạm"
+    },
+    "content": {
+      "full_text": "Điều 12. Thông tin về tuyển sinh trình độ đại học, cao đẳng sư phạm\nđ) Quy chế tuyển sinh của trường (nếu có)."
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D13",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "13",
+      "article_title": "Điều 13. Thông tin về tuyển sinh và đào tạo trình độ thạc sĩ"
+    },
+    "content": {
+      "full_text": "Điều 13. Thông tin về tuyển sinh và đào tạo trình độ thạc sĩ\nThông tin về tuyển sinh, đào tạo trình độ thạc sĩ và thời hạn đăng tin lên trang thông tin điện tử của cơ sở giáo dục đại học thực hiện theo quy định tại Thông tư số 15/2014/TT-BGDĐT ngày 15 tháng 5 năm 2014 của Bộ Giáo dục và Đào tạo ban hành quy chế đào tạo trình độ thạc sĩ, bao gồm:"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D14",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "14",
+      "article_title": "Điều 14. Thông tin về tuyển sinh và đào tạo trình độ tiến sĩ"
+    },
+    "content": {
+      "full_text": "Điều 14. Thông tin về tuyển sinh và đào tạo trình độ tiến sĩ\nThông tin về tuyển sinh, đào tạo trình độ tiến sĩ và thời hạn đăng tin lên trang thông tin điện tử của cơ sở giáo dục đại học thực hiện theo quy định tại Thông tư số 08/2017/TT-BGDĐT ngày 04 tháng 4 năm 2017 của Bộ Giáo dục và Đào tạo ban hành quy chế tuyển sinh và đào tạo trình độ tiến sĩ, bao gồm:"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D15",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "15",
+      "article_title": "Điều 15.Thông tin kiểm định chất lượng giáo dục và cấp văn bằng, chứng chỉ"
+    },
+    "content": {
+      "full_text": "Điều 15.Thông tin kiểm định chất lượng giáo dục và cấp văn bằng, chứng chỉ\nCông khai trên trang thông tin điện tử của cơ sở giáo dục đại học các thông tin kiểm định chất lượng giáo dục và cấp văn bằng chứng chỉ, gồm:"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D16",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "16",
+      "article_title": "Điều 16. Niên giám thống kê về giáo dục"
+    },
+    "content": {
+      "full_text": "Điều 16. Niên giám thống kê về giáo dục\nCông khai trên trang thông tin điện tử của cơ sở giáo dục đại học các thông tin về niên giám, thống kê giáo dục, gồm:"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D17",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương IV",
+      "section": "",
+      "article_number": "17",
+      "article_title": "Điều 17. Thông tin khác"
+    },
+    "content": {
+      "full_text": "Điều 17. Thông tin khác\nCác thông tin khác cần công khai trên trang thông tin điện tử của cơ sở giáo dục đại học gồm:\nTỔ CHỨC THỰC HIỆN"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D18",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương IV",
+      "section": "",
+      "article_number": "18",
+      "article_title": "Điều 18. Trách nhiệm của các cơ sở giáo dục đại học"
+    },
+    "content": {
+      "full_text": "Điều 18. Trách nhiệm của các cơ sở giáo dục đại học"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D19",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương IV",
+      "section": "",
+      "article_number": "19",
+      "article_title": "Điều 19. Hiệu lực thi hành"
+    },
+    "content": {
+      "full_text": "Điều 19. Hiệu lực thi hành"
+    }
+  },
+  {
+    "id": "15_2018_TT_BGDĐT_D20",
+    "metadata": {
+      "source": "Thông tư 15/2018/TT-BGDĐT",
+      "so_hieu": "15/2018/TT-BGDĐT",
+      "chapter": "Chương IV",
+      "section": "",
+      "article_number": "20",
+      "article_title": "Điều 20. Trách nhiệm thi hành"
+    },
+    "content": {
+      "full_text": "Điều 20. Trách nhiệm thi hành\nChánh Văn phòng, Cục trưởng Cục Công nghệ thông tin, Thủ trưởng các đơn vị liên quan thuộc Bộ Giáo dục và Đào tạo; Giám đốc đại học, học viện; Hiệu trưởng trường đại học; Hiệu trưởng các trường cao đẳng sư phạm, các tổ chức và cá nhân có liên quan chịu trách nhiệm thi hành Thông tư này./.\nNơi nhận: - Văn phòng Quốc hội; - Văn phòng Chính phủ; - Ủy ban VHGD TNTNNĐ của QH; - Ban Tuyên giáo Trung ương; - Các Bộ, cơ quan ngang Bộ, cơ quan thuộc CP; - Cục Kiểm tra văn bản QPPL (Bộ Tư pháp); - Bộ trưởng (để báo cáo); - Các Thứ trưởng; - Như Điều 20; - Công báo; - Cổng thông tin điện tử của Bộ GDĐT; - Lưu: VT, Vụ PC, Cục CNTT (10).\nKT. BỘ TRƯỞNG\nTHỨ TRƯỞNG\nNguyễn Văn Phúc"
+    }
+  }
+]

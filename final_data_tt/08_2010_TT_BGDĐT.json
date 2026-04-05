@@ -1,0 +1,283 @@
+[
+  {
+    "id": "08_2010_TT_BGDĐT_CAN_CU",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Căn cứ pháp lý",
+      "section": "",
+      "article_number": "CAN_CU",
+      "article_title": "Các căn cứ ban hành văn bản",
+      "is_base": true
+    },
+    "content": {
+      "full_text": "Căn cứ Luật Công nghệ thông tin ngày 29 tháng 6 năm 2006;\nCăn cứ Nghị định số 32/2008/NĐ-CP ngày 19 tháng 03 năm 2008 của Chính phủ quy định chức năng, nhiệm vụ, quyền hạn và cơ cấu tổ chức của Bộ Giáo dục và Đào tạo;\nCăn cứ Nghị định số 64/2007/NĐ-CP ngày 10 tháng 4 năm 2007 vê Ứng dụng công nghệ thông tin trong hoạt động của cơ quan nhà nước;\nCăn cứ Quyết định số 698/QĐ-TTg ngày 1 tháng 6 năm 2009 của Thủ tướng Chính phủ về phê duyệt kế hoạch tổng thể phát triển nguồn nhân lực công nghệ thông tin đến năm 2015 và định hướng đến năm 2020;\nCăn cứ Chỉ thị số 07/2008/CT-BTTTT ngày 30 tháng 12 năm 2008 của Bộ trưởng Bộ Thông tin và Truyên thông về đẩy mạnh sử dụng phần mềm tự do mã nguồn mở trong hoạt động của cơ quan, tổ chức nhà nước;\nBộ Giáo dục và Đào tạo quy định về sử dụng phần mềm tự do mã nguồn mở trong các cơ sở giáo dục như sau:"
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D1",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương I",
+      "section": "",
+      "article_number": "1",
+      "article_title": "Điều 1. Phạm vi điều chỉnh và đối tượng áp dụng"
+    },
+    "content": {
+      "full_text": "Điều 1. Phạm vi điều chỉnh và đối tượng áp dụng\n1. Thông tư này quy định về sử dụng phần mềm tự do mã nguồn mở trong các cơ sở giáo dục.\n2. Quy định này áp dụng đối với các cơ sở giáo dục bao gồm các đại học, học viện, trường đại học, trường cao đẳng, trường trung cấp chuyên nghiệp, cơ sở giáo dục phổ thông, trường mầm non, trung tâm giáo dục thường xuyên, trung tâm học tập cộng đồng, trung tâm ngoại ngữ - tin học (sau đây gọi chung là các cơ sở giáo dục) và các cơ quan quản lý giáo dục."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D2",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương I",
+      "section": "",
+      "article_number": "2",
+      "article_title": "Điều 2. Giải thích từ ngữ"
+    },
+    "content": {
+      "full_text": "Điều 2. Giải thích từ ngữ\nTrong văn bản này các từ ngữ dưới đây được hiểu như sau:\n1. “ Phần mềm mã nguồn mở ” (còn được gọi tắt là phần mềm nguồn mở) là phần mềm được tác giả cung cấp mã nguồn kèm theo và người sử dụng không phải trả chi phí bản quyền mua mã nguồn.\n2. “ Phần mềm tự do mã nguồn mở ” là phần mềm mã nguồn mở có bản quyền tác giả, có giấy phép sử dụng đi kèm với phần mềm, trong đó cho phép người sử dụng được quyền tự do sử dụng, tự do sao chép, tự do phân phối và tự do nghiên cứu, sửa đổi mã nguồn và phân phối lại các phần mềm dẫn xuất đã qua sửa đổi mã nguồn.\n3. “ Phần mềm thương mại mã nguồn đóng ” là phần mềm được đăng ký thương hiệu, được bán trên thị trường theo bản quyền sử dụng song tác giả không công bố mã nguồn và người sử dụng không được phép khai thác mã nguồn."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D3",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương I",
+      "section": "",
+      "article_number": "3",
+      "article_title": "Điều 3. Mục đích sử dụng phần mềm tự do mã nguồn mở trong ngành giáo dục"
+    },
+    "content": {
+      "full_text": "Điều 3. Mục đích sử dụng phần mềm tự do mã nguồn mở trong ngành giáo dục\n1. Hỗ trợ nâng cao hiểu biết về lập trình phần mềm, hỗ trợ đổi mới tư duy, tạo môi trường nghiên cứu, sáng tạo; rút ngắn thời gian nghiên cứu.\n2. Là môi trường học tập, chia sẻ kinh nghiệm trong xã hội học tập; tạo môi trường kỹ năng làm việc theo nhóm, theo cộng đồng.\n3. Hạn chế và hướng tới việc xóa bỏ việc vi phạm bản quyền phần mềm.\n4. Tiết kiệm chi phí bản quyền.\n5. Tạo sự thích nghi với các sản phẩm tương đương với các phần mềm thương mại mã nguồn đóng.\n6. Đảm bảo an ninh cho hạ tầng hệ thống thông tin và dữ liệu.\n7. Định hướng sử dụng các chuẩn mở."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D4",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương II",
+      "section": "",
+      "article_number": "4",
+      "article_title": "Điều 4. Định dạng chuẩn tài liệu mở trong giao dịch điện tử"
+    },
+    "content": {
+      "full_text": "Điều 4. Định dạng chuẩn tài liệu mở trong giao dịch điện tử\nÁp dụng Quyết định số 1761/QĐ-BKHCN ngày 27 tháng 8 năm 2009 về tiêu chuẩn Việt Nam TCVN 7978:2009 về định dạng tài liệu mở ODF (Open Document Format) cho các ứng dụng văn phòng.\nDANH MỤC PHẦN MỀM TỰ DO MÃ NGUỒN MỞ"
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D5",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương II",
+      "section": "",
+      "article_number": "5",
+      "article_title": "Điều 5. Danh mục các sản phẩm phần mềm tự do mã nguồn mở được yêu cầu sử dụng chính thức để dạy học và sử dụng trong công tác văn phòng của các cơ sở giáo dục"
+    },
+    "content": {
+      "full_text": "Điều 5. Danh mục các sản phẩm phần mềm tự do mã nguồn mở được yêu cầu sử dụng chính thức để dạy học và sử dụng trong công tác văn phòng của các cơ sở giáo dục\n1. Phần mềm văn phòng OpenOffice.Org (Sau đây có thể gọi tắt là OpenOffice) là phần mềm đáp ứng và tuân thủ tiêu chuẩn định dạng tài liệu mở ODF. OpenOffice.Org gồm 6 mô đun sau:\na) Soạn thảo văn bản (Writer);\nb) Bảng tính điện tử (Calc);\nc) Trình chiếu (Impress);\nd) Cơ sở dữ liệu (Base);\nđ) Đồ hoạ (Draw);\ne) Soạn thảo công thức toán học (Math);\n2. Bộ gõ tiếng Việt: Unikey.\n3. Trình duyệt web Mozilla Firefox.\n4. Phần mềm thư điện tử máy trạm của Mozilla: Thunderbird.\n5. Hệ điều hành trên nền Linux."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D6",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "6",
+      "article_title": "Điều 6. Danh mục các phần mềm mã nguồn mở được khuyến khích sử dụng trong các cơ sở giáo dục"
+    },
+    "content": {
+      "full_text": "Điều 6. Danh mục các phần mềm mã nguồn mở được khuyến khích sử dụng trong các cơ sở giáo dục\nDanh mục phần mềm mã nguồn mở được quy định tại Phụ lục I, ban hành kèm theo Thông tư này.\nÁP DỤNG PHẦN MỀM TỰ DO MÃ NGUỒN MỞ"
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D7",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "7",
+      "article_title": "Điều 7. Kho phần mềm tự do mã nguồn mở cho giáo dục"
+    },
+    "content": {
+      "full_text": "Điều 7. Kho phần mềm tự do mã nguồn mở cho giáo dục\n1. Kho phần mềm tự do mã nguồn mở được xây dựng nhằm tập trung lưu trữ, phổ biến, chia sẻ trên mạng giáo dục EduNet và nhằm tiết kiệm, tránh trùng lặp.\n2. Kho phần mềm tự do mã nguồn mở giáo dục được đặt tại: http://opensource.moet.gov.vn\nhoặc http://manguonmo.moet.gov.vn và www.edu.net.vn/media\n3. Website của các cơ sở giáo dục cần có đường liên kết đến kho phần mềm tự do mã nguồn mở này."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D8",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "8",
+      "article_title": "Điều 8. Thuật ngữ trong chương trình giảng dạy về công nghệ thông tin"
+    },
+    "content": {
+      "full_text": "Điều 8. Thuật ngữ trong chương trình giảng dạy về công nghệ thông tin\nKhi biên soạn chương trình giảng dạy về công nghệ thông tin ở các cấp học và trình độ đào tạo, thống nhất sử dụng các thuật ngữ chung chỉ chức năng của phần mềm, cụ thể như hệ điều hành, soạn thảo văn bản, bảng tính điện tử, trình chiếu, cơ sở dữ liệu thay cho các thuật ngữ dựa trên tên của các phần mềm thương mại mã nguồn đóng."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D9",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "9",
+      "article_title": "Điều 9. Cập nhật chương trình giảng dạy dựa trên nền phần mềm tự do mã nguồn mở"
+    },
+    "content": {
+      "full_text": "Điều 9. Cập nhật chương trình giảng dạy dựa trên nền phần mềm tự do mã nguồn mở\nGiáo viên, giảng viên có trách nhiệm đưa các phần mềm tự do mã nguồn mở vào chương trình và nội dung giảng dạy để đáp ứng nhu cầu xã hội, thay thế từng phần tiến tới thay thế hoàn toàn các chương trình cứng đã được xây dựng dựa trên việc sử dụng phần mềm thương mại mã nguồn đóng."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D10",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "10",
+      "article_title": "Điều 10. Tài liệu, giáo trình, sách giáo khoa trên nền phần mềm tự do mã nguồn mở"
+    },
+    "content": {
+      "full_text": "Điều 10. Tài liệu, giáo trình, sách giáo khoa trên nền phần mềm tự do mã nguồn mở\nGiáo viên được sử dụng các tài liệu, giáo trình, sách giáo khoa được biên soạn trên nền phần mềm tự do mã nguồn mở có giá trị tương đương và có thể thay thế các tài liệu, giáo trình, sách giáo khoa đã được soạn với nội dung dựa vào các sản phẩm đóng của Microsoft Windows, Word, Excel, Powerpoint, Access."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D11",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "11",
+      "article_title": "Điều 11. Tổ chức triển khai ứng dụng"
+    },
+    "content": {
+      "full_text": "Điều 11. Tổ chức triển khai ứng dụng\nCơ sở giáo dục tiến hành lên kế hoạch và triển khai ứng dụng phần mềm tự do mã nguồn mở cho hệ thống máy tính của đơn vị mình (bao gồm máy chủ và máy trạm), cho các phần mềm ứng dụng và hệ điều hành."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D12",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "12",
+      "article_title": "Điều 12. Tổ chức nghiên cứu, khai thác, phát triển trong các cơ sở giáo dục đại học"
+    },
+    "content": {
+      "full_text": "Điều 12. Tổ chức nghiên cứu, khai thác, phát triển trong các cơ sở giáo dục đại học\n1. Thành lập các trung tâm, nhóm nghiên cứu phát triển (đối với các trường đại học có khoa chuyên ngành công nghệ thông tin) và phổ biến ứng dụng phần mềm tự do mã nguồn mở tại các trường đại học trong toàn quốc.\n2. Tổ chức cho sinh viên và các giảng viên đại học, cao đẳng tham gia cộng đồng phần mềm tự do mã nguồn mở trong nước và quốc tế.\n3. Tổ chức cho sinh viên và các giảng viên đại học tham gia các cuộc thi trong nước và quốc tế về phần mềm tự do mã nguồn mở.\n4. Nghiên cứu, phát triển thêm các mô đun cho phần mềm tự do mã nguồn mở; Khuyến khích đăng ký đề tài nghiên cứu khoa học dựa trên nền phần mềm tự do mã nguồn mở.\n5. Phát triển các sản phẩm mới trên nền phần mềm mã nguồn mở."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D13",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "13",
+      "article_title": "Điều 13. Đề tài tốt nghiệp đại học, cao đẳng"
+    },
+    "content": {
+      "full_text": "Điều 13. Đề tài tốt nghiệp đại học, cao đẳng\nCác trường đại học, cao đẳng khuyến khích sinh viên làm đồ án, luận văn tốt nghiệp, thực tập trên cơ sở khai thác phần mềm tự do mã nguồn mở và sử dụng OpenOffice.Org để viết tài liệu và trình chiếu báo cáo luận án tốt nghiệp."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D14",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "14",
+      "article_title": "Điều 14. Tôn trọng bản quyền và giấy phép"
+    },
+    "content": {
+      "full_text": "Điều 14. Tôn trọng bản quyền và giấy phép\nKhi phát triển các phần mềm dẫn xuất dựa trên nền phần mềm tự do mã nguồn mở gốc ban đầu, người phát triển phần mềm phải tuân thủ đúng theo các điều khoản giấy phép của phần mềm gốc ban đầu."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D15",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương III",
+      "section": "",
+      "article_number": "15",
+      "article_title": "Điều 15. Mua sắm các dịch vụ và mua phiên bản doanh nghiệp"
+    },
+    "content": {
+      "full_text": "Điều 15. Mua sắm các dịch vụ và mua phiên bản doanh nghiệp\n1. Các cơ sở giáo dục chỉ đạo và tổ chức cho các đơn vị chuyên trách ứng dụng công nghệ thông tin của mình khai thác, phát triển và sử dụng phần mềm tự do mã nguồn mở.\n2. Trong trường hợp cần thiết, người sử dụng có thể mua các phiên bản doanh nghiệp với các tính năng cao cấp hoặc với tính năng mở rộng và các dịch vụ đi kèm với giải trình về tính cần thiết của các tính năng và qui mô đáp ứng của giải pháp; trình các cấp có thẩm quyền thẩm định và phê duyệt."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D16",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương V",
+      "section": "",
+      "article_number": "16",
+      "article_title": "Điều 16. Bồi dưỡng và tuyển dụng giáo viên và cán bộ quản lý cơ sở giáo dục"
+    },
+    "content": {
+      "full_text": "Điều 16. Bồi dưỡng và tuyển dụng giáo viên và cán bộ quản lý cơ sở giáo dục\n1. Khai thác và sử dụng phần mềm tự do mã nguồn mở là một nội dung trong chương trình bồi dưỡng kiến thức và kĩ năng công nghệ thông tin cho giáo viên và cán bộ quản lý cơ sở giáo dục.\n2. Nội dung kiến thức và kĩ năng sử dụng phần mềm tự do mã nguồn mở được quy định tại Điều 5 của Thông tư này được ưu tiên sử dụng trong các kỳ thi tuyển, sát hạnh tuyển dụng giáo viên và cán bộ quản lý cơ sở giáo dục.\nTỔ CHỨC THỰC HIỆN"
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D17",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương V",
+      "section": "",
+      "article_number": "17",
+      "article_title": "Điều 17. Tổ chức thực hiện chung"
+    },
+    "content": {
+      "full_text": "Điều 17. Tổ chức thực hiện chung\n1. Cục Công nghệ thông tin, Bộ Giáo dục và Đào tạo có trách nhiệm:\na) Chỉ đạo, đôn đốc và hướng dẫn thực hiện các nội dung của Thông tư này; tiếp nhận và xử lý các vướng mắc phát sinh;\nb) Chỉ đạo, tổ chức tập huấn, hỗ trợ dịch vụ và công nghệ cho các cơ sở giáo dục đại học có nhu cầu;\nc) Chỉ đạo và tổ chức thực hiện phát triển các mô đun kiến thức và kĩ năng tin học văn phòng, tin học ứng dụng dựa trên nền phần mềm tự do mã nguồn mở để dùng chung cho toàn ngành.\n2. Vụ Giáo dục Đại học, Vụ Giáo dục Chuyên nghiệp, Vụ Giáo dục thường xuyên, Vụ Giáo dục Trung học, Vụ Giáo dục Tiểu học có trách nhiệm quán triệt triển khai thực hiện Thông tư này trong các hướng dẫn chuyên môn của vụ.\n3. Các cơ sở giáo dục lập kế hoạch triển khai theo năm học.\n4. Thời hạn triển khai:\nĐến tháng 9 năm 2010, các cơ sở giáo dục hoàn tất việc triển khai các phần mềm OpenOffice.Org, Unikey, Firefox."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D18",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương V",
+      "section": "",
+      "article_number": "18",
+      "article_title": "Điều 18. Chế độ báo cáo và đánh giá"
+    },
+    "content": {
+      "full_text": "Điều 18. Chế độ báo cáo và đánh giá\nHàng năm các cơ sở giáo dục lập báo cáo về kế hoạch triển khai ứng dụng công nghệ thông tin trong đó có mục triển khai các nội dung của Thông tư này và gửi về Bộ Giáo dục và Đào tạo, cụ thể:\n1. Danh mục phần mềm tự do mã nguồn mở đã được triển khai.\n2. Mức độ triển khai theo lĩnh vực như quy định tại Chương III của Thông tư này và số lượng, tỉ lệ máy tính có cài đặt và sử dụng phần mềm tự do mã nguồn mở.\n3. Kinh phí thực hiện.\n4. Khó khăn, vướng mắc.\n5. Đánh giá chung và đề xuất."
+    }
+  },
+  {
+    "id": "08_2010_TT_BGDĐT_D19",
+    "metadata": {
+      "source": "Thông tư 08/2010/TT-BGDĐT",
+      "so_hieu": "08/2010/TT-BGDĐT",
+      "chapter": "Chương V",
+      "section": "",
+      "article_number": "19",
+      "article_title": "Điều 19. Hiệu lực thi hành."
+    },
+    "content": {
+      "full_text": "Điều 19. Hiệu lực thi hành.\nThông tư này có hiệu lực thi hành kể từ ngày 15 tháng 4 năm 2010.\nTrong quá trình thực hiện nếu có vấn đề phát sinh, vướng mắc, các cơ sở giáo dục cần phản ánh kịp thời về Bộ Giáo dục và Đào tạo qua email cuccongnghethongtin@moet.edu.vn để xem xét, bổ sung và sửa đổi.\nĐiêu 20. Chánh Văn phòng, Thu trưởng các đơn vị thuộc Bộ Giáo dục và Đào tạo và Thủ trưởng các cơ sở giáo dục đại học, Giám đốc các sở giáo dục và đào tạo, Chủ tịch Uỷ ban Nhân dân các tỉnh và thành phố trực thuộc trung ương chịu trách nhiêm thi hành Thông tư này./."
+    }
+  }
+]

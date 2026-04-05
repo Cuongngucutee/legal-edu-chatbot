@@ -6,23 +6,48 @@ services:
     image: qdrant/qdrant:latest
     container_name: qdrant_db
     ports:
-      - "6333:6333" # Cổng API & Dashboard
-      - "6334:6334" # Cổng gRPC (tốc độ cao)
+      - "6333:6333" 
+      - "6334:6334"
     volumes:
-      - ./qdrant_data:/qdrant/storage # Lưu dữ liệu luật vĩnh viễn ở ổ D
+      - ./qdrant_data:/qdrant/storage
+    networks:
+      - legal_network
+
+  # --- Lớp 1.5: Graph Database (Neo4j) ---
+  neo4j:
+    image: neo4j:latest
+    container_name: neo4j-legal
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/password123
+    volumes:
+      - ./neo4j/data:/data
+      - ./neo4j/logs:/logs
+    networks:
+      - legal_network
 
   # --- Lớp 2: AI Server (FastAPI + Streamlit) ---
   legal-ai:
-    build: ./backend # Trỏ đến thư mục chứa Dockerfile
+    build: ./backend
     container_name: legal_server
     ports:
       - "8000:8000"
       - "8501:8501"
     volumes:
-      - ./backend:/app # Mount code để sửa bên ngoài là bên trong đổi luôn
+      - ./backend:/app
     environment:
-      - QDRANT_HOST=qdrant # Tên service Qdrant ở trên
+      - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
-      - GROQ_API_KEY=${GROQ_API_KEY} # Lấy key từ file .env ở ổ D
+      - NEO4J_URI=bolt://neo4j:7687
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    networks:
+      - legal_network
     depends_on:
-      - qdrant # Chờ Qdrant chạy xong mới bật Server
+      - qdrant
+      - neo4j
+
+networks:
+  legal_network:
+    driver: bridge

@@ -4,3 +4,8 @@ venv/
 qdrant_data/
 *.pyc
 .DS_Store
+# Chặn toàn bộ data và logs của Neo4j
+neo4j/data/
+neo4j/logs/
+neo4j/transactions/
+*.db.*

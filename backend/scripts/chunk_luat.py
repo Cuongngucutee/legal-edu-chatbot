@@ -1,8 +1,8 @@
 import json
 import re
 
-INPUT_FILE = r"D:\legal-edu-chatbot\data\final\Luật 123_2025_QH15.json"
-OUTPUT_FILE = r"D:\legal-edu-chatbot\data\Luật_123_2025_QH15_chunked.json"
+INPUT_FILE = r"C:\legal-edu-chatbot\data\Nghi dinh\04_2021_NĐ_CP.json"
+OUTPUT_FILE = r"C:\legal-edu-chatbot\data\Nghi dinh\04_2021_NĐ_CP_chunked.json"
 
 # ==========================================
 # CÁCH 1: HIERARCHICAL CHUNKING (LỒNG NHAU)

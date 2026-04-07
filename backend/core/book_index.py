@@ -187,8 +187,8 @@ class BookIndex:
 
 if __name__ == "__main__":
     import sys
-    data_dir = "d:/legal-edu-chatbot/data/final"
-    kg_path = "d:/legal-edu-chatbot/outputs/knowledge_graph/entity_graph.json"
+    data_dir = "./data/final"
+    kg_path = "./outputs/knowledge_graph/entity_graph.json"
     index = BookIndex(data_dir, kg_path)
     index.load_index()
     print("Done building index!")

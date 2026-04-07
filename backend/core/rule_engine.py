@@ -3,14 +3,46 @@ import re
 class RuleEngine:
     def __init__(self, book_index=None):
         self.book_index = book_index
-        # Bộ từ điển để xác định tính hợp lệ của chủ đề (Domain Education Law)
-        self.domain_keywords = [
-            "luật", "nghị định", "thông tư", "quy định", "điều", "khoản", "giáo dục", 
-            "đại học", "phổ thông", "trường", "sinh viên", "học sinh", "giảng viên", "giáo viên",
-            "tuyển sinh", "đào tạo", "chương trình", "bộ", "phạt", "kỷ luật", "khen thưởng",
-            "học phí", "đình chỉ", "cơ sở", "nhà giáo", "bằng", "chứng chỉ", "thủ tục",
-            "biên chế", "nhà nước", "chính phủ", "tiêu chuẩn", "đánh giá", "lớp", "môn",
-            "xét", "học", "dạy", "thi", "kiểm tra", "điểm"
+        # Bộ từ điển được phân loại theo từng mảng trong Luật Giáo dục
+        self.domain_keywords = {
+            "van_ban_phap_luat": [
+                "luật giáo dục", "nghị định", "thông tư", "quyết định", "quy chế", 
+                "quy định", "điều", "khoản", "điểm", "ban hành", "sửa đổi", "bổ sung", 
+                "hiệu lực", "thi hành", "bãi bỏ", "hướng dẫn", "công văn", "chỉ thị"
+            ],
+            "cap_bac_va_co_so_dao_tao": [
+                "mầm non", "mẫu giáo", "tiểu học", "trung học cơ sở", "thcs", 
+                "trung học phổ thông", "thpt", "đại học", "cao đẳng", "trung cấp", 
+                "nghề nghiệp", "sau đại học", "thạc sĩ", "tiến sĩ", "giáo dục thường xuyên", 
+                "gdtx", "công lập", "dân lập", "tư thục", "cơ sở giáo dục"
+            ],
+            "chu_the_nhan_su": [
+                "bộ giáo dục", "bgdđt", "sở giáo dục", "phòng giáo dục", "nhà nước", 
+                "chính phủ", "hiệu trưởng", "giáo viên", "giảng viên", "nhà giáo", 
+                "người học", "học sinh", "sinh viên", "học viên", "cán bộ quản lý", 
+                "thanh tra giáo dục", "hội đồng trường"
+            ],
+            "hoat_dong_chuyen_mon": [
+                "tuyển sinh", "đào tạo", "chương trình giáo dục", "sách giáo khoa", 
+                "giáo trình", "chuẩn đầu ra", "kiểm định chất lượng", "đánh giá", 
+                "thi tốt nghiệp", "xét tuyển", "tín chỉ", "niên chế", "chuyển trường", 
+                "lưu ban", "học bạ", "văn bằng", "chứng chỉ"
+            ],
+            "hanh_chinh_va_che_tai": [
+                "học phí", "miễn giảm", "học bổng", "trợ cấp", "biên chế", "hợp đồng làm việc",
+                "kỷ luật", "khen thưởng", "xử phạt hành chính", "đình chỉ học tập", 
+                "buộc thôi học", "cảnh cáo", "khiển trách", "khiếu nại", "tố cáo"
+            ]
+        }
+
+        # Tạo một list phẳng (flattened list) để dùng cho các hàm kiểm tra đơn giản
+        self.flat_keywords = [
+            word for category in self.domain_keywords.values() for word in category
+        ]
+        
+        # Danh sách các từ đơn phổ thông có thể gây nhiễu, cần cẩn thận khi đối chiếu
+        self.risky_single_words = [
+            "xét", "học", "dạy", "thi", "điểm", "lớp", "môn", "bộ", "cơ sở"
         ]
 
     def validate(self, query: str) -> dict:
@@ -26,7 +58,13 @@ class RuleEngine:
 
         # 2. Out-of-scope Domain verification
         query_lower = query.lower()
-        has_domain = any(k in query_lower for k in self.domain_keywords)
+        has_domain = any(k in query_lower for k in self.flat_keywords)
+        
+        if not has_domain:
+            # Check nhóm từ dễ gây nhiễu bằng cách bắt buộc nó phải là nguyên chữ (Word Boundary)
+            words = set(re.findall(r'\w+', query_lower))
+            has_domain = any(w in words for w in self.risky_single_words)
+            
         if not has_domain:
             return {"pass": False, "reason": "Rất tiếc, có vẻ câu hỏi của bạn không bám sát nội dung **Pháp luật & Giáo dục**. Xin hãy đặt câu hỏi đúng phạm vi chuyên môn của tôi."}
 

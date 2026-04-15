@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables (contains API keys)
+.env
+
+# Scratch / temporary scripts
+scratch/
+scratch.py
+
+# Outputs - runtime artifacts (regenerated on demand)
+outputs/knowledge_graph/index_cache/
+outputs/offline_eval_log.jsonl
+outputs/doc_map_temp.json
+outputs/benchmark_it2.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Gemini AI assistant
+.gemini/
+.antigravityignore

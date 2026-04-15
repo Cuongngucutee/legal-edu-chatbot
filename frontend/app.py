@@ -1,4 +1,7 @@
 import os
+# CRITICAL: đặt trước MỌI import — tránh segfault MPS khi load nhiều model
+os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.0'
+
 import streamlit as st
 import time
 from dotenv import load_dotenv
@@ -10,11 +13,10 @@ load_dotenv(os.path.join(ROOT_DIR, ".env"))
 import sys
 sys.path.append(os.path.join(ROOT_DIR, "backend", "core"))
 
-from book_index import BookIndex
-from retriever import BookRAGRetriever
-from generator import BookRAGGenerator
-from agents import RAGAgents
-from rule_engine import RuleEngine
+# NOTE: KHÔNG import book_index/retriever ở đây!
+# SentenceTransformer init MPS sớm → Qwen safetensors sẽ SEGFAULT.
+# Import lazy bên trong cached functions SAU khi Qwen đã load.
+from query_intent import QwenIntentClassifier, QueryIntent, intent_to_legacy_type
 import json
 
 st.set_page_config(page_title="BookRAG Pháp Luật Demo", layout="wide")
@@ -23,11 +25,46 @@ st.markdown("Sử dụng cấu trúc Hierarchical Tree (JSON) & Knowledge Graph 
 
 # Setup config
 with st.sidebar:
-    st.header("Cấu Hình")
-    # link : https://api.groq.com/openai/v1
-    api_key = st.text_input("OpenAI/OpenRouter API Key", type="password", value=os.getenv("OPENAI_API_KEY", ""))
-    base_url = st.text_input("Base URL (Để trống hoặc dùng https://openrouter.ai/api/v1)", value=os.getenv("OPENAI_BASE_URL", ""))
-    model_name = st.text_input("Model Name", value=os.getenv("OPENAI_MODEL_NAME", "openai/gpt-oss-120b"))
+    st.header("Cấu Hình LLM")
+    
+    provider = st.selectbox("Provider", ["OpenRouter", "Groq", "OpenAI"], index=0)
+    
+    # Auto-fill base_url và model gợi ý theo provider
+    provider_config = {
+        "OpenRouter": {
+            "base_url": "https://openrouter.ai/api/v1",
+            "model_hint": "google/gemini-2.0-flash-001",
+            "key_hint": "sk-or-v1-...",
+        },
+        "Groq": {
+            "base_url": "https://api.groq.com/openai/v1",
+            "model_hint": "llama3-70b-8192",
+            "key_hint": "gsk_...",
+        },
+        "OpenAI": {
+            "base_url": "",
+            "model_hint": "gpt-4o-mini",
+            "key_hint": "sk-...",
+        },
+    }
+    cfg = provider_config[provider]
+    
+    api_key = st.text_input(
+        "API Key", 
+        type="password", 
+        value=os.getenv("OPENAI_API_KEY", ""),
+        placeholder=cfg["key_hint"],
+    )
+    base_url = st.text_input(
+        "Base URL", 
+        value=cfg["base_url"],
+        disabled=(provider != "OpenAI"),  # Auto-fill, chỉ editable cho OpenAI
+    )
+    model_name = st.text_input(
+        "Model Name", 
+        value=os.getenv("OPENAI_MODEL_NAME", "") or cfg["model_hint"],
+        placeholder=cfg["model_hint"],
+    )
     st.markdown("- **Embedding**: `namnguyenba2003/Vietnamese_Law_Embedding_finetuned_v3_256dims`")
     
     st.markdown("---")
@@ -36,21 +73,56 @@ with st.sidebar:
     # Initialize components
     if "index" not in st.session_state:
         st.session_state.index_status = "Đang tải mô hình & dữ liệu..."
-        
+
+@st.cache_resource
+def load_catalog_matcher():
+    """Load CatalogMatcher (nhẹ, chỉ đọc JSON, không cần model)."""
+    from catalog_matcher import CatalogMatcher
+    return CatalogMatcher()
+
+@st.cache_resource
+def load_qwen_model(_catalog_matcher):
+    """Load Qwen model TRƯỚC FAISS — tránh segfault do FAISS mmap xung đột safetensors.
+    Nếu vẫn crash, đổi use_regex_only=True."""
+    classifier = QwenIntentClassifier(
+        model_name="Qwen/Qwen2.5-3B-Instruct",
+        use_regex_only=False,  # True nếu Qwen vẫn crash
+        catalog_matcher=_catalog_matcher,
+    )
+    classifier._load_model()  # Eager load TRƯỚC FAISS
+    return classifier
+
 @st.cache_resource
 def load_index():
+    # Lazy import — phải sau khi Qwen đã load xong
+    from book_index import BookIndex
     data_dir = os.path.join(ROOT_DIR, "data", "final")
     kg_path = os.path.join(ROOT_DIR, "outputs", "knowledge_graph", "entity_graph.json")
     index = BookIndex(data_dir, kg_path)
     index.load_index()
     return index
 
-with st.spinner("Đang xây dựng BookIndex (Tree + Knowledge Graph)... Vui lòng đợi (Lần đầu sẽ mất thời gian load model embedding)"):
+@st.cache_resource
+def load_retriever(_index):
+    """Load Retriever + CrossEncoder (cached, chỉ load 1 lần)."""
+    from retriever import BookRAGRetriever
+    return BookRAGRetriever(_index)
+
+# ── CRITICAL LOAD ORDER: CatalogMatcher → Qwen → BookIndex/FAISS → Retriever ──
+with st.spinner("Đang tải Catalog Matcher..."):
+    catalog_matcher = load_catalog_matcher()
+
+with st.spinner("Đang tải Qwen Intent Classifier..."):
+    intent_classifier = load_qwen_model(catalog_matcher)
+
+with st.spinner("Đang xây dựng BookIndex (Tree + Knowledge Graph)... Vui lòng đợi"):
     index = load_index()
-    retriever = BookRAGRetriever(index)
+    # Gán doc_registry cho classifier sau khi index load
+    intent_classifier.doc_registry = index.doc_registry
+    retriever = load_retriever(index)
 
 st.sidebar.success("✅ BookIndex & Retriever Đã Sẵn Sàng!")
-st.sidebar.info(f"Số lượng Node: {index.graph.number_of_nodes()}\nSố lượng Edge: {index.graph.number_of_edges()}")
+st.sidebar.info(f"Số lượng Node: {index.graph.number_of_nodes()}\nSố lượng Edge: {index.graph.number_of_edges()}\nDoc Registry: {len(index.doc_registry)} entries → {len(index.doc_nodes)} documents")
 
 # Main Chat UI
 if "messages" not in st.session_state:
@@ -65,13 +137,14 @@ if prompt := st.chat_input("Hãy đặt câu hỏi pháp lý..."):
         st.warning("Vui lòng nhập API Key ở Sidebar!")
         st.stop()
         
-    # RULE ENGINE GATE CONSTRUCT
-    rule_engine = RuleEngine(book_index=index)
-    val_res = rule_engine.validate(prompt)
-    if not val_res["pass"]:
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        st.session_state.messages.append({"role": "assistant", "content": f"🚨 **Từ chối (Rule Engine):** {val_res['reason']}"})
-        st.rerun()
+    # RULE ENGINE GATE CONSTRUCT (Tạm thời tắt)
+    # from rule_engine import RuleEngine
+    # rule_engine = RuleEngine(book_index=index)
+    # val_res = rule_engine.validate(prompt)
+    # if not val_res["pass"]:
+    #     st.session_state.messages.append({"role": "user", "content": prompt})
+    #     st.session_state.messages.append({"role": "assistant", "content": f"🚨 **Từ chối (Rule Engine):** {val_res['reason']}"})
+    #     st.rerun()
         
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
@@ -80,32 +153,56 @@ if prompt := st.chat_input("Hãy đặt câu hỏi pháp lý..."):
     with st.chat_message("assistant"):
         with st.status("Đang phân tích ý định câu hỏi (Query Understanding)...", expanded=True) as status:
             start_time = time.time()
-            # 1. Tầng 1: Query Classification
+            
+            # ══════════════════════════════════════════════════════════════
+            # TẦNG 1: Query Intent Classification
+            # ══════════════════════════════════════════════════════════════
+            intent = intent_classifier.analyze(prompt)
+            
+            classifier_label = "Regex Classifier" if intent._fallback_used else "Qwen2.5 Classifier"
+            st.write(f"🧠 **Tầng 1 ({classifier_label}):** Phát hiện loại `[{intent.type.upper()}]` ({intent.total_time_ms:.0f}ms)")
+            
+            # Hiển thị chi tiết QueryIntent
+            with st.expander("📋 Chi tiết QueryIntent JSON", expanded=False):
+                st.json(intent.to_dict())
+            
+            if intent._fallback_used:
+                st.write("⚠️ *Model Qwen không khả dụng — đã dùng Regex fallback*")
+            
+            if intent.documents:
+                st.write(f"📄 Văn bản nhận diện: `{', '.join(intent.documents)}`")
+            if intent.article_hint:
+                st.write(f"📌 Gợi ý Điều: `Điều {intent.article_hint}`")
+            
+            # ══════════════════════════════════════════════════════════════
+            # TẦNG 2: Adaptive Hybrid Retrieval (Intent-driven)
+            # ══════════════════════════════════════════════════════════════
+            st.write(f"🔍 **Tầng 2 (Intent-driven Retrieval):** Chiến lược `{intent.type}` — BM25 + FAISS + KG Scope...")
+            base_top_k = 5
+            context = retriever.retrieve(prompt, intent=intent, top_k=base_top_k)
+            st.write(f"✨ Đã truy xuất {len(context)} ký tự ngữ cảnh.")
+            
+            # ══════════════════════════════════════════════════════════════
+            # TẦNG 3: Self-Check Agent (API-based)
+            # ══════════════════════════════════════════════════════════════
+            from agents import RAGAgents
             agent = RAGAgents(
                 api_key=api_key, 
                 base_url=base_url if base_url.strip() else None, 
                 model_name=model_name
             )
-            query_type = agent.classify_query(prompt)
-            st.write(f"🕵️ **Tầng 1 (Query Classifier):** Phát hiện loại câu hỏi `[{query_type.upper()}]`")
             
-            # 2. Tầng 2: Adaptive Hybrid Retrieval + Cross-Encoder Reranking
-            st.write(f"🔍 **Tầng 2 (Adaptive Hybrid Retrieval):** BM25 + FAISS + Graph Search...")
-            base_top_k = 5
-            base_max_hops = 1
-            context = retriever.retrieve(prompt, query_type=query_type, top_k=base_top_k, max_hops=base_max_hops)
-            st.write(f"✨ Đã áp dụng Lọc chéo (Cross-Encoder Reranker) giữ lại các Node tốt nhất.")
-            
-            # 3. Tầng 3: Self-Check Agent
             st.write(f"⚖️ **Tầng 3 (Self-Check Agent):** Đánh giá chất lượng ngữ cảnh...")
             check_result = agent.self_check(prompt, context)
             if check_result["sufficient"]:
                 st.write(f"✅ **Self-Check Pass:** Ngữ cảnh đầy đủ ({check_result['reason']})")
             else:
                 st.write(f"⚠️ **Self-Check Fail:** Thiếu hụt thông tin ({check_result['reason']})")
-                st.write(f"🔄 Kích hoạt trích xuất sâu hơn (max_hops=2, top_k=10)...")
-                # Retry logic
-                context = retriever.retrieve(prompt, query_type="tong_hop", top_k=10, max_hops=2)
+                st.write(f"🔄 Kích hoạt trích xuất sâu hơn (global search, top_k=10)...")
+                # Retry logic — fallback về cross_document search
+                from query_intent import QueryIntent as QI
+                retry_intent = QI(type="cross_document", keywords=intent.keywords, search_scope="global", topic=intent.topic)
+                context = retriever.retrieve(prompt, intent=retry_intent, top_k=10)
                 st.write(f"✅ Đã thu thập thêm dữ kiện vòng 2.")
             
             st.markdown("**Ngữ Cảnh Tìm Thấy:**")
@@ -114,7 +211,10 @@ if prompt := st.chat_input("Hãy đặt câu hỏi pháp lý..."):
                 
             status.update(label=f"Đã duyệt xong quy trình trong ({time.time() - start_time:.2f}s)! Đang sinh câu trả lời...", state="running")
             
-            # 4. Tầng 4: Structured Generation + LLM Judge
+            # ══════════════════════════════════════════════════════════════
+            # TẦNG 4: Structured Generation + LLM Judge
+            # ══════════════════════════════════════════════════════════════
+            from generator import BookRAGGenerator
             generator = BookRAGGenerator(
                 api_key=api_key, 
                 base_url=base_url if base_url.strip() else None, 
@@ -127,10 +227,15 @@ if prompt := st.chat_input("Hãy đặt câu hỏi pháp lý..."):
                 status.update(label="Đang đánh giá kết quả (LLM Judge Eval)...", state="running")
                 judge_res = agent.judge_generation(prompt, context, answer)
                 
-                # Setup offline logging
+                # Setup offline logging (thêm intent vào log)
                 outputs_dir = os.path.join(ROOT_DIR, "outputs")
                 os.makedirs(outputs_dir, exist_ok=True)
-                log_data = {"query": prompt, "answer": answer, "eval": judge_res}
+                log_data = {
+                    "query": prompt,
+                    "intent": intent.to_dict(),
+                    "answer": answer,
+                    "eval": judge_res
+                }
                 try:
                     with open(os.path.join(outputs_dir, "offline_eval_log.jsonl"), "a", encoding="utf-8") as lf:
                         lf.write(json.dumps(log_data, ensure_ascii=False) + "\n")

@@ -1,0 +1,370 @@
+{
+  "timestamp": "2026-04-15 11:55:00",
+  "mode": "qwen",
+  "total_retrieval": 23,
+  "total_intent": 10,
+  "max_score": 25,
+  "retrieval_pct": 92.0,
+  "intent_pct": 40.0,
+  "results": {
+    "Q01": {
+      "name": "Hành vi bị cấm — Điều 22 Luật GD 2019",
+      "intent_type": "single_lookup",
+      "classified_as": "procedure",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "Luật43_D22"
+      ],
+      "missing_chunks": [],
+      "context_length": 15619,
+      "retrieval_time": 0.91,
+      "catalog_confidence": "high"
+    },
+    "Q02": {
+      "name": "Tiền lương nhà giáo — Điều 76 Luật GD 2019",
+      "intent_type": "single_lookup",
+      "classified_as": "eligibility_check",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "Luật43_D76"
+      ],
+      "missing_chunks": [],
+      "context_length": 11910,
+      "retrieval_time": 2.0,
+      "catalog_confidence": "high"
+    },
+    "Q03": {
+      "name": "Nguyên tắc học phí — Điều 7 NĐ 238",
+      "intent_type": "single_lookup",
+      "classified_as": "eligibility_check",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "238_2025_NĐ_CP_D7"
+      ],
+      "missing_chunks": [],
+      "context_length": 20197,
+      "retrieval_time": 2.14,
+      "catalog_confidence": "high"
+    },
+    "Q04": {
+      "name": "Hệ thống giáo dục quốc dân — Điều 6 Luật GD",
+      "intent_type": "single_lookup",
+      "classified_as": "listing",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "Luật43_D6"
+      ],
+      "missing_chunks": [],
+      "context_length": 23091,
+      "retrieval_time": 1.2,
+      "catalog_confidence": "high"
+    },
+    "Q05": {
+      "name": "Học phí — Điều 99 Luật GD 2019",
+      "intent_type": "single_lookup",
+      "classified_as": "eligibility_check",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "Luật43_D99"
+      ],
+      "missing_chunks": [],
+      "context_length": 23142,
+      "retrieval_time": 2.18,
+      "catalog_confidence": "high"
+    },
+    "Q06": {
+      "name": "So sánh học phí NĐ 238 vs NĐ 84",
+      "intent_type": "comparison",
+      "classified_as": "comparison",
+      "intent_correct": true,
+      "retrieval_pass": false,
+      "found_chunks": [
+        "238_2025_NĐ_CP_D10"
+      ],
+      "missing_chunks": [
+        "84_2020_NĐ_CP_D5"
+      ],
+      "context_length": 96818,
+      "retrieval_time": 1.16,
+      "catalog_confidence": "high"
+    },
+    "Q07": {
+      "name": "So sánh quyền nhà giáo: Luật GD vs Luật Nhà giáo",
+      "intent_type": "comparison",
+      "classified_as": "comparison",
+      "intent_correct": true,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "Luật43_D70",
+        "Luật73_D8"
+      ],
+      "missing_chunks": [],
+      "context_length": 57688,
+      "retrieval_time": 1.0,
+      "catalog_confidence": "high"
+    },
+    "Q08": {
+      "name": "So sánh nghĩa vụ nhà giáo 2 Luật",
+      "intent_type": "comparison",
+      "classified_as": "comparison",
+      "intent_correct": true,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "Luật43_D70",
+        "Luật73_D9"
+      ],
+      "missing_chunks": [],
+      "context_length": 39959,
+      "retrieval_time": 1.08,
+      "catalog_confidence": "high"
+    },
+    "Q09": {
+      "name": "Đối tượng miễn học phí NĐ 238",
+      "intent_type": "listing",
+      "classified_as": "listing",
+      "intent_correct": true,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "238_2025_NĐ_CP_D15"
+      ],
+      "missing_chunks": [],
+      "context_length": 27409,
+      "retrieval_time": 1.75,
+      "catalog_confidence": "high"
+    },
+    "Q10": {
+      "name": "Đối tượng không phải đóng học phí NĐ 238",
+      "intent_type": "listing",
+      "classified_as": "eligibility_check",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "238_2025_NĐ_CP_D14"
+      ],
+      "missing_chunks": [],
+      "context_length": 19942,
+      "retrieval_time": 1.48,
+      "catalog_confidence": "high"
+    },
+    "Q11": {
+      "name": "Trường hợp không được dạy thêm",
+      "intent_type": "listing",
+      "classified_as": "procedure",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "29_2024_TT_BGDĐT_D4"
+      ],
+      "missing_chunks": [],
+      "context_length": 13100,
+      "retrieval_time": 0.77,
+      "catalog_confidence": "high"
+    },
+    "Q12": {
+      "name": "Những việc nhà giáo không được làm",
+      "intent_type": "listing",
+      "classified_as": "listing",
+      "intent_correct": true,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "Luật73_D11"
+      ],
+      "missing_chunks": [],
+      "context_length": 27418,
+      "retrieval_time": 1.52,
+      "catalog_confidence": "high"
+    },
+    "Q13": {
+      "name": "Sinh viên sư phạm bồi hoàn kinh phí",
+      "intent_type": "eligibility_check",
+      "classified_as": "procedure",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "116_2020_NĐ_CP_D6"
+      ],
+      "missing_chunks": [],
+      "context_length": 25898,
+      "retrieval_time": 0.82,
+      "catalog_confidence": "high"
+    },
+    "Q14": {
+      "name": "Mức hỗ trợ sinh viên sư phạm",
+      "intent_type": "eligibility_check",
+      "classified_as": "procedure",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "116_2020_NĐ_CP_D4"
+      ],
+      "missing_chunks": [],
+      "context_length": 24267,
+      "retrieval_time": 0.65,
+      "catalog_confidence": "high"
+    },
+    "Q15": {
+      "name": "Tiêu chuẩn giảng viên hạng III",
+      "intent_type": "eligibility_check",
+      "classified_as": "eligibility_check",
+      "intent_correct": true,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "40_2020_TT_BGDĐT_D5"
+      ],
+      "missing_chunks": [],
+      "context_length": 17641,
+      "retrieval_time": 1.82,
+      "catalog_confidence": "high"
+    },
+    "Q16": {
+      "name": "Thủ tục thành lập trường mầm non",
+      "intent_type": "procedure",
+      "classified_as": "cross_document",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "125_2024_NĐ_CP_D4"
+      ],
+      "missing_chunks": [],
+      "context_length": 22948,
+      "retrieval_time": 0.77,
+      "catalog_confidence": "high"
+    },
+    "Q17": {
+      "name": "Điều kiện thành lập trường mầm non",
+      "intent_type": "procedure",
+      "classified_as": "eligibility_check",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "125_2024_NĐ_CP_D3"
+      ],
+      "missing_chunks": [],
+      "context_length": 20907,
+      "retrieval_time": 1.59,
+      "catalog_confidence": "high"
+    },
+    "Q18": {
+      "name": "Thủ tục đăng ký hỗ trợ SV sư phạm",
+      "intent_type": "procedure",
+      "classified_as": "procedure",
+      "intent_correct": true,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "116_2020_NĐ_CP_D7"
+      ],
+      "missing_chunks": [],
+      "context_length": 26662,
+      "retrieval_time": 0.73,
+      "catalog_confidence": "high"
+    },
+    "Q19": {
+      "name": "Quyền và nghĩa vụ nhà giáo toàn diện",
+      "intent_type": "cross_document",
+      "classified_as": "listing",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "Luật73_D8",
+        "Luật73_D9"
+      ],
+      "missing_chunks": [],
+      "context_length": 18873,
+      "retrieval_time": 1.62,
+      "catalog_confidence": "high"
+    },
+    "Q20": {
+      "name": "Chính sách hỗ trợ sinh viên sư phạm",
+      "intent_type": "cross_document",
+      "classified_as": "eligibility_check",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "116_2020_NĐ_CP_D4",
+        "116_2020_NĐ_CP_D6"
+      ],
+      "missing_chunks": [],
+      "context_length": 22351,
+      "retrieval_time": 1.89,
+      "catalog_confidence": "high"
+    },
+    "Q21": {
+      "name": "Quy định dạy thêm học thêm",
+      "intent_type": "cross_document",
+      "classified_as": "procedure",
+      "intent_correct": false,
+      "retrieval_pass": false,
+      "found_chunks": [
+        "29_2024_TT_BGDĐT_D6"
+      ],
+      "missing_chunks": [
+        "29_2024_TT_BGDĐT_D5"
+      ],
+      "context_length": 12171,
+      "retrieval_time": 0.79,
+      "catalog_confidence": "high"
+    },
+    "Q22": {
+      "name": "Đạo đức nhà giáo theo Luật Nhà giáo",
+      "intent_type": "cross_document",
+      "classified_as": "definition",
+      "intent_correct": false,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "Luật73_D10",
+        "Luật73_D11"
+      ],
+      "missing_chunks": [],
+      "context_length": 12022,
+      "retrieval_time": 0.48,
+      "catalog_confidence": "high"
+    },
+    "Q23": {
+      "name": "Định nghĩa dạy thêm học thêm",
+      "intent_type": "definition",
+      "classified_as": "definition",
+      "intent_correct": true,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "29_2024_TT_BGDĐT_D2"
+      ],
+      "missing_chunks": [],
+      "context_length": 14414,
+      "retrieval_time": 0.42,
+      "catalog_confidence": "high"
+    },
+    "Q24": {
+      "name": "Định nghĩa nhà giáo",
+      "intent_type": "definition",
+      "classified_as": "definition",
+      "intent_correct": true,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "Luật73_D4"
+      ],
+      "missing_chunks": [],
+      "context_length": 14803,
+      "retrieval_time": 0.56,
+      "catalog_confidence": "high"
+    },
+    "Q25": {
+      "name": "Định nghĩa chức danh nhà giáo",
+      "intent_type": "definition",
+      "classified_as": "definition",
+      "intent_correct": true,
+      "retrieval_pass": true,
+      "found_chunks": [
+        "Luật73_D12"
+      ],
+      "missing_chunks": [],
+      "context_length": 9583,
+      "retrieval_time": 0.58,
+      "catalog_confidence": "high"
+    }
+  }
+}

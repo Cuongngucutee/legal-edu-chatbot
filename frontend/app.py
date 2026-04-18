@@ -75,19 +75,12 @@ with st.sidebar:
         st.session_state.index_status = "Đang tải mô hình & dữ liệu..."
 
 @st.cache_resource
-def load_catalog_matcher():
-    """Load CatalogMatcher (nhẹ, chỉ đọc JSON, không cần model)."""
-    from catalog_matcher import CatalogMatcher
-    return CatalogMatcher()
-
-@st.cache_resource
-def load_qwen_model(_catalog_matcher):
-    """Load Qwen model TRƯỚC FAISS — tránh segfault do FAISS mmap xung đột safetensors.
+def load_qwen_model():
+    """Load Fine-tuned Qwen model TRƯỚC FAISS — tránh segfault do FAISS mmap xung đột safetensors.
     Nếu vẫn crash, đổi use_regex_only=True."""
     classifier = QwenIntentClassifier(
-        model_name="Qwen/Qwen2.5-3B-Instruct",
+        model_name="manhcuong2005/qwen2.5-1.5b-legal-edu-v5",
         use_regex_only=False,  # True nếu Qwen vẫn crash
-        catalog_matcher=_catalog_matcher,
     )
     classifier._load_model()  # Eager load TRƯỚC FAISS
     return classifier
@@ -108,12 +101,9 @@ def load_retriever(_index):
     from retriever import BookRAGRetriever
     return BookRAGRetriever(_index)
 
-# ── CRITICAL LOAD ORDER: CatalogMatcher → Qwen → BookIndex/FAISS → Retriever ──
-with st.spinner("Đang tải Catalog Matcher..."):
-    catalog_matcher = load_catalog_matcher()
-
+# ── CRITICAL LOAD ORDER: Qwen → BookIndex/FAISS → Retriever ──
 with st.spinner("Đang tải Qwen Intent Classifier..."):
-    intent_classifier = load_qwen_model(catalog_matcher)
+    intent_classifier = load_qwen_model()
 
 with st.spinner("Đang xây dựng BookIndex (Tree + Knowledge Graph)... Vui lòng đợi"):
     index = load_index()

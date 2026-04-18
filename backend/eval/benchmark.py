@@ -352,8 +352,11 @@ def run_benchmark(retriever, intent_classifier) -> dict:
         
         intent_match = intent.type == intent_type
         
-        classifier_label = "Regex" if intent._fallback_used else "Qwen"
+        classifier_label = "Regex" if intent._fallback_used else "Qwen-FT"
         print(f" Intent ({classifier_label}): {intent.type} | docs={intent.documents[:3]}")
+        print(f" Topic: '{intent.topic or '(none)'}'")
+        if intent.sub_queries:
+            print(f" Sub-queries ({len(intent.sub_queries)}): {intent.sub_queries}")
         
         if not intent_match:
             print(f" ⚠️ Expected: {intent_type}, Got: {intent.type}")
@@ -389,13 +392,14 @@ def run_benchmark(retriever, intent_classifier) -> dict:
             "name": bm["name"],
             "intent_type": intent_type,
             "classified_as": intent.type,
+            "topic": intent.topic,
+            "sub_queries": intent.sub_queries or [],
             "intent_correct": intent_match,
             "retrieval_pass": retrieval_pass,
             "found_chunks": check["found"],
             "missing_chunks": check["missing"],
             "context_length": len(context),
             "retrieval_time": round(retrieval_time, 2),
-            "catalog_confidence": getattr(intent, 'catalog_confidence', 'N/A'),
         }
     
     # ══════════════════════════════════════════════════════════════════════
@@ -405,19 +409,20 @@ def run_benchmark(retriever, intent_classifier) -> dict:
     print("SCORE TABLE — Benchmark v3")
     print("=" * 100)
     
-    header = f"| {'#':<4} | {'Tên câu hỏi':<45} | {'Type':<18} | {'Classified':<18} | {'Intent':>6} | {'Retrieval':>9} |"
+    header = f"| {'#':<4} | {'Tên câu hỏi':<45} | {'Type':<18} | {'Classified':<18} | {'Topic':<30} | {'Intent':>6} | {'Retrieval':>9} |"
     print(header)
-    print("|" + "-"*6 + "|" + "-"*47 + "|" + "-"*20 + "|" + "-"*20 + "|" + "-"*8 + "|" + "-"*11 + "|")
+    print("|" + "-"*6 + "|" + "-"*47 + "|" + "-"*20 + "|" + "-"*20 + "|" + "-"*32 + "|" + "-"*8 + "|" + "-"*11 + "|")
     
     for qid in sorted(results.keys()):
         r = results[qid]
         i_mark = "✓" if r["intent_correct"] else "✗"
         r_mark = "✓" if r["retrieval_pass"] else "✗"
-        line = f"| {qid:<4} | {r['name']:<45} | {r['intent_type']:<18} | {r['classified_as']:<18} | {i_mark:>6} | {r_mark:>9} |"
+        topic_display = (r.get('topic', '') or '')[:30]
+        line = f"| {qid:<4} | {r['name']:<45} | {r['intent_type']:<18} | {r['classified_as']:<18} | {topic_display:<30} | {i_mark:>6} | {r_mark:>9} |"
         print(line)
     
-    print("|" + "-"*6 + "|" + "-"*47 + "|" + "-"*20 + "|" + "-"*20 + "|" + "-"*8 + "|" + "-"*11 + "|")
-    print(f"| {'':4} | {'TOTAL':<45} | {'':18} | {'':18} | {total_intent:>4}/{len(BENCHMARKS):<1} | {total_retrieval:>7}/{len(BENCHMARKS):<1} |")
+    print("|" + "-"*6 + "|" + "-"*47 + "|" + "-"*20 + "|" + "-"*20 + "|" + "-"*32 + "|" + "-"*8 + "|" + "-"*11 + "|")
+    print(f"| {'':4} | {'TOTAL':<45} | {'':18} | {'':18} | {'':30} | {total_intent:>4}/{len(BENCHMARKS):<1} | {total_retrieval:>7}/{len(BENCHMARKS):<1} |")
     
     # ── Type Breakdown ──
     print("\n" + "=" * 80)
@@ -497,19 +502,14 @@ def main():
         print(f"  ✅ All {len(all_chunk_ids)} ground truth chunk IDs verified.")
     
     # ── Load models ──
-    from catalog_matcher import CatalogMatcher
     from query_intent import QwenIntentClassifier
     
-    print(f"\n[Step 0] Loading CatalogMatcher...")
-    catalog_matcher = CatalogMatcher()
-    
     use_regex = "--regex" in sys.argv
-    mode_label = "Regex-only" if use_regex else "Qwen2.5-3B"
+    mode_label = "Regex-only" if use_regex else "Qwen2.5-1.5B Fine-tuned"
     print(f"\n[Step 1] Loading QwenIntentClassifier... Mode: {mode_label}")
     intent_classifier = QwenIntentClassifier(
-        model_name="Qwen/Qwen2.5-3B-Instruct",
+        model_name="manhcuong2005/qwen2.5-1.5b-legal-edu-v5",
         use_regex_only=use_regex,
-        catalog_matcher=catalog_matcher,
     )
     if not use_regex:
         intent_classifier._load_model()

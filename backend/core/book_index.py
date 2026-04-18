@@ -249,80 +249,10 @@ class BookIndex:
                 
             except Exception as e:
                 pass  # Skip silently
-        
-        # Bridge catalog doc_ids to corpus canonicals
-        self._build_catalog_bridge()
+
         
         print(f"  Document Registry: {len(self.doc_registry)} entries → {len(self.doc_nodes)} documents")
-    
-    def _build_catalog_bridge(self):
-        """Map catalog doc_id format sang file-based canonical format.
-        
-        Examples:
-          catalog: "01/2014/TT-BGDĐT"    → corpus: "01/2014/TT-BGDĐT" (direct match)
-          catalog: "Luật 43/2019/QH14"    → corpus via file stem "Luật_43_2019_QH14"
-          catalog: "23/2024/TT-BGDĐT (Sửa đổi)" → clean "23/2024/TT-BGDĐT"
-        """
-        catalog_path = self.data_dir.parent / "outputs" / "document_catalog_final.json"
-        if not catalog_path.exists():
-            return
-        
-        try:
-            with open(catalog_path, 'r', encoding='utf-8') as f:
-                catalog = json.load(f)
-        except Exception:
-            return
-        
-        bridged = 0
-        for entry in catalog:
-            cat_doc_id = entry["doc_id"]
-            
-            # Already registered?
-            if cat_doc_id in self.doc_registry:
-                continue
-            
-            # Clean suffixes like "(Sửa đổi)", "(Cập nhật)"
-            clean_id = re.sub(r'\s*\(.*?\)\s*', '', cat_doc_id).strip()
-            
-            # Try direct match with clean version
-            if clean_id in self.doc_registry:
-                self.doc_registry[cat_doc_id] = self.doc_registry[clean_id]
-                self.doc_registry[cat_doc_id.lower()] = self.doc_registry[clean_id]
-                bridged += 1
-                continue
-            
-            # Try file stem matching: "01/2014/TT-BGDĐT" → "01_2014_TT_BGDĐT"
-            stem = clean_id.replace('/', '_').replace('-', '_')
-            for canonical in self.doc_nodes:
-                canonical_stem = canonical.replace('/', '_').replace('-', '_')
-                if stem == canonical_stem or stem.lower() == canonical_stem.lower():
-                    self.doc_registry[cat_doc_id] = canonical
-                    self.doc_registry[cat_doc_id.lower()] = canonical
-                    self.doc_registry[clean_id] = canonical
-                    self.doc_registry[clean_id.lower()] = canonical
-                    bridged += 1
-                    break
-            else:
-                # Handle "Luật XX/YYYY/QHZZ" format
-                # Catalog: "Luật 43/2019/QH14" → file: "Luật_43_2019_QH14"
-                if clean_id.startswith("Luật "):
-                    luat_stem = "Luật_" + clean_id[5:].replace('/', '_').replace('-', '_')
-                    for canonical in self.doc_nodes:
-                        canonical_stem = canonical.replace('/', '_').replace('-', '_')
-                        if luat_stem == canonical_stem or luat_stem.lower() == canonical_stem.lower():
-                            self.doc_registry[cat_doc_id] = canonical
-                            self.doc_registry[cat_doc_id.lower()] = canonical
-                            self.doc_registry[clean_id] = canonical
-                            self.doc_registry[clean_id.lower()] = canonical
-                            # Also register without "Luật " prefix  
-                            num_part = clean_id[5:]  # "43/2019/QH14"
-                            if num_part not in self.doc_registry:
-                                self.doc_registry[num_part] = canonical
-                            bridged += 1
-                            break
-        
-        if bridged > 0:
-            print(f"  Catalog Bridge: {bridged} additional mappings registered")
+
     
     def get_doc_node_ids(self, so_hieu: str) -> set:
         """Get all node IDs belonging to a document by so_hieu."""

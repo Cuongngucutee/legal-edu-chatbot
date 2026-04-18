@@ -30,7 +30,7 @@ class BookRAGRetriever:
     # ─── Intent-based Retrieval (MỚI) ────────────────────────────────────
 
     def _retrieve_with_intent(self, query: str, intent: QueryIntent, top_k: int = 5) -> str:
-        """Dispatch retrieval strategy theo QueryIntent.type — catalog-aware."""
+        """Dispatch retrieval strategy theo QueryIntent.type."""
         
         strategy_map = {
             "single_lookup":     self._retrieve_single_lookup,
@@ -42,30 +42,84 @@ class BookRAGRetriever:
             "definition":        self._retrieve_definition,
         }
         
-        # Inject catalog topics vào keywords để boost reranking
-        if intent.catalog_confidence in ("high", "medium") and intent.catalog_metadata:
-            extra_keywords = []
-            for doc_meta in intent.catalog_metadata.values():
-                for topic in doc_meta.get("main_topics", []):
-                    # Lấy các từ nghĩa từ topics
-                    words = [w for w in topic.lower().split() if len(w) > 2]
-                    extra_keywords.extend(words[:3])  # Max 3 words per topic
-            # Deduplicate và merge
-            existing = set(kw.lower() for kw in intent.keywords)
-            for kw in extra_keywords:
-                if kw not in existing:
-                    intent.keywords.append(kw)
-                    existing.add(kw)
-        
         strategy = strategy_map.get(intent.type, self._retrieve_default)
         result = strategy(query, intent, top_k)
         
-        # Catalog fallback retry: nếu context rỗng và catalog có gợi ý
+        # Fallback: nếu context rỗng và có documents → thử global search
         if (not result or not result.strip()) and intent.documents:
-            print(f"[Retriever] Strategy '{intent.type}' returned empty. Trying catalog fallback...")
-            result = self._catalog_fallback_retrieve(query, intent, top_k)
+            print(f"[Retriever] Strategy '{intent.type}' returned empty. Trying global fallback...")
+            all_nodes = self._global_retrieve(query, faiss_k=top_k * 3, bm25_k=top_k * 2)
+            if all_nodes:
+                expanded = self._expand_graph(set(all_nodes), hops=1)
+                selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=intent.keywords)
+                result = self._format_context(selected)
         
         return result
+
+    # ── Multi-Query Retrieval (Tận dụng sub_queries) ─────────────────────
+
+    def _multi_query_retrieve(self, query: str, intent: QueryIntent,
+                               faiss_k: int = 10, bm25_k: int = 10,
+                               scoped: bool = True) -> List[str]:
+        """
+        Tìm kiếm song song với từng sub_query (nếu có) rồi merge kết quả.
+        
+        Luật:
+        - Nếu sub_queries chỉ có 1 → search 2 lần: sub_query + topic, rồi merge
+        - Nếu sub_queries >= 2 → chạy riêng từng sub_query
+        """
+        sub_queries = intent.sub_queries or [query]
+        # Deduplicate sub_queries
+        seen_sq = set()
+        unique_sqs = []
+        for sq in sub_queries:
+            sq_lower = sq.strip().lower()
+            if sq_lower and sq_lower not in seen_sq:
+                seen_sq.add(sq_lower)
+                unique_sqs.append(sq)
+        if not unique_sqs:
+            unique_sqs = [query]
+        
+        all_nodes = []
+        
+        if len(unique_sqs) == 1:
+            # ── 1 sub_query → search 2 lần: sub_query + topic, rồi merge ──
+            sub_q = unique_sqs[0]
+            topic = (intent.topic or "").strip()
+            
+            # Lần 1: Search bằng sub_query
+            if scoped and intent.documents:
+                for doc in intent.documents:
+                    nodes = self._scoped_retrieve(sub_q, doc, faiss_k=faiss_k, bm25_k=bm25_k)
+                    all_nodes.extend(nodes)
+            else:
+                nodes = self._global_retrieve(sub_q, faiss_k=faiss_k, bm25_k=bm25_k)
+                all_nodes.extend(nodes)
+            
+            # Lần 2: Search bằng topic (nếu topic khác sub_query)
+            if topic and topic.lower() != sub_q.strip().lower():
+                if scoped and intent.documents:
+                    for doc in intent.documents:
+                        nodes = self._scoped_retrieve(topic, doc, faiss_k=faiss_k, bm25_k=bm25_k)
+                        all_nodes.extend(nodes)
+                else:
+                    nodes = self._global_retrieve(topic, faiss_k=faiss_k, bm25_k=bm25_k)
+                    all_nodes.extend(nodes)
+        else:
+            # ── Nhiều sub_queries → chạy từng sub_query riêng, KHÔNG thêm query gốc ──
+            per_query_faiss = max(3, faiss_k // len(unique_sqs))
+            per_query_bm25 = max(3, bm25_k // len(unique_sqs))
+            
+            for sq in unique_sqs:
+                if scoped and intent.documents:
+                    for doc in intent.documents:
+                        nodes = self._scoped_retrieve(sq, doc, faiss_k=per_query_faiss, bm25_k=per_query_bm25)
+                        all_nodes.extend(nodes)
+                else:
+                    nodes = self._global_retrieve(sq, faiss_k=per_query_faiss, bm25_k=per_query_bm25)
+                    all_nodes.extend(nodes)
+        
+        return list(set(all_nodes))
 
     # ── Strategy: single_lookup ───────────────────────────────────────────
 
@@ -78,13 +132,10 @@ class BookRAGRetriever:
             if context:
                 return context
         
-        # Fallback: scoped retrieval trong document cụ thể
-        if intent.documents:
-            all_nodes = []
-            for doc in intent.documents:
-                nodes = self._scoped_retrieve(query, doc, faiss_k=top_k, bm25_k=top_k * 2)
-                all_nodes.extend(nodes)
-            # Expand qua graph 1 hop
+        # Multi-query retrieval với sub_queries
+        all_nodes = self._multi_query_retrieve(query, intent, faiss_k=top_k, bm25_k=top_k * 2, scoped=bool(intent.documents))
+        
+        if all_nodes:
             expanded = self._expand_graph(set(all_nodes), hops=1)
             selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=intent.keywords)
             return self._format_context(selected)
@@ -130,17 +181,12 @@ class BookRAGRetriever:
     # ── Strategy: listing ─────────────────────────────────────────────────
 
     def _retrieve_listing(self, query: str, intent: QueryIntent, top_k: int) -> str:
-        """Liệt kê đối tượng/điều kiện. Mở rộng search, MMR diversity."""
+        """Liệt kê đối tượng/điều kiện. Multi-query + MMR diversity."""
         
         effective_k = top_k * 3 if intent.expand_search else top_k * 2
         
-        if intent.documents:
-            all_nodes = []
-            for doc in intent.documents:
-                nodes = self._scoped_retrieve(query, doc, faiss_k=effective_k, bm25_k=effective_k)
-                all_nodes.extend(nodes)
-        else:
-            all_nodes = self._global_retrieve(query, faiss_k=effective_k, bm25_k=effective_k)
+        # Multi-query: tận dụng sub_queries để cover nhiều khía cạnh
+        all_nodes = self._multi_query_retrieve(query, intent, faiss_k=effective_k, bm25_k=effective_k, scoped=bool(intent.documents))
         
         expanded = self._expand_graph(set(all_nodes), hops=1)
         # Rerank + MMR cho diversity
@@ -150,18 +196,10 @@ class BookRAGRetriever:
     # ── Strategy: eligibility_check ───────────────────────────────────────
 
     def _retrieve_eligibility(self, query: str, intent: QueryIntent, top_k: int) -> str:
-        """Kiểm tra điều kiện. Search cả subject lẫn check_aspects."""
+        """Kiểm tra điều kiện. Multi-query + check_aspects."""
         
-        all_nodes = set()
-        
-        # Search chính với query gốc
-        if intent.documents:
-            for doc in intent.documents:
-                nodes = self._scoped_retrieve(query, doc, faiss_k=top_k, bm25_k=top_k)
-                all_nodes.update(nodes)
-        else:
-            nodes = self._global_retrieve(query, faiss_k=top_k, bm25_k=top_k)
-            all_nodes.update(nodes)
+        # Multi-query với sub_queries (bao gồm câu hỏi gốc)
+        all_nodes = set(self._multi_query_retrieve(query, intent, faiss_k=top_k, bm25_k=top_k, scoped=bool(intent.documents)))
         
         # Search bổ sung cho từng check_aspect
         if intent.check_aspects:
@@ -182,16 +220,10 @@ class BookRAGRetriever:
     # ── Strategy: procedure ───────────────────────────────────────────────
 
     def _retrieve_procedure(self, query: str, intent: QueryIntent, top_k: int) -> str:
-        """Thủ tục/quy trình. BM25 trọng số cao, boost procedure_keywords."""
+        """Thủ tục/quy trình. Multi-query + BM25 boost procedure_keywords."""
         
-        if intent.documents:
-            all_nodes = []
-            for doc in intent.documents:
-                # BM25 k cao hơn FAISS cho thủ tục (exact terms matter)
-                nodes = self._scoped_retrieve(query, doc, faiss_k=top_k, bm25_k=top_k * 3)
-                all_nodes.extend(nodes)
-        else:
-            all_nodes = self._global_retrieve(query, faiss_k=top_k, bm25_k=top_k * 3)
+        # Multi-query với sub_queries, BM25 trọng số cao hơn cho thuật ngữ thủ tục
+        all_nodes = self._multi_query_retrieve(query, intent, faiss_k=top_k, bm25_k=top_k * 3, scoped=bool(intent.documents))
         
         expanded = self._expand_graph(set(all_nodes), hops=1)
         boost_kw = (intent.procedure_keywords or []) + intent.keywords
@@ -201,22 +233,23 @@ class BookRAGRetriever:
     # ── Strategy: cross_document ──────────────────────────────────────────
 
     def _retrieve_cross_document(self, query: str, intent: QueryIntent, top_k: int) -> str:
-        """Tìm kiếm xuyên văn bản. Scoped-first nếu có docs, global nếu không."""
+        """Tìm kiếm xuyên văn bản. Multi-query để cover nhiều khía cạnh."""
         
-        if intent.documents:
-            # Có docs từ catalog/regex → scoped search ưu tiên
-            all_nodes = []
-            for doc in intent.documents[:5]:  # Max 5 docs
-                nodes = self._scoped_retrieve(query, doc, faiss_k=top_k * 2, bm25_k=top_k * 2)
-                all_nodes.extend(nodes)
-            if all_nodes:
-                expanded = self._expand_graph(set(all_nodes), hops=1)
-                selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=intent.keywords)
-                result = self._format_context(selected)
-                if result.strip():
-                    return result
+        # Multi-query: mỗi sub_query tìm riêng rồi merge
+        all_nodes = self._multi_query_retrieve(
+            query, intent,
+            faiss_k=top_k * 3, bm25_k=top_k * 2,
+            scoped=bool(intent.documents)
+        )
         
-        # Fallback: Global search
+        if all_nodes:
+            expanded = self._expand_graph(set(all_nodes), hops=1)
+            selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=intent.keywords, use_mmr=True)
+            result = self._format_context(selected)
+            if result.strip():
+                return result
+        
+        # Fallback: Global search không dùng sub_queries
         all_nodes = self._global_retrieve(query, faiss_k=top_k * 3, bm25_k=top_k * 2)
         expanded = self._expand_graph(set(all_nodes), hops=1)
         selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=intent.keywords)
@@ -225,24 +258,25 @@ class BookRAGRetriever:
     # ── Strategy: definition ──────────────────────────────────────────────
 
     def _retrieve_definition(self, query: str, intent: QueryIntent, top_k: int) -> str:
-        """Tra cứu định nghĩa. Scoped-first, BM25 boost cho term (exact match)."""
+        """Tra cứu định nghĩa. Multi-query + BM25 boost cho term (exact match)."""
         
         boost_kw = intent.keywords.copy()
         if intent.term:
             boost_kw.insert(0, intent.term)
         
-        if intent.documents:
-            # Có docs từ catalog/regex → scoped search ưu tiên
-            all_nodes = []
-            for doc in intent.documents[:3]:
-                nodes = self._scoped_retrieve(query, doc, faiss_k=top_k, bm25_k=top_k * 2)
-                all_nodes.extend(nodes)
-            if all_nodes:
-                expanded = self._expand_graph(set(all_nodes), hops=1)
-                selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=boost_kw)
-                result = self._format_context(selected)
-                if result.strip():
-                    return result
+        # Multi-query retrieval với sub_queries
+        all_nodes = self._multi_query_retrieve(
+            query, intent,
+            faiss_k=top_k, bm25_k=top_k * 2,
+            scoped=bool(intent.documents)
+        )
+        
+        if all_nodes:
+            expanded = self._expand_graph(set(all_nodes), hops=1)
+            selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=boost_kw)
+            result = self._format_context(selected)
+            if result.strip():
+                return result
         
         # Fallback: Global search
         all_nodes = self._global_retrieve(query, faiss_k=top_k, bm25_k=top_k * 2)
@@ -253,9 +287,9 @@ class BookRAGRetriever:
     # ── Strategy: default fallback ────────────────────────────────────────
 
     def _retrieve_default(self, query: str, intent: QueryIntent, top_k: int) -> str:
-        """Fallback strategy — catalog-aware: scoped nếu có docs, global nếu không."""
+        """Fallback strategy: scoped nếu có docs, global nếu không."""
         if intent.documents:
-            # Có docs (từ regex hoặc catalog) → scoped search
+            # Có docs (từ regex hoặc Qwen) → scoped search
             all_nodes = []
             for doc in intent.documents:
                 nodes = self._scoped_retrieve(query, doc, faiss_k=top_k * 2, bm25_k=top_k * 2)
@@ -273,23 +307,7 @@ class BookRAGRetriever:
         selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=intent.keywords if intent else [])
         return self._format_context(selected)
     
-    def _catalog_fallback_retrieve(self, query: str, intent: QueryIntent, top_k: int) -> str:
-        """Fallback: dùng catalog docs để scoped search khi strategy chính fail."""
-        all_nodes = []
-        for doc in intent.documents[:5]:
-            nodes = self._scoped_retrieve(query, doc, faiss_k=top_k * 2, bm25_k=top_k * 2)
-            all_nodes.extend(nodes)
-        
-        if not all_nodes:
-            # Last resort: global search
-            all_nodes = self._global_retrieve(query, faiss_k=top_k * 3, bm25_k=top_k * 2)
-        
-        if not all_nodes:
-            return ""
-        
-        expanded = self._expand_graph(set(all_nodes), hops=1)
-        selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=intent.keywords)
-        return self._format_context(selected)
+
 
     # ─── Core Retrieval Building Blocks ───────────────────────────────────
 

@@ -1,3 +1,4 @@
+import re
 import numpy as np
 import networkx as nx
 from typing import List, Dict, Set, Optional
@@ -5,6 +6,34 @@ from typing import List, Dict, Set, Optional
 from sentence_transformers import CrossEncoder
 from book_index import BookIndex
 from query_intent import QueryIntent, intent_to_legacy_type
+
+# Patterns nhận diện câu hỏi tóm tắt/tổng quan về văn bản
+_SUMMARY_PATTERNS = [
+    r"nói về (gì|điều gì|cái gì|vấn đề gì)",
+    r"quy định (gì|những gì|về gì|về vấn đề gì)",
+    r"gồm (những gì|bao nhiêu|mấy)",
+    r"bao gồm (những gì|nội dung gì)",
+    r"tóm tắt",
+    r"nội dung (chính|chủ yếu|tổng quan|cơ bản)",
+    r"có (bao nhiêu|mấy) (chương|điều|mục|phần)",
+    r"tổng quan",
+    r"giới thiệu",
+    r"cấu trúc",
+    r"phạm vi điều chỉnh",
+]
+
+# Patterns nhận diện câu hỏi thống kê/liệt kê văn bản
+_STAT_PATTERNS = [
+    r"những (nghị định|thông tư|luật|văn bản|quy định) nào",
+    r"liệt kê.*(nghị định|thông tư|luật|văn bản)",
+    r"có (bao nhiêu|mấy) (nghị định|thông tư|luật|văn bản)",
+    r"danh sách.*(nghị định|thông tư|luật|văn bản)",
+    r"(nghị định|thông tư|luật|văn bản) nào.*(liên quan|nói về|quy định về|đề cập)",
+    r"(năm|trong năm)\s+20\d{2}.*(nghị định|thông tư|luật|văn bản|ban hành|ra)",
+    r"(nghị định|thông tư|luật|văn bản).*(năm|trong năm)\s+20\d{2}",
+    r"ban hành.*(năm|trong năm)\s+20\d{2}",
+    r"(ra|được ban hành).*(năm|trong)\s+20\d{2}",
+]
 
 
 class BookRAGRetriever:
@@ -54,7 +83,65 @@ class BookRAGRetriever:
                 selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=intent.keywords)
                 result = self._format_context(selected)
         
+        # TOC Injection: nếu có document cụ thể + câu hỏi dạng tóm tắt
+        # → prepend mục lục vào context (retrieval vẫn chạy bình thường)
+        if intent.documents and self._is_summary_query(query):
+            toc_parts = []
+            for doc_ref in intent.documents:
+                toc = self.index.build_toc(doc_ref)
+                if toc:
+                    toc_parts.append(toc)
+            if toc_parts:
+                toc_context = "\n\n".join(toc_parts)
+                print(f"[Retriever] TOC injected for {len(toc_parts)} document(s)")
+                result = toc_context + "\n\n" + (result or "")
+        
+        # Catalog Injection: câu hỏi thống kê/liệt kê văn bản
+        # → truy vấn Document Catalog (metadata + semantic), prepend vào context
+        if self._is_statistical_query(query):
+            year_filter = self._extract_year_filter(query)
+            doc_type_filter = self._extract_doc_type_filter(query)
+            
+            catalog_result = self.index.query_catalog(
+                query=query,
+                doc_type=doc_type_filter,
+                year=year_filter,
+            )
+            if catalog_result:
+                print(f"[Retriever] Catalog injected (year={year_filter}, type={doc_type_filter})")
+                result = catalog_result + "\n\n" + (result or "")
+        
         return result
+
+    @staticmethod
+    def _is_summary_query(query: str) -> bool:
+        """Kiểm tra câu hỏi có phải dạng tóm tắt/tổng quan không."""
+        query_lower = query.lower()
+        return any(re.search(p, query_lower) for p in _SUMMARY_PATTERNS)
+
+    @staticmethod
+    def _is_statistical_query(query: str) -> bool:
+        """Kiểm tra câu hỏi có phải dạng thống kê/liệt kê văn bản không."""
+        query_lower = query.lower()
+        return any(re.search(p, query_lower) for p in _STAT_PATTERNS)
+
+    @staticmethod
+    def _extract_year_filter(query: str) -> str:
+        """Trích xuất năm từ câu hỏi (nếu có)."""
+        m = re.search(r'(20\d{2})', query)
+        return m.group(1) if m else None
+
+    @staticmethod
+    def _extract_doc_type_filter(query: str) -> str:
+        """Trích xuất loại văn bản từ câu hỏi (nếu có)."""
+        query_lower = query.lower()
+        if "nghị định" in query_lower:
+            return "Nghị định"
+        elif "thông tư" in query_lower:
+            return "Thông tư"
+        elif "luật" in query_lower:
+            return "Luật"
+        return None
 
     # ── Multi-Query Retrieval (Tận dụng sub_queries) ─────────────────────
 
@@ -592,7 +679,7 @@ class BookRAGRetriever:
         # Tùy chỉnh tham số Hybrid Search theo Intent (chiến lược Adaptive)
         if query_type == "tra_cuu":
             faiss_k = top_k
-            bm25_k = top_k * 2  # Trọng số lexcial cao hơn vì tra cứu cần chuẩn xác từ khóa
+            bm25_k = top_k * 2  # Trọng số lexical cao hơn vì tra cứu cần chuẩn xác từ khóa
             max_hops = max(1, max_hops)
         elif query_type == "so_sanh":
             faiss_k = top_k * 2
@@ -654,7 +741,7 @@ class BookRAGRetriever:
         scores = self.reranker.predict(candidate_pairs)
         ranked_indices = np.argsort(scores)[::-1]
         
-        # Giữ lại Top N có điểm cao nhất để gừi LLM (tránh nhiễu context)
+        # Giữ lại Top N có điểm cao nhất để gửi LLM (tránh nhiễu context)
         final_top = min(top_k * 2, len(ranked_indices))
         selected_nodes = [node_contexts[i] for i in ranked_indices[:final_top]]
 

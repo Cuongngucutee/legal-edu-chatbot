@@ -18,6 +18,7 @@ os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.0'
 import time
 import sys
 import json
+import glob
 from collections import defaultdict
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "core"))
@@ -480,7 +481,6 @@ def main():
     
     found_in_files = set()
     data_path = os.path.join(data_dir)
-    import glob
     for fp in glob.glob(os.path.join(data_path, "*.json")):
         try:
             with open(fp, 'r', encoding='utf-8') as f:
@@ -489,7 +489,7 @@ def main():
                 cid = c.get("id", "")
                 if cid in all_chunk_ids:
                     found_in_files.add(cid)
-        except:
+        except Exception:
             pass
     
     missing_ids = all_chunk_ids - found_in_files

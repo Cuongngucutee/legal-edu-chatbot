@@ -13,6 +13,7 @@ os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.0'
 import faiss
 import networkx as nx
 import numpy as np
+import pickle
 from sentence_transformers import SentenceTransformer
 from rank_bm25 import BM25Okapi
 
@@ -41,6 +42,12 @@ class BookIndex:
         self.doc_registry = {}  # "81/2021" → "01/2021/TT-BGDĐT"
         self.doc_nodes = {}     # so_hieu → set of node_ids belonging to that doc
         self.doc_faiss_map = {} # canonical → set of FAISS indices (for scoped search)
+        
+        # Document Catalog for statistical/listing queries
+        self.doc_catalog = []       # List[dict] — one entry per document
+        self.doc_catalog_faiss = None  # Separate FAISS for doc-level semantic search
+        self.doc_catalog_bm25 = None   # Separate BM25 for doc-level lexical search
+        self.doc_catalog_mapping = {}  # FAISS idx → catalog idx
 
     def _tokenize(self, text: str) -> List[str]:
         text = text.lower()
@@ -100,6 +107,9 @@ class BookIndex:
         
         print("Building Doc-FAISS Map...")
         self._build_doc_faiss_map()
+        
+        print("Building Document Catalog...")
+        self._build_doc_catalog()
         
     def _augment_with_json_tree(self):
         # Read JSON chunks to get full texts and hierarchical structures (chapters, sections)
@@ -205,9 +215,7 @@ class BookIndex:
                 # VD: source="Luật 43/2019/QH14" → canonical="43/2019/QH14"
                 canonical = so_hieu
                 if not canonical and source:
-                    # Extract "43/2019/QH14" from "Luật 43/2019/QH14"
-                    import re as _re
-                    m = _re.search(r'(\d+[\/-]\d{4}[\/-]?[\w\-]*)', source)
+                    m = re.search(r'(\d+[\/-]\d{4}[\/-]?[\w\-]*)', source)
                     if m:
                         canonical = m.group(1)
                     else:
@@ -248,7 +256,7 @@ class BookIndex:
                         self.doc_registry[num] = canonical
                 
             except Exception as e:
-                pass  # Skip silently
+                print(f"[BookIndex] Warning: skipping {file_path.name}: {e}")
 
         
         print(f"  Document Registry: {len(self.doc_registry)} entries → {len(self.doc_nodes)} documents")
@@ -258,7 +266,284 @@ class BookIndex:
         """Get all node IDs belonging to a document by so_hieu."""
         canonical = self.doc_registry.get(so_hieu, so_hieu)
         return self.doc_nodes.get(canonical, set())
+
+    def build_toc(self, so_hieu: str) -> str:
+        """Build a structured Table of Contents (TOC) for a document.
+        
+        Returns a formatted string listing all articles grouped by chapter/section,
+        using only article titles (not full text) to keep context compact.
+        """
+        node_ids = self.get_doc_node_ids(so_hieu)
+        if not node_ids:
+            return ""
+        
+        # Collect article info with their chapter/section from graph edges
+        articles = []
+        for node_id in node_ids:
+            if node_id not in self.graph.nodes:
+                continue
+            
+            # Skip CAN_CU nodes (căn cứ pháp lý, không phải điều luật)
+            if "_CAN_CU" in node_id:
+                continue
+            
+            node_data = self.graph.nodes[node_id]
+            
+            # Get article title: prefer 'name', fallback to first line of full_text
+            name = node_data.get("name", "")
+            if not name:
+                full_text = node_data.get("full_text", "") or node_data.get("search_text", "")
+                if full_text:
+                    # First line = article title (e.g. "Điều 1. Phạm vi điều chỉnh")
+                    first_line = full_text.split("\n")[0].strip()
+                    # Truncate long titles
+                    name = first_line[:120] if len(first_line) > 120 else first_line
+            
+            if not name:
+                continue
+            
+            # Get chapter via THUOC_CHUONG edge
+            chapter = ""
+            for neighbor in self.graph.neighbors(node_id):
+                edge_type = self.graph.edges[node_id, neighbor].get("type", "")
+                if edge_type == "THUOC_CHUONG":
+                    chapter = self.graph.nodes[neighbor].get("name", "")
+                    break
+            
+            # Get section via THUOC_MUC edge
+            section = ""
+            for neighbor in self.graph.neighbors(node_id):
+                edge_type = self.graph.edges[node_id, neighbor].get("type", "")
+                if edge_type == "THUOC_MUC":
+                    section = self.graph.nodes[neighbor].get("name", "")
+                    break
+            
+            # Extract article number for sorting
+            art_num = 0
+            m = re.search(r'Điều\s+(\d+)', name)
+            if m:
+                art_num = int(m.group(1))
+            
+            articles.append({
+                "name": name,
+                "chapter": chapter,
+                "section": section,
+                "art_num": art_num,
+            })
+        
+        if not articles:
+            return ""
+        
+        # Sort by article number
+        articles.sort(key=lambda a: a["art_num"])
+        
+        # Build structured TOC grouped by chapter → section
+        canonical = self.doc_registry.get(so_hieu, so_hieu)
+        toc_lines = [f"=== MỤC LỤC: {canonical} ==="]
+        
+        current_chapter = None
+        current_section = None
+        
+        for art in articles:
+            if art["chapter"] and art["chapter"] != current_chapter:
+                current_chapter = art["chapter"]
+                current_section = None  # Reset section when chapter changes
+                toc_lines.append(f"\n{current_chapter}")
+            
+            if art["section"] and art["section"] != current_section:
+                current_section = art["section"]
+                toc_lines.append(f"  {current_section}")
+            
+            indent = "    " if current_section else "  "
+            toc_lines.append(f"{indent}- {art['name']}")
+        
+        toc_lines.append(f"\nTổng cộng: {len(articles)} điều")
+        return "\n".join(toc_lines)
     
+    # ─── Document Catalog (Statistical Queries) ────────────────────────
+
+    def _build_doc_catalog(self):
+        """Build document-level catalog with metadata + summaries.
+        
+        Each entry contains: source, so_hieu, doc_type, year, summary, canonical.
+        Also builds a doc-level FAISS index on summaries for semantic search.
+        """
+        self.doc_catalog = []
+        json_files = list(self.data_dir.glob("*.json"))
+        
+        for file_path in json_files:
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    chunks = json.load(f)
+                if not isinstance(chunks, list) or not chunks:
+                    continue
+                
+                meta = chunks[0].get("metadata", {})
+                source = meta.get("source", "") or ""
+                so_hieu = meta.get("so_hieu", "") or ""
+                
+                if not source:
+                    continue
+                
+                # Extract doc_type from source prefix
+                source_lower = source.lower()
+                if source_lower.startswith("nghị định"):
+                    doc_type = "Nghị định"
+                elif source_lower.startswith("thông tư"):
+                    doc_type = "Thông tư"
+                elif source_lower.startswith("luật"):
+                    doc_type = "Luật"
+                else:
+                    doc_type = "Khác"
+                
+                # Extract year from so_hieu (e.g. '238/2025/NĐ-CP' → 2025)
+                year = ""
+                m = re.search(r'(\d{4})', so_hieu)
+                if m:
+                    year = m.group(1)
+                
+                # Extract summary from Điều 1 (Phạm vi điều chỉnh)
+                summary = ""
+                for chunk in chunks:
+                    c_meta = chunk.get("metadata", {})
+                    art_num = str(c_meta.get("article_number", "")).strip()
+                    if art_num == "1":
+                        full_text = chunk.get("content", {}).get("full_text", "")
+                        # Take first 300 chars as summary
+                        summary = full_text[:300].strip()
+                        break
+                
+                # Fallback summary from CAN_CU or first chunk
+                if not summary:
+                    for chunk in chunks:
+                        full_text = chunk.get("content", {}).get("full_text", "")
+                        if full_text and "_CAN_CU" not in str(chunk.get("id", "")):
+                            summary = full_text[:300].strip()
+                            break
+                
+                canonical = self.doc_registry.get(so_hieu, so_hieu)
+                
+                self.doc_catalog.append({
+                    "source": source,
+                    "so_hieu": so_hieu,
+                    "canonical": canonical,
+                    "doc_type": doc_type,
+                    "year": year,
+                    "summary": summary,
+                })
+            except Exception as e:
+                print(f"[Catalog] Warning: skipping {file_path.name}: {e}")
+        
+        # Build doc-level Hybrid index on summaries (FAISS + BM25)
+        if self.doc_catalog:
+            texts = [f"{entry['source']}: {entry['summary']}" for entry in self.doc_catalog]
+            embeddings = self.encoder.encode(texts, normalize_embeddings=True)
+            embeddings = np.array(embeddings).astype('float32')
+            
+            self.doc_catalog_faiss = faiss.IndexFlatIP(self.embed_dim)
+            self.doc_catalog_faiss.add(embeddings)
+            
+            tokenized_corpus = [self._tokenize(text) for text in texts]
+            self.doc_catalog_bm25 = BM25Okapi(tokenized_corpus)
+            
+            self.doc_catalog_mapping = {i: i for i in range(len(self.doc_catalog))}
+        
+        print(f"  Document Catalog: {len(self.doc_catalog)} documents indexed")
+
+    def query_catalog(self, query: str, 
+                      doc_type: str = None, 
+                      year: str = None,
+                      semantic_top_k: int = 20,
+                      max_results: int = 15) -> str:
+        """Query the document catalog using metadata filters + semantic search.
+        
+        Args:
+            query: User query for semantic matching
+            doc_type: Filter by type ('Nghị định', 'Thông tư', 'Luật')
+            year: Filter by year ('2025', '2026', etc.)
+            semantic_top_k: Number of semantic matches to consider
+            max_results: Max documents to return
+        
+        Returns:
+            Formatted string listing matching documents
+        """
+        if not self.doc_catalog:
+            return ""
+        
+        # Step 1: Metadata filter
+        candidates = self.doc_catalog
+        
+        if doc_type:
+            candidates = [d for d in candidates if d["doc_type"].lower() == doc_type.lower()]
+        
+        if year:
+            candidates = [d for d in candidates if d["year"] == year]
+        
+        # Step 2: If no metadata filter matched or we want semantic ranking too
+        if self.doc_catalog_faiss and self.doc_catalog_bm25 and query:
+            # 1. FAISS Search
+            query_emb = self.encoder.encode([query], normalize_embeddings=True)
+            query_emb = np.array(query_emb).astype('float32')
+            k_faiss = min(semantic_top_k * 2, self.doc_catalog_faiss.ntotal)
+            faiss_scores, faiss_indices = self.doc_catalog_faiss.search(query_emb, k_faiss)
+            
+            # 2. BM25 Search
+            tokenized_query = self._tokenize(query)
+            bm25_all_scores = self.doc_catalog_bm25.get_scores(tokenized_query)
+            
+            # 3. Reciprocal Rank Fusion (RRF)
+            rrf_scores = {}
+            k_rrf = 60
+            
+            # Accumulate FAISS rank
+            for rank, idx in enumerate(faiss_indices[0]):
+                if idx >= 0 and faiss_scores[0][rank] > 0.15:  # Basic sanity threshold
+                    rrf_scores[int(idx)] = rrf_scores.get(int(idx), 0.0) + 1.0 / (k_rrf + rank + 1)
+            
+            # Accumulate BM25 rank
+            k_bm25 = min(semantic_top_k * 2, len(self.doc_catalog))
+            bm25_indices = np.argsort(bm25_all_scores)[::-1][:k_bm25]
+            for rank, idx in enumerate(bm25_indices):
+                score = bm25_all_scores[idx]
+                if score > 0:  # Only count if BM25 actually matches something
+                    rrf_scores[int(idx)] = rrf_scores.get(int(idx), 0.0) + 1.0 / (k_rrf + rank + 1)
+            
+            # Build set of semantically relevant catalog indices (sorted by RRF)
+            sorted_indices = sorted(rrf_scores.keys(), key=lambda x: rrf_scores[x], reverse=True)
+            semantic_set = set(sorted_indices[:semantic_top_k])
+            
+            if candidates == self.doc_catalog:
+                # No metadata filter → use semantic results directly
+                candidates = [self.doc_catalog[i] for i in sorted(semantic_set) 
+                              if i < len(self.doc_catalog)]
+            else:
+                # Intersect metadata-filtered + semantic, but keep all metadata matches
+                # Prioritize those in semantic_set
+                candidate_set = {d["so_hieu"] for d in candidates}
+                semantic_docs = [self.doc_catalog[i] for i in sorted(semantic_set)
+                                 if i < len(self.doc_catalog) 
+                                 and self.doc_catalog[i]["so_hieu"] in candidate_set]
+                
+                # If intersection is too small, just keep all metadata-filtered
+                if len(semantic_docs) >= 3:
+                    candidates = semantic_docs
+        
+        # Limit results
+        candidates = candidates[:max_results]
+        
+        if not candidates:
+            return ""
+        
+        # Format output
+        lines = [f"=== KẾT QUẢ TÌM KIẾM VĂN BẢN ({len(candidates)} kết quả) ==="]
+        for i, doc in enumerate(candidates, 1):
+            summary_preview = doc['summary'].split('\n')[0][:150] if doc['summary'] else 'Không có tóm tắt'
+            lines.append(f"\n{i}. {doc['source']}")
+            lines.append(f"   Loại: {doc['doc_type']} | Năm: {doc['year']}")
+            lines.append(f"   Nội dung: {summary_preview}")
+        
+        return "\n".join(lines)
+
     def _build_doc_faiss_map(self):
         """Build mapping: canonical doc → set of FAISS indices.
         Cho phép scoped_vector_search tra cứu trực tiếp."""
@@ -306,10 +591,6 @@ class BookIndex:
         return [self.node_mapping[indices_arr[i]] for i in top_local if scores[i] > 0]
 
     def _build_vector_index(self):
-        import os
-        import pickle
-        import faiss
-        
         cache_dir = self.kg_path.parent / "index_cache"
         cache_dir.mkdir(parents=True, exist_ok=True)
         

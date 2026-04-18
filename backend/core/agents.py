@@ -25,40 +25,8 @@ class RAGAgents:
                 return json.loads(match.group(0))
             return json.loads(text)
         except Exception as e:
-            print(f"JSON parsing error: {e} - Raw text: {text}")
+            print(f"[Agents] JSON parsing error: {e} - Raw text: {text[:200]}")
             return {}
-
-    def classify_query(self, query: str) -> str:
-        """
-        Phân loại câu hỏi của người dùng thành 4 nhóm để chỉ đạo Retrieval Strategy:
-        - tra_cuu: Cần chính xác, ưu tiên Semantic cao + Lexical. Bám sát Điều X.
-        - so_sanh: Cần mở rộng ngữ cảnh cả 2 đối tượng + đi Graph Hops = 2.
-        - thu_tuc: Cần tuần tự điều khoản, Hops = 1.
-        - tong_hop: Cần mở rộng rất rộng, Hops = 1, Top K FAISS cao.
-        """
-        system_prompt = """Bạn là trợ lý AI phân tích ngôn ngữ tự nhiên. Phân loại câu hỏi thành 1 trong 4 loại sau:
-1. "tra_cuu": Dành cho các câu hỏi tra thông tin trực tiếp, VD: Điều 25 là gì? Khoản 2 Điều 10 quy định về gì?
-2. "so_sanh": Dành cho phân biệt, so sánh điểm khác nhau, VD: Cao đẳng và Đại học khác nhau thế nào?
-3. "thu_tuc": Dành cho các hướng dẫn từng bước, điều kiện, hồ sơ, VD: Thủ tục thành lập trường? Làm thế nào để xin phép?
-4. "tong_hop": Dành cho các câu hỏi bao quát, khái niệm mở, VD: Các quy định về học phí? Quyền lợi giảng viên?
-Bạn PHẢI trả về ĐÚNG MỘT JSON với định dạng: {"category": "loại"}"""
-
-        try:
-            resp = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": query}
-                ],
-                temperature=0.0,
-                max_tokens=64
-            )
-            content = resp.choices[0].message.content
-            parsed = self._extract_json(content)
-            return parsed.get("category", "tong_hop")
-        except Exception as e:
-            print(f"[Query Classifier] Failed: {e}")
-            return "tong_hop"
 
     def self_check(self, query: str, context: str) -> dict:
         """

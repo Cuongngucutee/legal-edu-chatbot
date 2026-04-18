@@ -39,7 +39,8 @@ class LawCrawlerUltimate:
             if next_btn:
                 url = urljoin(self.base_url, next_btn['href'])
                 page += 1
-            else: url = None
+            else:
+                url = None
         return laws
 
     def normalize_text(self, text):
@@ -51,7 +52,8 @@ class LawCrawlerUltimate:
     def parse_chunks(self, html_content, meta):
         soup = BeautifulSoup(html_content, "html.parser")
         content_div = soup.find("div", {"id": "toanvancontent"}) or soup.find("div", {"class": "toanvancontent"})
-        if not content_div: return []
+        if not content_div:
+            return []
 
         # Xử lý: Hợp nhất nội dung trong mỗi thẻ p/div để không bị chia cắt "Điều 1"
         processed_lines = []

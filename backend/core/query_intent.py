@@ -327,14 +327,12 @@ class QwenIntentClassifier:
         try:
             # Lần 1: Gọi bình thường
             raw_output = self._generate(query)
-            print(f"[QueryIntent] RAW OUTPUT: {raw_output[:500]}")
             parsed = self._safe_parse_json(raw_output)
             
             # Lần 2: Nếu không phải JSON → retry với force_json=True
             if not parsed:
                 print(f"[QueryIntent] ⚠️ Output không phải JSON → retry với force_json...")
                 raw_output = self._generate(query, force_json=True)
-                print(f"[QueryIntent] RETRY OUTPUT: {raw_output[:500]}")
                 parsed = self._safe_parse_json(raw_output)
                 
         except Exception as e:
@@ -554,7 +552,7 @@ class QwenIntentClassifier:
         if m:
             try:
                 result["sub_queries"] = json.loads(f"[{m.group(1)}]")
-            except:
+            except (ValueError, json.JSONDecodeError):
                 result["sub_queries"] = []
         
         # keywords
@@ -562,7 +560,7 @@ class QwenIntentClassifier:
         if m:
             try:
                 result["keywords"] = json.loads(f"[{m.group(1)}]")
-            except:
+            except (ValueError, json.JSONDecodeError):
                 result["keywords"] = []
         
         # documents

@@ -72,7 +72,7 @@ with st.sidebar:
     
     # Initialize components
     if "index" not in st.session_state:
-        st.session_state.index_status = "Đang tải mô hình & dữ liệu..."
+        pass  # Index sẽ được khởi tạo bên dưới qua @st.cache_resource
 
 @st.cache_resource
 def load_qwen_model():
@@ -229,7 +229,7 @@ if prompt := st.chat_input("Hãy đặt câu hỏi pháp lý..."):
                 try:
                     with open(os.path.join(outputs_dir, "offline_eval_log.jsonl"), "a", encoding="utf-8") as lf:
                         lf.write(json.dumps(log_data, ensure_ascii=False) + "\n")
-                except:
+                except Exception:
                     pass
                 
                 if judge_res["passed"]:

@@ -143,7 +143,6 @@ class EntityGraphBuilder:
         self.relations: List[Dict]        = []
         self.node_entity_links: List[Dict] = []
 
-        # ← FIX VĐ4: Set để dedup relations
         self._seen_relations: Set[Tuple[str, str, str]] = set()
 
         print(f"⏳ Tải Model Offline {self.model_name} vào VRAM...")
@@ -275,7 +274,6 @@ class EntityGraphBuilder:
                 clause_header = f"Khoản {c.get('clause_id', '?')}: {c.get('text', '')}"
                 detail_parts.append(clause_header)
 
-                # ← FIX VĐ3: Bổ sung point (điểm a, b, c...)
                 points = c.get("point", [])
                 if points:
                     for p in points:
@@ -308,9 +306,6 @@ class EntityGraphBuilder:
     def _extract_batch(self, chunks: List[dict]) -> List[dict]:
         """
         Gửi toàn bộ batch vào llm.generate() một lần duy nhất.
-        vLLM tự động lên lịch song song trên GPU → tận dụng tối đa RTX 6000.
-
-        FIX VĐ2: Chunk CAN_CU dùng system prompt riêng (_SYS_EXTRACT_CAN_CU).
         """
         prompts = []
         for c in chunks:
@@ -524,7 +519,7 @@ class EntityGraphBuilder:
                         "relation":  "MENTIONS",
                     })
 
-                # ← FIX VĐ4: Dedup relations bằng set
+                # Dedup relations bằng set
                 for rel in extracted.get("relations", []):
                     src_name = rel.get("source", "").strip()
                     tgt_name = rel.get("target", "").strip()
@@ -547,7 +542,7 @@ class EntityGraphBuilder:
               f"({total/elapsed:.1f} chunks/s)")
         print(f"   Entities: {len(self.entities)} | Relations (unique): {len(self.relations)}")
 
-        # ← FIX VĐ7: Chạy Entity Resolution sau khi trích xuất xong
+        # Chạy Entity Resolution sau khi trích xuất xong
         if self.entity_resolution:
             self._resolve_entities_batch()
 
@@ -585,10 +580,10 @@ if __name__ == "__main__":
         gpu_memory_utilization = 0.9,
         max_model_len          = 32768,
 
-        batch_size             = 64,    # ← FIX VĐ6: Tối ưu cho RTX 6000 96GB
+        batch_size             = 64,    # Tối ưu cho RTX 6000 96GB VRAM
         resolution_batch_size  = 200,   # Số entity mỗi lần gọi resolution
         enable_thinking        = False,
-        entity_resolution      = True,  # ← FIX VĐ7: Bật entity resolution
+        entity_resolution      = True,  # Bật entity resolution
     )
 
     print("\n🚀 Bắt đầu trích xuất thực thể bằng LLM Offline (Batched)...")

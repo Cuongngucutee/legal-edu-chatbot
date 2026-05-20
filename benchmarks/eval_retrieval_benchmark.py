@@ -80,19 +80,23 @@ CROSS_REFERENCE_MAP = {
 }
 
 def inject_cross_refs(top_docs, all_docs_map):
-    """Inject parent laws from cross-reference map into top_docs list."""
-    injected = list(top_docs)
-    for sh in list(top_docs):
+    """Inject parent laws from cross-reference map into top_docs list immediately following the child document."""
+    injected = []
+    seen = set()
+    for sh in top_docs:
         bare = bare_sh(sh)
-        # Check all cross-ref entries
+        if bare not in seen:
+            injected.append(sh)
+            seen.add(bare)
+        # Find if this sh has parent laws
         for key, parents in CROSS_REFERENCE_MAP.items():
             if bare_sh(key) == bare or key == sh:
                 for parent in parents:
-                    # Try to resolve parent to actual registry key
                     resolved = resolve_sh(parent, index.doc_registry)
                     parent_bare = bare_sh(resolved)
-                    if not any(bare_sh(s) == parent_bare for s in injected):
+                    if parent_bare not in seen:
                         injected.append(resolved)
+                        seen.add(parent_bare)
     return injected
 
 
@@ -253,9 +257,10 @@ for idx, test_case in enumerate(benchmark):
     explicit_targets = expander.get_target_docs(question)
     for ext_doc in explicit_targets:
         ext_bare = bare_sh(ext_doc)
-        if ext_bare not in top_so_hieu:
-            top_so_hieu.insert(0, ext_bare)  # Put at Rank 1 to guarantee its TOC is processed in Stage 2!
-            unique_docs_map[ext_bare] = ext_doc
+        if ext_bare in top_so_hieu:
+            top_so_hieu.remove(ext_bare)
+        top_so_hieu.insert(0, ext_bare)  # Put at Rank 1 to guarantee its TOC is processed in Stage 2!
+        unique_docs_map[ext_bare] = ext_doc
             
     # Inject cross-referenced parent laws
     top_so_hieu = inject_cross_refs(top_so_hieu, unique_docs_map)
@@ -280,8 +285,8 @@ for idx, test_case in enumerate(benchmark):
     
     # ── Stage 2: 320B TOC Analysis ───────────────────────────
     toc_parts = []
-    # Build TOC only for the top 3 documents to keep prompt compact and prevent API empty responses!
-    for sh in top_so_hieu[:3]:
+    # Build TOC for the top 4 documents to keep coverage high for cross-referenced parent laws!
+    for sh in top_so_hieu[:4]:
         # Resolve sh to the canonical doc registry key first!
         canonical_sh = resolve_sh(sh, index.doc_registry)
         toc = index.build_toc(canonical_sh)
@@ -393,6 +398,7 @@ Hãy chọn TẤT CẢ các điều liên quan, kể cả điều liên quan gi�
 LƯU Ý QUAN TRỌNG:
 - Đối với Luật sửa đổi bổ sung (ví dụ Luật 34/2018), Điều 1 thường chứa toàn bộ nội dung sửa đổi. Nếu câu hỏi liên quan đến nội dung được sửa đổi, hãy chọn Điều 1 của Luật sửa đổi.
 - Đối với Thông tư sửa đổi (ví dụ TT 08/2023), Điều 1 hoặc Điều 2 thường chứa nội dung sửa đổi chính.
+- Nếu mục lục hiển thị nhiều văn bản quy định chồng lấp nhau qua các thời kỳ hoặc các năm khác nhau (ví dụ: cùng quy định thăng hạng giáo viên ở Thông tư 01/2021 hoặc 02/2021, Thông tư sửa đổi 08/2023, và Thông tư mới 13/2024), hãy chọn ĐỒNG THỜI các Điều tương ứng ở TẤT CẢ các văn bản này.
 
 Trả về JSON: [{{"so_hieu": "...", "dieu": <số>}}]
 Chỉ xuất mảng JSON, không giải thích."""
@@ -412,6 +418,11 @@ Mục lục các văn bản:
 
 Nhiệm vụ: Liệt kê TẤT CẢ các Điều khoản có thể liên quan đến câu hỏi, kể cả các điều liên quan gián tiếp.
 Chọn ÍT NHẤT 2 điều khoản.
+
+LƯU Ý:
+- Nếu có cả văn bản cũ (01/2021, 02/2021, 08/2023) và mới (13/2024), hãy liệt kê các Điều liên quan ở CẢ văn bản cũ và văn bản mới.
+- Đối với Luật 34/2018 và TT 08/2023, luôn liệt kê Điều 1 hoặc Điều 2 nếu nội dung câu hỏi bị tác động bởi luật sửa đổi này.
+
 Trả về JSON: [{{"so_hieu": "...", "dieu": <số>}}]
 Chỉ xuất mảng JSON, không giải thích."""
             try:
@@ -424,8 +435,8 @@ Chỉ xuất mảng JSON, không giải thích."""
                 pass
         
         # Attempt 3: Expand to next-ranked docs if still empty
-        if not stage2_articles and len(ranked_docs) > 3:
-            extra_shs = [sh for sh, _ in ranked_docs[3:6] if sh not in top_so_hieu]
+        if not stage2_articles and len(ranked_docs) > 4:
+            extra_shs = [sh for sh, _ in ranked_docs[4:7] if sh not in top_so_hieu]
             extra_tocs = []
             for sh in extra_shs:
                 toc = index.build_toc(sh)

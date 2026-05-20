@@ -203,22 +203,64 @@ class EducationQueryExpander:
         """Trả về list các so_hieu văn bản đích dựa trên keyword đặc trưng."""
         q = query.lower()
         targets = []
-        mappings = [
-            (["nâng chuẩn", "trình độ chuẩn", "bằng cử nhân giáo viên"], "71/2020/NĐ-CP"),
-            (["bổ nhiệm hạng", "thăng hạng", "hạng ii", "hạng iii", "giáo viên mầm non công lập"], "08/2023/TT-BGDĐT"),
-            (["bổ nhiệm hạng", "thăng hạng", "hạng ii", "hạng iii"], "01/2021/TT-BGDĐT"),
-            (["thăng hạng tiểu học", "thăng hạng gv tiểu học", "giáo viên tiểu học thăng hạng"], "02/2021/TT-BGDĐT"),
-            (["giữa kỳ", "cuối kỳ", "bài kiểm tra", "kiểm tra định kỳ", "kiểm tra thường xuyên", "nghỉ học nhiều", "ở lại lớp", "lên lớp", "tai nạn", "kiểm tra giữa kỳ"], "22/2021/TT-BGDĐT"),
-            (["chuyển đổi đại học", "đại học tư thục", "không vì lợi nhuận", "hội đồng trường", "đại học y"], "34/2018/QH14"),
-            (["chuyển đổi đại học", "đại học tư thục", "không vì lợi nhuận", "hội đồng trường"], "99/2019/NĐ-CP"),
-            (["thi tốt nghiệp", "tốt nghiệp thpt", "2026", "24/2024"], "24/2024/TT-BGDĐT"),
-            (["học bổng chính sách", "cử tuyển", "nghị định 84"], "84/2020/NĐ-CP"),
-            (["du học", "nghiên cứu khoa học nước ngoài", "gia hạn du học"], "86/2021/NĐ-CP"),
-            (["sinh viên sư phạm", "hỗ trợ sinh hoạt phí", "bồi hoàn", "116/2020"], "116/2020/NĐ-CP"),
-            (["chuyển trường khác tỉnh", "giấy giới thiệu"], "43/2019/QH14")
-        ]
-        for kws, doc in mappings:
-            if any(kw in q for kw in kws):
-                targets.append(doc)
-        return targets
+        
+        # 1. Nâng chuẩn GV
+        if any(kw in q for kw in ["nâng chuẩn", "trình độ chuẩn", "bằng cử nhân giáo viên"]):
+            targets.append("71/2020/NĐ-CP")
+            
+        # 2. Thăng bổ nhiệm hạng GV
+        if any(kw in q for kw in ["bổ nhiệm hạng", "thăng hạng", "hạng ii", "hạng iii"]):
+            if "mầm non" in q:
+                targets.append("01/2021/TT-BGDĐT")
+                targets.append("08/2023/TT-BGDĐT")
+            elif "tiểu học" in q:
+                targets.append("02/2021/TT-BGDĐT")
+                targets.append("08/2023/TT-BGDĐT")
+            else:
+                targets.append("01/2021/TT-BGDĐT")
+                targets.append("08/2023/TT-BGDĐT")
+                
+        # 3. Đánh giá kiểm tra định kỳ học sinh THCS/THPT
+        if any(kw in q for kw in ["giữa kỳ", "cuối kỳ", "bài kiểm tra", "kiểm tra định kỳ", 
+                                  "kiểm tra thường xuyên", "nghỉ học nhiều", "ở lại lớp", 
+                                  "lên lớp", "tai nạn", "kiểm tra giữa kỳ", "nghỉ học quá 45 buổi"]):
+            targets.append("22/2021/TT-BGDĐT")
+            
+        # 4. Chuyển đổi loại hình đại học tư thục / công lập
+        if "chuyển đổi" in q and "đại học" in q:
+            targets.append("34/2018/QH14")
+            targets.append("99/2019/NĐ-CP")
+        elif any(kw in q for kw in ["đại học tư thục", "không vì lợi nhuận", "hội đồng trường", "đại học y"]):
+            targets.append("34/2018/QH14")
+            targets.append("99/2019/NĐ-CP")
+            
+        # 5. Thi tốt nghiệp THPT mới 2026
+        if any(kw in q for kw in ["thi tốt nghiệp", "tốt nghiệp thpt", "2026", "24/2024"]):
+            targets.append("24/2024/TT-BGDĐT")
+            
+        # 6. Tuyển sinh đại học 2022
+        if any(kw in q for kw in ["tuyển sinh năm 2022", "tuyển sinh 2022", "tuyển sinh đại học"]):
+            targets.append("08/2022/TT-BGDĐT")
+            
+        # 7. Học bổng chính sách / cử tuyển
+        if any(kw in q for kw in ["học bổng", "cử tuyển", "dự bị đại học", "nội trú"]):
+            targets.append("84/2020/NĐ-CP")
+            
+        # 8. Du học sinh / Nghiên cứu nước ngoài
+        if any(kw in q for kw in ["du học", "nghiên cứu khoa học nước ngoài", "gia hạn du học", "sinh viên cử đi học", "giảng viên đại học cử ra nước ngoài"]):
+            targets.append("86/2021/NĐ-CP")
+            
+        # 9. Sinh viên sư phạm hỗ trợ kinh phí
+        if any(kw in q for kw in ["sinh viên sư phạm", "hỗ trợ sinh hoạt phí", "bồi hoàn", "116/2020", "bảo lưu sư phạm"]):
+            targets.append("116/2020/NĐ-CP")
+            
+        # 10. Chuyển trường khác tỉnh
+        if any(kw in q for kw in ["chuyển trường khác tỉnh", "giấy giới thiệu", "thủ tục chuyển trường"]):
+            targets.append("43/2019/QH14")
+            
+        # 11. Chương trình giáo dục phổ thông 2018 / dạy ngoại ngữ
+        if any(kw in q for kw in ["ngoại ngữ", "dạy ngoại ngữ", "ngoại ngữ 1", "chương trình giáo dục phổ thông 2018", "chương trình 2018"]):
+            targets.append("32/2018/TT-BGDĐT")
+            
+        return list(dict.fromkeys(targets))  # Deduplicate while preserving order
 

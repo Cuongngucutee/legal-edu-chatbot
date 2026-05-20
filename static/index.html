@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduLaw AI — Trợ lý Pháp lý Giáo dục</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            /* Colors */
+            --navy-base: #0A1628;
+            --navy-light: #152744;
+            --navy-lighter: #1E3860;
+            --navy-transparent: rgba(10, 22, 40, 0.7);
+            
+            --gold-base: #C9A84C;
+            --gold-light: #DFCA81;
+            --gold-dark: #A38433;
+            --gold-transparent: rgba(201, 168, 76, 0.15);
+            
+            --text-main: #E2E8F0;
+            --text-muted: #94A3B8;
+            --text-dark: #0F172A;
+            
+            /* Fonts */
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Be Vietnam Pro', sans-serif;
+            
+            /* UI */
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --radius-pill: 999px;
+            
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-glow: 0 0 15px rgba(201, 168, 76, 0.2);
+            
+            --sidebar-width: 280px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--navy-base);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* -------------------------------------
+           SIDEBAR
+           ------------------------------------- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100%;
+            background-color: #07101D;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 20;
+            transition: transform 0.3s ease;
+            
+            /* Subtle diagonal pattern */
+            background-image: repeating-linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.01) 0px,
+                rgba(255, 255, 255, 0.01) 1px,
+                transparent 1px,
+                transparent 10px
+            );
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .logo-icon {
+            color: var(--gold-base);
+            background: var(--gold-transparent);
+            padding: 8px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+        }
+
+        .logo-text h1 {
+            font-family: var(--font-serif);
+            font-size: 22px;
+            color: var(--gold-base);
+            line-height: 1.2;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .btn-new-chat {
+            width: 100%;
+            background: linear-gradient(135deg, var(--gold-base), var(--gold-dark));
+            color: var(--text-dark);
+            border: none;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 10px rgba(201, 168, 76, 0.2);
+        }
+
+        .btn-new-chat:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(201, 168, 76, 0.3);
+            filter: brightness(1.05);
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        
+        /* Custom Scrollbar */
+        .history-list::-webkit-scrollbar, .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+        .history-list::-webkit-scrollbar-thumb, .chat-messages::-webkit-scrollbar-thumb {
+            background-color: var(--navy-lighter);
+            border-radius: 4px;
+        }
+
+        .history-item {
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-left: 2px solid transparent;
+        }
+
+        .history-item:hover, .history-item.active {
+            background-color: var(--navy-light);
+            color: var(--text-main);
+            border-left-color: var(--gold-base);
+        }
+
+        .history-item i[data-lucide] {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--navy-lighter);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--gold-base);
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: color 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-icon:hover {
+            color: var(--gold-base);
+            background-color: var(--navy-light);
+        }
+
+        /* -------------------------------------
+           MAIN CHAT AREA
+           ------------------------------------- */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: var(--navy-base);
+            overflow: hidden;
+        }
+
+        /* Ambient Glowing Orbs */
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--gold-base);
+            top: -100px;
+            right: -100px;
+        }
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: #2563EB; /* Deep blue glow */
+            bottom: -200px;
+            left: -100px;
+        }
+
+        .header {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(10, 22, 40, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 10;
+        }
+
+        .header-title {
+            font-weight: 500;
+            font-size: 15px;
+            color: var(--text-main);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .menu-toggle {
+            display: none;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 5;
+            transition: opacity 0.3s ease;
+        }
+
+        .welcome-hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .welcome-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px;
+            height: 72px;
+            background: var(--gold-transparent);
+            color: var(--gold-base);
+            border-radius: 20px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .welcome-hero h2 {
+            font-family: var(--font-serif);
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .welcome-hero p {
+            color: var(--text-muted);
+            max-width: 450px;
+            line-height: 1.5;
+        }
+
+        .suggestion-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .suggestion-chip {
+            background-color: var(--navy-light);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px 20px;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .suggestion-chip:hover {
+            transform: translateY(-2px);
+            background-color: var(--navy-lighter);
+            border-color: var(--gold-base);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .suggestion-chip i {
+            color: var(--gold-base);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .suggestion-chip span {
+            font-size: 14px;
+            line-height: 1.4;
+            color: var(--text-main);
+        }
+
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            z-index: 5;
+            scroll-behavior: smooth;
+        }
+
+        .message-wrapper {
+            display: flex;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: slideUpFade 0.3s forwards ease-out;
+        }
+
+        @keyframes slideUpFade {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message {
+            max-width: 85%;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .message.user {
+            margin-left: auto;
+            background: linear-gradient(135deg, var(--gold-base), var(--gold-dark));
+            color: var(--text-dark);
+            padding: 14px 20px;
+            border-radius: 20px 20px 4px 20px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .message.bot {
+            margin-right: auto;
+            display: flex;
+            gap: 16px;
+            max-width: 90%;
+        }
+
+        .bot-avatar {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            background-color: var(--navy-light);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            color: var(--gold-base);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bot-content {
+            background-color: rgba(21, 39, 68, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px 20px;
+            border-radius: 4px 20px 20px 20px;
+            font-size: 15px;
+            color: var(--text-main);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .bot-content strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .timestamp {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            text-align: right;
+        }
+        
+        .message-wrapper:hover .timestamp {
+            opacity: 1;
+        }
+
+        .message.user .timestamp {
+            color: rgba(15, 23, 42, 0.6);
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+        }
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--gold-base);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 20px 24px;
+            background: linear-gradient(to top, var(--navy-base) 70%, transparent);
+            z-index: 10;
+            position: relative;
+        }
+
+        .input-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--navy-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: flex-end;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-container:focus-within {
+            border-color: var(--gold-base);
+            box-shadow: 0 0 0 1px var(--gold-base), 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: var(--font-sans);
+            font-size: 15px;
+            padding: 10px 8px;
+            resize: none;
+            max-height: 120px;
+            min-height: 44px;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .btn-send {
+            background-color: var(--gold-base);
+            color: var(--text-dark);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 8px;
+            margin-bottom: 2px;
+        }
+
+        .btn-send:hover {
+            transform: scale(1.05);
+            background-color: var(--gold-light);
+        }
+        
+        .btn-send:disabled {
+            background-color: var(--navy-lighter);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .disclaimer {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+
+        /* Overlay for mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 15;
+            backdrop-filter: blur(2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: var(--text-main);
+                cursor: pointer;
+                padding: 4px;
+            }
+            .sidebar-overlay.open {
+                display: block;
+            }
+            .suggestion-grid {
+                grid-template-columns: 1fr;
+            }
+            .welcome-hero h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i data-lucide="scale"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>EduLaw AI</h1>
+                    <p>Trợ lý Pháp lý Giáo dục</p>
+                </div>
+            </div>
+            <button class="btn-new-chat" id="btnNewChat">
+                <i data-lucide="plus" size="18"></i> Cuộc hội thoại mới
+            </button>
+        </div>
+
+        <div class="history-list">
+            <div class="history-item active">
+                <i data-lucide="message-square"></i> Nghỉ học quá 45 buổi THPT
+            </div>
+            <div class="history-item">
+                <i data-lucide="message-square"></i> Thủ tục thành lập trường mầm non
+            </div>
+            <div class="history-item">
+                <i data-lucide="message-square"></i> Quy định về thu học phí 2024
+            </div>
+            <div class="history-item">
+                <i data-lucide="message-square"></i> Khiếu nại điểm thi tốt nghiệp
+            </div>
+            <div class="history-item">
+                <i data-lucide="message-square"></i> Điều kiện cấp chứng chỉ hành nghề...
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="avatar">U</div>
+                <div class="user-name">Người dùng</div>
+            </div>
+            <button class="btn-icon" aria-label="Cài đặt">
+                <i data-lucide="settings" size="18"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CHAT AREA -->
+    <main class="main-content">
+        <!-- Background Orbs -->
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+
+        <!-- Header -->
+        <header class="header">
+            <button class="menu-toggle" id="menuToggle">
+                <i data-lucide="menu"></i>
+            </button>
+            <div class="header-title" id="chatTitle">Nghỉ học quá 45 buổi THPT</div>
+            <div class="header-actions">
+                <button class="btn-icon" title="Chia sẻ"><i data-lucide="share" size="18"></i></button>
+                <button class="btn-icon" title="Xoá lịch sử" id="btnClearChat"><i data-lucide="trash-2" size="18"></i></button>
+            </div>
+        </header>
+
+        <!-- Welcome Screen (Hidden by default since we preload a chat) -->
+        <div class="welcome-screen" id="welcomeScreen" style="display: none;">
+            <div class="welcome-hero">
+                <div class="welcome-icon">
+                    <i data-lucide="gavel" size="36"></i>
+                </div>
+                <h2>Xin chào! Tôi có thể giúp gì cho bạn?</h2>
+                <p>Hỏi về luật giáo dục, chính sách học phí, quyền của học sinh, thủ tục tuyển sinh...</p>
+            </div>
+            <div class="suggestion-grid">
+                <div class="suggestion-chip" onclick="sendPrompt(this)">
+                    <i data-lucide="clipboard-list" size="20"></i>
+                    <span>Điều kiện xét tuyển đại học 2024 là gì?</span>
+                </div>
+                <div class="suggestion-chip" onclick="sendPrompt(this)">
+                    <i data-lucide="alert-circle" size="20"></i>
+                    <span>Học sinh có quyền khiếu nại điểm thi không?</span>
+                </div>
+                <div class="suggestion-chip" onclick="sendPrompt(this)">
+                    <i data-lucide="coins" size="20"></i>
+                    <span>Quy định về học phí trường công lập?</span>
+                </div>
+                <div class="suggestion-chip" onclick="sendPrompt(this)">
+                    <i data-lucide="file-text" size="20"></i>
+                    <span>Thủ tục xin nghỉ học tạm thời như thế nào?</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div class="chat-messages" id="chatMessages">
+            
+            <!-- Preloaded Mock Exchange -->
+            <div class="message-wrapper">
+                <div class="message user">
+                    Học sinh THPT có được phép nghỉ học quá 45 buổi không?
+                    <div class="timestamp">Vừa xong</div>
+                </div>
+            </div>
+
+            <div class="message-wrapper">
+                <div class="message bot">
+                    <div class="bot-avatar"><i data-lucide="scale" size="20"></i></div>
+                    <div class="bot-content">
+                        Theo <strong>Thông tư 58/2011/TT-BGDĐT</strong> và các quy định hiện hành:<br><br>
+                        <strong>📌 Quy định nghỉ học:</strong><br>
+                        - Học sinh nghỉ học <strong>không có lý do</strong> quá <strong>10 buổi/học kỳ</strong> hoặc <strong>20 buổi/năm</strong> học có thể bị xếp loại hạnh kiểm yếu<br>
+                        - Nghỉ quá <strong>45 buổi/năm</strong> (có phép hoặc không phép) → không đủ điều kiện xét lên lớp<br><br>
+                        <strong>⚠️ Lưu ý:</strong> Nhà trường có thể xem xét các trường hợp đặc biệt (bệnh nặng, lý do gia đình) nếu có giấy tờ hợp lệ.<br><br>
+                        Bạn có muốn biết thêm về quy trình xin miễn giảm không?
+                        <div class="timestamp">Vừa xong</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing indicator -->
+            <div class="message-wrapper typing-indicator" id="typingIndicator">
+                <div class="message bot">
+                    <div class="bot-avatar"><i data-lucide="scale" size="20"></i></div>
+                    <div class="bot-content">
+                        <div class="typing-dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <div class="input-container">
+                <textarea 
+                    class="chat-input" 
+                    id="chatInput" 
+                    placeholder="Nhập câu hỏi về luật giáo dục..." 
+                    rows="1"
+                ></textarea>
+                <button class="btn-send" id="btnSend" disabled>
+                    <i data-lucide="send" size="18"></i>
+                </button>
+            </div>
+            <div class="disclaimer">
+                EduLaw AI có thể mắc lỗi. Hãy kiểm tra thông tin quan trọng với chuyên gia pháp lý.
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // DOM Elements
+        const chatInput = document.getElementById('chatInput');
+        const btnSend = document.getElementById('btnSend');
+        const chatMessages = document.getElementById('chatMessages');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const btnNewChat = document.getElementById('btnNewChat');
+        const btnClearChat = document.getElementById('btnClearChat');
+        const chatTitle = document.getElementById('chatTitle');
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        // State
+        let hasMessages = true; // Started with preload
+        let isWaiting = false;
+        let sessionId = "sess-" + Math.random().toString(36).substr(2, 9);
+
+        // Auto-resize textarea
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            let newHeight = Math.min(this.scrollHeight, 120);
+            this.style.height = newHeight + 'px';
+            
+            // Enable/disable send button
+            btnSend.disabled = this.value.trim() === '';
+        });
+
+        // Handle Enter key
+        chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+
+        btnSend.addEventListener('click', handleSend);
+
+        // Sidebar Toggle for Mobile
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('open');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('open');
+        });
+
+        // New Chat Button
+        function startNewChat() {
+            // Remove all message wrappers except typing indicator
+            const wrappers = chatMessages.querySelectorAll('.message-wrapper:not(.typing-indicator)');
+            wrappers.forEach(w => w.remove());
+            
+            welcomeScreen.style.display = 'flex';
+            chatTitle.innerText = "Cuộc hội thoại mới";
+            hasMessages = false;
+            sessionId = "sess-" + Math.random().toString(36).substr(2, 9);
+            chatInput.focus();
+            
+            // Close mobile sidebar if open
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('open');
+        }
+
+        btnNewChat.addEventListener('click', startNewChat);
+        btnClearChat.addEventListener('click', startNewChat);
+
+        // Send Prompt from Suggestion Chip
+        window.sendPrompt = function(element) {
+            const text = element.querySelector('span').innerText;
+            chatInput.value = text;
+            chatInput.dispatchEvent(new Event('input')); // Trigger resize/button enable
+            handleSend();
+        }
+
+        // Format Markdown-like text
+        function formatText(text) {
+            if (!text) return "";
+            // Replace **bold** with <strong>bold</strong>
+            let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Replace newlines with <br>
+            formatted = formatted.replace(/\n/g, '<br>');
+            return formatted;
+        }
+
+        function getTimeString() {
+            const now = new Date();
+            return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function handleSend() {
+            const text = chatInput.value.trim();
+            if (!text || isWaiting) return;
+
+            // Update state
+            isWaiting = true;
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            btnSend.disabled = true;
+            
+            if (!hasMessages) {
+                hasMessages = true;
+                welcomeScreen.style.opacity = '0';
+                setTimeout(() => {
+                    welcomeScreen.style.display = 'none';
+                    welcomeScreen.style.opacity = '1';
+                }, 300);
+                chatTitle.innerText = text.length > 20 ? text.substring(0, 20) + "..." : text;
+            }
+
+            // Append User Message
+            appendUserMessage(text);
+            
+            // Show typing
+            const existingStatus = document.getElementById('typingStatusText');
+            if(existingStatus) existingStatus.remove();
+            typingIndicator.style.display = 'flex';
+            scrollToBottom();
+
+            try {
+                // Call actual backend API
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': 'lawedu-default-key'
+                    },
+                    body: JSON.stringify({
+                        question: text,
+                        session_id: sessionId,
+                        stream: true,
+                        include_sources: true
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let buffer = "";
+                let fullText = "";
+                
+                let botWrapper = null;
+                let textSpan = null;
+                let sourcesContainer = null;
+                let sourcesList = null;
+
+                function initBotBubble() {
+                    if (botWrapper) return;
+                    typingIndicator.style.display = 'none';
+                    
+                    botWrapper = document.createElement('div');
+                    botWrapper.className = 'message-wrapper';
+                    botWrapper.innerHTML = `
+                        <div class="message bot">
+                            <div class="bot-avatar"><i data-lucide="scale" size="20"></i></div>
+                            <div class="bot-content">
+                                <span class="bot-text"></span>
+                                <div class="sources-container" style="display:none; margin-top: 12px; font-size: 13px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
+                                    <strong style="color: var(--gold-base); font-size: 12px; text-transform: uppercase;">Căn cứ pháp lý:</strong>
+                                    <ul class="sources-list" style="padding-left: 16px; margin-top: 4px; color: var(--text-muted); line-height: 1.4;"></ul>
+                                </div>
+                                <div class="timestamp">${getTimeString()}</div>
+                            </div>
+                        </div>
+                    `;
+                    chatMessages.insertBefore(botWrapper, typingIndicator);
+                    lucide.createIcons({ root: botWrapper });
+                    
+                    textSpan = botWrapper.querySelector('.bot-text');
+                    sourcesContainer = botWrapper.querySelector('.sources-container');
+                    sourcesList = botWrapper.querySelector('.sources-list');
+                    scrollToBottom();
+                }
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n\n');
+                    buffer = lines.pop(); // Keep incomplete chunk in buffer
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const dataStr = line.substring(6);
+                            if (dataStr.trim() === '[DONE]') continue;
+                            
+                            try {
+                                const data = JSON.parse(dataStr);
+                                if (data.type === 'token') {
+                                    initBotBubble();
+                                    fullText += data.content;
+                                    textSpan.innerHTML = formatText(fullText);
+                                    scrollToBottom();
+                                } else if (data.type === 'status') {
+                                    let statusText = document.getElementById('typingStatusText');
+                                    if (!statusText) {
+                                        statusText = document.createElement('div');
+                                        statusText.id = 'typingStatusText';
+                                        statusText.style.fontSize = '12px';
+                                        statusText.style.color = 'var(--gold-base)';
+                                        statusText.style.marginTop = '8px';
+                                        statusText.style.fontStyle = 'italic';
+                                        const botContent = typingIndicator.querySelector('.bot-content');
+                                        if (botContent) botContent.appendChild(statusText);
+                                    }
+                                    statusText.innerText = '⏳ ' + data.content;
+                                    scrollToBottom();
+                                } else if (data.type === 'sources' && data.sources && data.sources.length > 0) {
+                                    initBotBubble();
+                                    sourcesContainer.style.display = 'block';
+                                    sourcesList.innerHTML = data.sources.map(s => `<li>${s.breadcrumb} ${s.tinh_trang === 'da_sua_doi' ? '<span style="color:#ff9800">(Đã sửa đổi)</span>' : ''}</li>`).join('');
+                                    scrollToBottom();
+                                } else if (data.type === 'done') {
+                                    initBotBubble();
+                                    // Make sure final text is formatted
+                                    textSpan.innerHTML = formatText(data.answer || fullText);
+                                    if (data.warning) {
+                                        const warn = document.createElement('div');
+                                        warn.style.color = '#ff9800';
+                                        warn.style.marginTop = '8px';
+                                        warn.style.fontSize = '13px';
+                                        warn.innerText = data.warning;
+                                        textSpan.appendChild(warn);
+                                    }
+                                    scrollToBottom();
+                                }
+                            } catch (e) {
+                                console.error("Error parsing JSON chunk:", e, dataStr);
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                typingIndicator.style.display = 'none';
+                appendBotMessage("Xin lỗi, có lỗi xảy ra khi kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng hoặc liên hệ quản trị viên.");
+            } finally {
+                isWaiting = false;
+                if (window.innerWidth > 768) {
+                    chatInput.focus();
+                }
+            }
+        }
+
+        function appendUserMessage(text) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper';
+            wrapper.innerHTML = `
+                <div class="message user">
+                    ${text}
+                    <div class="timestamp">${getTimeString()}</div>
+                </div>
+            `;
+            // Insert before typing indicator
+            chatMessages.insertBefore(wrapper, typingIndicator);
+            scrollToBottom();
+        }
+
+        function appendBotMessage(text) {
+            const formatted = formatText(text);
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper';
+            wrapper.innerHTML = `
+                <div class="message bot">
+                    <div class="bot-avatar"><i data-lucide="scale" size="20"></i></div>
+                    <div class="bot-content">
+                        ${formatted}
+                        <div class="timestamp">${getTimeString()}</div>
+                    </div>
+                </div>
+            `;
+            chatMessages.insertBefore(wrapper, typingIndicator);
+            lucide.createIcons({ root: wrapper });
+            scrollToBottom();
+        }
+    </script>
+</body>
+</html>

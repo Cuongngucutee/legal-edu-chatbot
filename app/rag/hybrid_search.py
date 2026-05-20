@@ -4,8 +4,28 @@ import networkx as nx
 from typing import List, Dict, Set, Optional
 
 from sentence_transformers import CrossEncoder
-from book_index import BookIndex
-from query_intent import QueryIntent, intent_to_legacy_type
+from app.index.book_index import BookIndex
+
+# QueryIntent dataclass — kept for backward compatibility with intent-based retrieval
+from dataclasses import dataclass, field
+from typing import List as _List
+
+@dataclass
+class QueryIntent:
+    """Lightweight QueryIntent for retriever strategies (no Qwen model needed)."""
+    type: str = "single_lookup"
+    documents: _List[str] = field(default_factory=list)
+    topic: str = ""
+    keywords: _List[str] = field(default_factory=list)
+    sub_queries: list = field(default_factory=list)
+    article_hint: str = None
+    criteria: list = None
+    expand_search: bool = False
+    subject: str = None
+    check_aspects: list = None
+    procedure_keywords: list = None
+    search_scope: str = "scoped"
+    term: str = None
 
 # Patterns nhận diện câu hỏi tóm tắt/tổng quan về văn bản
 _SUMMARY_PATTERNS = [
@@ -34,6 +54,7 @@ _STAT_PATTERNS = [
     r"ban hành.*(năm|trong năm)\s+20\d{2}",
     r"(ra|được ban hành).*(năm|trong)\s+20\d{2}",
 ]
+
 
 
 class BookRAGRetriever:
@@ -270,7 +291,7 @@ class BookRAGRetriever:
     def _retrieve_listing(self, query: str, intent: QueryIntent, top_k: int) -> str:
         """Liệt kê đối tượng/điều kiện. Multi-query + MMR diversity."""
         
-        effective_k = top_k * 3 if intent.expand_search else top_k * 2
+        effective_k = top_k * 2 if intent.expand_search else top_k + 3
         
         # Multi-query: tận dụng sub_queries để cover nhiều khía cạnh
         all_nodes = self._multi_query_retrieve(query, intent, faiss_k=effective_k, bm25_k=effective_k, scoped=bool(intent.documents))
@@ -301,7 +322,7 @@ class BookRAGRetriever:
                     all_nodes.update(nodes)
         
         expanded = self._expand_graph(all_nodes, hops=1)
-        selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=intent.keywords)
+        selected = self._rerank_select(query, expanded, top_k + 3, boost_keywords=intent.keywords)
         return self._format_context(selected)
 
     # ── Strategy: procedure ───────────────────────────────────────────────
@@ -325,13 +346,13 @@ class BookRAGRetriever:
         # Multi-query: mỗi sub_query tìm riêng rồi merge
         all_nodes = self._multi_query_retrieve(
             query, intent,
-            faiss_k=top_k * 3, bm25_k=top_k * 2,
+            faiss_k=top_k * 2, bm25_k=top_k + 3,
             scoped=bool(intent.documents)
         )
         
         if all_nodes:
             expanded = self._expand_graph(set(all_nodes), hops=1)
-            selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=intent.keywords, use_mmr=True)
+            selected = self._rerank_select(query, expanded, top_k + 3, boost_keywords=intent.keywords, use_mmr=True)
             result = self._format_context(selected)
             if result.strip():
                 return result
@@ -629,7 +650,12 @@ class BookRAGRetriever:
     # ─── Context Formatting ───────────────────────────────────────────────
 
     def _format_context(self, nodes: Set[str]) -> str:
-        """Construct hierarchical context from selected nodes."""
+        """Construct hierarchical context from selected nodes.
+        
+        Áp dụng truncation:
+        - Mỗi node tối đa MAX_NODE_TEXT chars
+        - Tổng context tối đa MAX_TOTAL_CONTEXT chars
+        """
         articles_and_clauses = [n for n in nodes if str(n).startswith("node:")]
         
         structured_contexts = []
@@ -671,6 +697,133 @@ class BookRAGRetriever:
             structured_contexts.append(f"[{path_str} -> {title}]\n{content}\n")
             
         return "\n".join(set(structured_contexts))  # deduplicate
+
+    def _node_to_doc(self, node_id: str) -> dict:
+        """Convert a graph node to SkillRAG-compatible doc dict."""
+        if node_id not in self.index.graph.nodes:
+            return None
+        
+        node_data = self.index.graph.nodes[node_id]
+        content = node_data.get("full_text") or node_data.get("text", "")
+        if not content:
+            return None
+        
+        # Build metadata from graph structure
+        # Find document
+        doc_name = ""
+        so_hieu = ""
+        docs = [n for n in self.index.graph.neighbors(node_id) 
+                if self.index.graph.edges[node_id, n].get("type") == "THUOC_VAN_BAN"]
+        if docs:
+            doc_node_data = self.index.graph.nodes[docs[0]]
+            doc_name = doc_node_data.get("name") or doc_node_data.get("search_text", docs[0])
+            so_hieu = doc_node_data.get("so_hieu", "")
+        
+        # Find chapter
+        chapter = ""
+        chaps = [n for n in self.index.graph.neighbors(node_id)
+                 if self.index.graph.edges[node_id, n].get("type") == "THUOC_CHUONG"]
+        if chaps:
+            chapter = self.index.graph.nodes[chaps[0]].get("name", "")
+        
+        # Extract article number
+        name = node_data.get("name", "")
+        so_dieu = ""
+        m = re.search(r'Điều\s+(\d+)', name or content[:100])
+        if m:
+            so_dieu = m.group(1)
+        
+        # Build breadcrumb
+        parts = [p for p in [doc_name, chapter, name] if p]
+        breadcrumb = " > ".join(parts) if parts else node_id
+        
+        # Extract doc_id from node_id (e.g. "node:Luật43_D22" → "Luật43")
+        raw_id = node_id.replace("node:", "")
+        doc_id_match = re.match(r'([^_]+(?:_\d+[^_]*)*?)_D\d+', raw_id)
+        doc_id = doc_id_match.group(1) if doc_id_match else raw_id
+        
+        return {
+            "chunk_id": node_id,
+            "content": content,
+            "metadata": {
+                "doc_id": doc_id,
+                "so_hieu": so_hieu,
+                "ten_van_ban": doc_name,
+                "so_dieu": so_dieu,
+                "breadcrumb": breadcrumb,
+                "chapter": chapter,
+                "tinh_trang": node_data.get("tinh_trang", "con_hieu_luc"),
+                "ngay_hieu_luc": node_data.get("ngay_hieu_luc", ""),
+            },
+        }
+
+    def retrieve_as_docs(self, query: str, intent: 'QueryIntent' = None, top_k: int = 5) -> list:
+        """Retrieve and return as list[dict] (SkillRAG-compatible format).
+        
+        Each dict has: chunk_id, content, metadata{doc_id, so_hieu, ten_van_ban, 
+        so_dieu, breadcrumb, tinh_trang, ngay_hieu_luc}
+        """
+        if intent is not None:
+            # Use intent-based strategy to get node IDs
+            strategy_map = {
+                "single_lookup":     self._retrieve_single_lookup,
+                "comparison":        self._retrieve_comparison,
+                "listing":           self._retrieve_listing,
+                "eligibility_check": self._retrieve_eligibility,
+                "procedure":         self._retrieve_procedure,
+                "cross_document":    self._retrieve_cross_document,
+                "definition":        self._retrieve_definition,
+            }
+            # Get raw nodes before formatting
+            all_nodes = self._multi_query_retrieve(
+                query, intent, 
+                faiss_k=top_k * 2, bm25_k=top_k * 2, 
+                scoped=bool(intent.documents)
+            )
+        else:
+            # Global retrieve
+            all_nodes = self._global_retrieve(query, faiss_k=top_k * 2, bm25_k=top_k * 2)
+        
+        if not all_nodes:
+            return []
+        
+        # Expand + rerank
+        expanded = self._expand_graph(set(all_nodes), hops=1)
+        keywords = intent.keywords if intent else []
+        selected = self._rerank_select(query, expanded, top_k * 2, boost_keywords=keywords)
+        
+        # Convert selected nodes to doc dicts
+        docs = []
+        for node_id in selected:
+            doc = self._node_to_doc(node_id)
+            if doc:
+                docs.append(doc)
+        
+        return docs[:top_k * 2]  # Return more than top_k to give handlers room
+
+    def retrieve_by_doc_id(self, doc_ref: str) -> list:
+        """Retrieve all chunks belonging to a specific document.
+        Used by SummaryHandler to get full document content."""
+        node_ids = self.index.get_doc_node_ids(doc_ref)
+        if not node_ids:
+            return []
+        
+        docs = []
+        for node_id in sorted(node_ids):
+            doc = self._node_to_doc(node_id)
+            if doc:
+                docs.append(doc)
+        
+        # Sort by article number
+        def sort_key(d):
+            so_dieu = d.get("metadata", {}).get("so_dieu", "")
+            try:
+                return int(so_dieu) if so_dieu else 999
+            except ValueError:
+                return 999
+        
+        docs.sort(key=sort_key)
+        return docs
 
     # ─── Legacy API (backward compatibility) ──────────────────────────────
 

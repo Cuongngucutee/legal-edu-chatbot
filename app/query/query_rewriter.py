@@ -79,3 +79,30 @@ class EvidenceFocusSkill:
                 docs = new_docs
         logger.info(f"  🎯 FOCUS: '{query}' → '{fq}'")
         return fq if fq else query, docs
+
+
+class HyDESkill:
+    """Sinh tài liệu giả định (Hypothetical Document Embedding) bằng 320B LLM để cải thiện truy vấn."""
+
+    def apply(self, query, docs, llm, retriever=None):
+        hyde_prompt = (
+            "Bạn là chuyên gia pháp luật giáo dục Việt Nam.\n"
+            "Hãy viết một đoạn văn ngắn (2-4 câu) mô tả quy định pháp luật giả định chính xác nhất để trả lời cho câu hỏi sau.\n"
+            "Hãy sử dụng văn phong văn bản luật chính xác, trang trọng và khách quan.\n"
+            "Không cần mở đầu bằng lời chào hay giải thích, hãy viết thẳng nội dung quy định giả định.\n\n"
+            f"Câu hỏi: {query}\n\n"
+            "Quy định pháp luật giả định:"
+        )
+        hyde_doc = llm.generate(hyde_prompt, temperature=0.3).strip()
+        logger.info(f"  📝 [HyDE] Sinh tài liệu giả định:\n{hyde_doc}")
+        
+        if retriever and hyde_doc:
+            new_docs = retriever.retrieve_as_docs(hyde_doc, top_k=5)
+            if new_docs:
+                seen = set(d.get("chunk_id", "") for d in docs)
+                for d in new_docs:
+                    if d.get("chunk_id", "") not in seen:
+                        docs.append(d)
+                        seen.add(d.get("chunk_id", ""))
+                        
+        return query, docs

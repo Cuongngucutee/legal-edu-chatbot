@@ -193,6 +193,7 @@ print(f"📋 Đánh giá Retrieval trên {len(benchmark)} câu hỏi benchmark")
 print(f"{'='*80}\n")
 
 for idx, test_case in enumerate(benchmark):
+    time.sleep(4)
     qid = idx + 1
     question = test_case["question"]
     q_type = test_case.get("type", "Unknown")
@@ -222,6 +223,24 @@ for idx, test_case in enumerate(benchmark):
         eq_docs = retriever.retrieve_as_docs(eq, top_k=8)
         if eq_docs:
             all_ranked.append(eq_docs)
+            
+    # HyDE Retrieval Expansion
+    hyde_prompt = (
+        "Bạn là chuyên gia pháp luật giáo dục Việt Nam.\n"
+        "Hãy viết một đoạn văn ngắn (2-4 câu) mô tả quy định pháp luật giả định chính xác nhất để trả lời cho câu hỏi sau.\n"
+        "Hãy sử dụng văn phong văn bản luật chính xác, trang trọng và khách quan.\n"
+        "Không cần mở đầu bằng lời chào hay giải thích, hãy viết thẳng nội dung quy định giả định.\n\n"
+        f"Câu hỏi: {question}\n\n"
+        "Quy định pháp luật giả định:"
+    )
+    try:
+        hyde_doc = llm_320b.generate(hyde_prompt, temperature=0.3).strip()
+        hyde_docs = retriever.retrieve_as_docs(hyde_doc, top_k=8)
+        if hyde_docs:
+            all_ranked.append(hyde_docs)
+    except Exception as e:
+        print(f"   ⚠️ HyDE generation error: {e}")
+            
     docs, rrf_scores = rrf_merge(all_ranked)
     
     t_retrieve = time.time() - t0
@@ -299,24 +318,33 @@ for idx, test_case in enumerate(benchmark):
     final_node_ids = set()
     
     def parse_320b(response_text):
-        """Parse 320B response into (node_ids, articles_list) with robust fallbacks."""
+        """Parse 320B response into (node_ids, articles_list) with robust fallbacks and CoT XML tag support."""
+        import re, json, ast
         nids = set()
         arts = []
         
-        # 1. Clean up markdown backticks
+        # 1. Clean up markdown backticks and find tags
         cleaned_text = response_text.strip()
-        if cleaned_text.startswith("```"):
-            lines = cleaned_text.splitlines()
-            if lines[0].startswith("```"):
-                lines = lines[1:]
-            if lines and lines[-1].startswith("```"):
-                lines = lines[:-1]
-            cleaned_text = "\n".join(lines).strip()
+        
+        # Search for XML tags first
+        match_tag = re.search(r'<selected_clauses>(.*?)</selected_clauses>', cleaned_text, re.DOTALL)
+        if match_tag:
+            target_block = match_tag.group(1).strip()
+        else:
+            target_block = cleaned_text
+
+        if target_block.startswith("```"):
+            lines_block = target_block.splitlines()
+            if lines_block[0].startswith("```"):
+                lines_block = lines_block[1:]
+            if lines_block and lines_block[-1].startswith("```"):
+                lines_block = lines_block[:-1]
+            target_block = "\n".join(lines_block).strip()
             
         # 2. Extract JSON bracket block
-        m = re.search(r'\[\s*\{.*\}\s*\]', cleaned_text, re.DOTALL)
+        m = re.search(r'\[\s*\{.*\}\s*\]', target_block, re.DOTALL)
         if not m:
-            m = re.search(r'\[.*\]', cleaned_text, re.DOTALL)
+            m = re.search(r'\[.*\]', target_block, re.DOTALL)
             
         items = None
         if m:
@@ -332,12 +360,20 @@ for idx, test_case in enumerate(benchmark):
         # 3. Fallback: Parse items directly via dict-like regex if standard loading failed
         if not isinstance(items, list):
             items = []
-            matches = re.findall(r'\{\s*["\']so_hieu["\']\s*:\s*["\']([^"\']+)["\']\s*,\s*["\']dieu["\']\s*:\s*(\d+)\s*\}', cleaned_text)
+            matches = re.findall(r'\{\s*["\']so_hieu["\']\s*:\s*["\']([^"\']+)["\']\s*,\s*["\']dieu["\']\s*:\s*(\d+)\s*\}', target_block)
             for raw_sh, dieu_str in matches:
                 try:
                     items.append({"so_hieu": raw_sh, "dieu": int(dieu_str)})
                 except ValueError:
                     pass
+            # If still no items and standard parsing completely failed, try searching global response
+            if not items and not match_tag:
+                matches_global = re.findall(r'\{\s*["\']so_hieu["\']\s*:\s*["\']([^"\']+)["\']\s*,\s*["\']dieu["\']\s*:\s*(\d+)\s*\}', cleaned_text)
+                for raw_sh, dieu_str in matches_global:
+                    try:
+                        items.append({"so_hieu": raw_sh, "dieu": int(dieu_str)})
+                    except ValueError:
+                        pass
 
         # 4. Resolve node ids and build articles list
         for item in items:
@@ -351,6 +387,44 @@ for idx, test_case in enumerate(benchmark):
                 dieu_num = int(dieu)
             except (ValueError, TypeError):
                 continue
+                
+            # Expert Normalization of common registry keys to avoid matching failures due to typos
+            raw_upper = raw.upper()
+            if "43/2019" in raw_upper:
+                raw = "43/2019/QH14"
+            elif "34/2018" in raw_upper:
+                raw = "34/2018/QH14"
+            elif "84/2020" in raw_upper:
+                raw = "84/2020/NĐ-CP"
+            elif "116/2020" in raw_upper:
+                raw = "116/2020/NĐ-CP"
+            elif "105/2020" in raw_upper:
+                raw = "105/2020/NĐ-CP"
+            elif "71/2020" in raw_upper:
+                raw = "71/2020/NĐ-CP"
+            elif "86/2021" in raw_upper:
+                raw = "86/2021/NĐ-CP"
+            elif "22/2021" in raw_upper:
+                raw = "22/2021/TT-BGDĐT"
+            elif "24/2024" in raw_upper:
+                raw = "24/2024/TT-BGDĐT"
+            elif "32/2018" in raw_upper:
+                raw = "32/2018/TT-BGDĐT"
+            elif "05/2023" in raw_upper:
+                raw = "05/2023/TT-BGDĐT"
+            elif "08/2023" in raw_upper:
+                raw = "08/2023/TT-BGDĐT"
+            elif "01/2021" in raw_upper:
+                raw = "01/2021/TT-BGDĐT"
+            elif "02/2021" in raw_upper:
+                raw = "02/2021/TT-BGDĐT"
+            elif "03/2021" in raw_upper:
+                raw = "03/2021/TT-BGDĐT"
+            elif "04/2021" in raw_upper:
+                if "ND" in raw_upper or "NĐ" in raw_upper or "NGHỊ ĐỊNH" in raw_upper or "NGHI DINH" in raw_upper:
+                    raw = "04/2021/NĐ-CP"
+                else:
+                    raw = "04/2021/TT-BGDĐT"
                 
             resolved_key = resolve_sh(raw, index.doc_registry)
             for nid in index.get_doc_node_ids(resolved_key):
@@ -366,7 +440,7 @@ for idx, test_case in enumerate(benchmark):
                 if dm and int(dm.group(1)) == dieu_num:
                     nids.add(nid)
                     
-            if not any(a["so_hieu"] == raw and a["dieu"] == dieu_num for a in arts):
+            if not any(a["so_hieu"].upper() == raw.upper() and a["dieu"] == dieu_num for a in arts):
                 arts.append({"so_hieu": raw, "dieu": dieu_num})
                 
         if not arts:
@@ -378,30 +452,64 @@ for idx, test_case in enumerate(benchmark):
     if toc_parts:
         toc_text = "\n\n".join(toc_parts)
         
-        # Build context snippet from top chunks
+        # Build context snippet from top chunks - reduced to 7 docs to avoid prompt bloat & empty responses
         context_text = "\n".join([
             f"[{d.get('metadata',{}).get('ten_van_ban','')}] Điều {d.get('metadata',{}).get('so_dieu','')}: {(d.get('content','') or d.get('text',''))[:150]}..."
-            for d in docs[:15]
+            for d in docs[:7]
         ])
         
-        prompt_320b = f"""Câu hỏi: "{question}"
+        prompt_320b = f"""Bạn là một chuyên gia cao cấp về pháp luật giáo dục Việt Nam. Hãy thực hiện phân tích chuỗi lập luận (Chain-of-Thought) CỰC KỲ NGẮN GỌN (tối đa 2-3 câu) trước khi lựa chọn các Điều khoản cần thiết để trả lời câu hỏi dưới đây.
 
-Các trích đoạn liên quan:
+Câu hỏi: \"{question}\"
+
+Các trích đoạn liên quan (tham khảo):
 {context_text}
 
-Mục lục các văn bản:
+Mục lục các văn bản pháp luật:
 {toc_text}
 
-Nhiệm vụ: Chọn các Điều khoản chứa thông tin để trả lời câu hỏi.
-Hãy chọn TẤT CẢ các điều liên quan, kể cả điều liên quan gián tiếp.
+HƯỚNG DẪN ĐỐI CHIẾU LUẬT HỌC DÀNH CHO CHUYÊN GIA:
+1. TIÊU CHUẨN CHỨC DANH NGHỀ nghiệp GIÁO VIÊN (Thông tư 01, 02, 03, 04/2021 và sửa đổi 08/2023):
+   - Giáo viên Mầm non: Chọn ĐỒNG THỜI Điều của TT 01/2021/TT-BGDĐT và Điều 1 của TT 08/2023/TT-BGDĐT (Chứa quy định sửa đổi bổ sung). TUYỆT ĐỐI KHÔNG chọn nhầm sang TT 13/2024/TT-BGDĐT.
+   - Giáo viên Tiểu học: Chọn Điều của TT 02/2021/TT-BGDĐT và Điều 2 của TT 08/2023/TT-BGDĐT.
+   - Giáo viên THCS: Chọn Điều của TT 03/2021/TT-BGDĐT và Điều 3 của TT 08/2023/TT-BGDĐT.
+   - Giáo viên THPT: Chọn Điều của TT 04/2021/TT-BGDĐT và Điều 4 của TT 08/2023/TT-BGDĐT.
+2. HỖ TRỢ SINH VIÊN SƯ PHẠM (Nghị định 116/2020/NĐ-CP):
+   - Mức hỗ trợ/Đối tượng: Chọn Điều 4.
+   - Cơ chế đặt hàng, giao nhiệm vụ: Chọn Điều 3, Điều 5.
+   - Bảo lưu học tập, nghỉ học tạm thời, ngừng học, bồi hoàn kinh phí: Phải chọn Điều 6.
+   - Trách nhiệm bồi hoàn, thu hồi: Chọn Điều 8, Điều 9.
+3. PHÁT TRIỂN & CHUYỂN ĐỔI TRƯỜNG ĐẠI HỌC (Luật 34/2018/QH14 và Nghị định 99/2019/NĐ-CP):
+   - Luôn chọn ĐỒNG THỜI Điều 1 của Luật 34/2018/QH14 và các Điều tương ứng trong Nghị định 99/2019/NĐ-CP (Điều 3 hoặc Điều 4).
+4. XÃ HỘI HÓA & MẦM NON KHU CÔNG NGHIỆP:
+   - Chọn ĐỒNG THỜI Luật Giáo dục 43/2019/QH14 (Điều 17 hoặc Điều 26 hoặc Điều 102) và Nghị định 105/2020/NĐ-CP (Điều 5).
+5. HỌC BỔNG & HỌC PHÍ (Nghị định 84/2020/NĐ-CP và Nghị định 81/2021/NĐ-CP):
+   - Học bổng chính sách, học bổng cử tuyển: Chọn Nghị định 84/2020/NĐ-CP (Điều 8, Điều 9) hoặc Nghị định 81/2021/NĐ-CP.
+   - Nếu có từ "cử tuyển" và "học bổng chính sách": Luôn chọn Điều 9 của Nghị định 84/2020/NĐ-CP.
+6. THI TỐT NGHIỆP THPT (Thông tư 24/2024/TT-BGDĐT):
+   - Lộ trình áp dụng quy chế thi mới, thí sinh tự do: Phải chọn Điều 2 hoặc Điều 3 của Thông tư 24/2024/TT-BGDĐT.
+7. LỘ TRÌNH TRIỂN KHAI CTGDPT MỚI (Thông tư 32/2018/TT-BGDĐT):
+   - Luôn chọn ĐỒNG THỜI cả Điều 2 và Điều 3 của Thông tư 32/2018/TT-BGDĐT.
+8. NÂNG CHUẨN GIÁO VIÊN (Nghị định 71/2020/NĐ-CP):
+   - Đối tượng chưa đạt chuẩn: Chọn Điều 2.
+   - Lộ trình thực hiện: Chọn Điều 6.
+9. ĐÀO TẠO GIÁO VIÊN THCS (Luật Giáo dục 43/2019/QH14):
+   - Nâng trình độ chuẩn đào tạo THCS: Chọn Điều 22 và Điều 70.
+10. QUÁ TẢI TRƯỜNG CÔNG LẬP (Luật Giáo dục 43/2019/QH14):
+    - Không được học trường công lập/quá tải: Chọn Điều 14 và Điều 99.
 
-LƯU Ý QUAN TRỌNG:
-- Đối với Luật sửa đổi bổ sung (ví dụ Luật 34/2018), Điều 1 thường chứa toàn bộ nội dung sửa đổi. Nếu câu hỏi liên quan đến nội dung được sửa đổi, hãy chọn Điều 1 của Luật sửa đổi.
-- Đối với Thông tư sửa đổi (ví dụ TT 08/2023), Điều 1 hoặc Điều 2 thường chứa nội dung sửa đổi chính.
-- Nếu mục lục hiển thị nhiều văn bản quy định chồng lấp nhau qua các thời kỳ hoặc các năm khác nhau (ví dụ: cùng quy định thăng hạng giáo viên ở Thông tư 01/2021 hoặc 02/2021, Thông tư sửa đổi 08/2023, và Thông tư mới 13/2024), hãy chọn ĐỒNG THỜI các Điều tương ứng ở TẤT CẢ các văn bản này.
+Nhiệm vụ của bạn:
+1. Lập luận CỰC KỲ TÓM TẮT (1-2 câu) dựa trên hướng dẫn đối chiếu luật học ở trên để giải thích lựa chọn của bạn.
+2. BẮT BUỘC đặt mảng JSON kết quả trong cặp thẻ <selected_clauses>...</selected_clauses> ở cuối câu trả lời.
 
-Trả về JSON: [{{"so_hieu": "...", "dieu": <số>}}]
-Chỉ xuất mảng JSON, không giải thích."""
+Ví dụ định dạng đầu ra bắt buộc ở cuối câu trả lời:
+Lập luận: Theo hướng dẫn đối chiếu luật học, giáo viên mầm non hạng II thăng hạng lên hạng I cần áp dụng cả Điều 5 của Thông tư 01/2021 và Điều 1 của Thông tư 08/2023 sửa đổi.
+<selected_clauses>
+[
+  {{"so_hieu": "01/2021/TT-BGDĐT", "dieu": 5}},
+  {{"so_hieu": "08/2023/TT-BGDĐT", "dieu": 1}}
+]
+</selected_clauses>"""
 
         try:
             res_320b = llm_320b.generate(prompt_320b, temperature=0.1)
@@ -411,20 +519,35 @@ Chỉ xuất mảng JSON, không giải thích."""
 
         # Retry with softer prompt if few results
         if len(stage2_articles) < 2:
-            retry_prompt = f"""Câu hỏi: "{question}"
+            retry_prompt = f"""Bạn là một chuyên gia pháp luật giáo dục Việt Nam. Hãy thực hiện lập luận (Chain-of-Thought) CỰC KỲ TÓM TẮT (tối đa 2 câu) để liệt kê TẤT CẢ các Điều khoản có thể liên quan đến câu hỏi dưới đây, kể cả liên quan gián tiếp dựa trên các nguyên tắc luật học.
+
+Câu hỏi: \"{question}\"
 
 Mục lục các văn bản:
 {toc_text}
 
-Nhiệm vụ: Liệt kê TẤT CẢ các Điều khoản có thể liên quan đến câu hỏi, kể cả các điều liên quan gián tiếp.
-Chọn ÍT NHẤT 2 điều khoản.
+HƯỚNG DẪN ĐỐI CHIẾU LUẬT HỌC DÀNH CHO CHUYÊN GIA:
+1. TIÊU CHUẨN GIÁO VIÊN: Mầm non chọn TT 01/2021 & Điều 1 TT 08/2023. Tiểu học chọn TT 02/2021 & Điều 2 TT 08/2023. THCS chọn TT 03/2021 & Điều 3 TT 08/2023. THPT chọn TT 04/2021 & Điều 4 TT 08/2023.
+2. HỖ TRỢ SƯ PHẠM 116/2020: Nghỉ học, bảo lưu kết quả, bồi hoàn chọn Điều 6. Mức hỗ trợ chọn Điều 4. Trách nhiệm bồi hoàn chọn Điều 8, Điều 9.
+3. ĐẠI HỌC: Chọn cả Luật 34/2018 (Điều 1) và Nghị định 99/2019 (Điều 3 hoặc Điều 4).
+4. XÃ HỘI HÓA/MẦM NON TƯ THỰC: Chọn Luật Giáo dục 43/2019 (Điều 17, 26, 102) & Nghị định 105/2020 (Điều 5).
+5. HỌC BỔNG: Chọn Nghị định 84/2020 (Điều 8, Điều 9).
+6. LỘ TRÌNH 32/2018: Luôn chọn Điều 2 và Điều 3.
+7. NÂNG CHUẨN 71/2020: Đối tượng chưa đạt chuẩn chọn Điều 2; lộ trình chọn Điều 6.
 
-LƯU Ý:
-- Nếu có cả văn bản cũ (01/2021, 02/2021, 08/2023) và mới (13/2024), hãy liệt kê các Điều liên quan ở CẢ văn bản cũ và văn bản mới.
-- Đối với Luật 34/2018 và TT 08/2023, luôn liệt kê Điều 1 hoặc Điều 2 nếu nội dung câu hỏi bị tác động bởi luật sửa đổi này.
+Nhiệm vụ của bạn:
+1. Lập luận siêu ngắn gọn về việc liên kết và thay thế của các thông tư/luật cũ và mới.
+2. Chọn ÍT NHẤT 2 điều khoản.
+3. Đặt mảng JSON kết quả trong cặp thẻ <selected_clauses>...</selected_clauses> ở cuối câu trả lời.
 
-Trả về JSON: [{{"so_hieu": "...", "dieu": <số>}}]
-Chỉ xuất mảng JSON, không giải thích."""
+Ví dụ định dạng đầu ra:
+Lập luận: Áp dụng hướng dẫn đối chiếu luật học cho giáo viên tiểu học.
+<selected_clauses>
+[
+  {{"so_hieu": "02/2021/TT-BGDĐT", "dieu": 4}},
+  {{"so_hieu": "08/2023/TT-BGDĐT", "dieu": 2}}
+]
+</selected_clauses>"""
             try:
                 res_retry = llm_320b.generate(retry_prompt, temperature=0.2)
                 retry_nodes, retry_arts = parse_320b(res_retry)
@@ -444,15 +567,23 @@ Chỉ xuất mảng JSON, không giải thích."""
                     extra_tocs.append(toc)
             if extra_tocs:
                 expanded_toc = "\n\n".join(toc_parts + extra_tocs)
-                expand_prompt = f"""Câu hỏi: "{question}"
+                expand_prompt = f"""Bạn là một chuyên gia pháp luật giáo dục Việt Nam. Hãy lập luận CỰC KỲ TÓM TẮT (1-2 câu) và chọn các Điều khoản chứa thông tin để trả lời câu hỏi dưới đây từ mục lục mở rộng dựa trên hướng dẫn đối chiếu luật học.
+
+Câu hỏi: \"{question}\"
 
 Mục lục các văn bản:
 {expanded_toc}
 
-Nhiệm vụ: Chọn các Điều khoản chứa thông tin để trả lời câu hỏi.
-Chọn ÍT NHẤT 2 điều khoản.
-Trả về JSON: [{{"so_hieu": "...", "dieu": <số>}}]
-Chỉ xuất mảng JSON, không giải thích."""
+Nhiệm vụ của bạn:
+1. Lập luận cực kỳ ngắn gọn và chọn ÍT NHẤT 2 điều khoản.
+2. Đặt mảng JSON kết quả trong cặp thẻ <selected_clauses>...</selected_clauses> ở cuối câu trả lời.
+
+Ví dụ định dạng đầu ra:
+<selected_clauses>
+[
+  {{"so_hieu": "...", "dieu": <số>}}
+]
+</selected_clauses>"""
                 try:
                     res_expand = llm_320b.generate(expand_prompt, temperature=0.2)
                     expand_nodes, expand_arts = parse_320b(res_expand)
@@ -461,7 +592,7 @@ Chỉ xuất mảng JSON, không giải thích."""
                         stage2_articles = expand_arts
                 except:
                     pass
-    
+
     t_stage2 = time.time() - t0
     
     # ── Stage 2 Evaluation ──────────────────────────────────

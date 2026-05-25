@@ -58,18 +58,29 @@ class LLMClient:
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
 
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                temperature=temperature if temperature is not None else self.temperature,
-                max_tokens=max_tokens or self.max_tokens,
-            )
-            raw = response.choices[0].message.content
-            return (raw or "").strip()
-        except Exception as e:
-            logger.error(f"LLM generate error: {e}")
-            return f"[LLM Error: {e}]"
+        import time
+        max_retries = 3
+        delay = 2
+        for attempt in range(max_retries):
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=messages,
+                    temperature=temperature if temperature is not None else self.temperature,
+                    max_tokens=max_tokens or self.max_tokens,
+                )
+                raw = response.choices[0].message.content
+                if raw and raw.strip():
+                    return raw.strip()
+                logger.warning(f"Empty LLM response on attempt {attempt+1}, retrying in {delay}s...")
+            except Exception as e:
+                logger.warning(f"LLM generate attempt {attempt+1} failed: {e}")
+                if attempt == max_retries - 1:
+                    logger.error(f"LLM generate error: {e}")
+                    return f"[LLM Error: {e}]"
+            time.sleep(delay)
+            delay *= 2
+        return ""
 
     def generate_stream(
         self,

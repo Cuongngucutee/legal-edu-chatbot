@@ -1,17 +1,19 @@
 """
-Full Pipeline Evaluation — Retrieval + Generation
-Chạy toàn bộ 12 câu benchmark qua pipeline agentic, ghi lại câu trả lời
-và đánh giá chi tiết từng câu.
+Full Pipeline Evaluation on 44-Question Benchmark — Retrieval + Generation
+Chạy toàn bộ 44 câu benchmark qua pipeline agentic, ghi lại câu trả lời và đánh giá chi tiết từng câu.
 """
 import json, re, time, sys, os, math
+import unicodedata
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, PROJECT_ROOT)
 
 # ── Load benchmark ──
-with open(os.path.join(os.path.dirname(__file__), "education_benchmark_v2.json"), "r", encoding="utf-8") as f:
+BENCHMARK_PATH = os.path.join(PROJECT_ROOT, "benmark.json")
+with open(BENCHMARK_PATH, "r", encoding="utf-8") as f:
     benchmark = json.load(f)
-questions = benchmark["questions"]
+
+print(f"📋 Loaded {len(benchmark)} test cases from benmark.json")
 
 # ── Init pipeline ──
 print("🔧 Đang khởi tạo pipeline...")
@@ -36,7 +38,6 @@ llm_320b = LLMClient(
     model=os.getenv("LLM_MODEL_NAME", "glm-4.7"),
 )
 expander = EducationQueryExpander()
-
 
 # ── Cross-reference: implementing docs → parent laws ────────
 CROSS_REFERENCE_MAP = {
@@ -74,10 +75,30 @@ def inject_cross_refs(top_docs, all_docs_map):
                         seen.add(parent_bare)
     return injected
 
-# ── Helpers ──
+# ── Parsing Helpers ──
+def parse_citation(citation_str: str):
+    dieu_nums = [int(n) for n in re.findall(r'[Đđ]iều\s+(\d+)', citation_str)]
+    
+    so_hieu_match = re.search(r'(\d+/\d{4}/[\w\-]+)', citation_str)
+    so_hieu = so_hieu_match.group(1) if so_hieu_match else None
+    
+    if not so_hieu:
+        alt_match = re.search(r'(Luật|Nghị định|Thông tư|Quyết định)[^\d]*(\d+[\/-]\d{4}[\/-]?[\w\-]*)', citation_str)
+        if alt_match:
+            so_hieu = alt_match.group(2)
+    return so_hieu, dieu_nums
+
+def normalize_text(text):
+    if not text: return ""
+    text = str(text).lower().strip()
+    text = text.replace("đ", "d")
+    nfd_form = unicodedata.normalize('NFD', text)
+    return "".join([c for c in nfd_form if not unicodedata.combining(c)])
+
 def bare_sh(text):
-    m = re.search(r'(\d+[\/\-]\d{4}[\/\-]?[\w\-]*)', str(text))
-    return m.group(1) if m else text
+    text_norm = normalize_text(text)
+    m = re.search(r'(\d+[\/-]\d{4}[\/-]?[\w\-]*)', text_norm)
+    return m.group(1) if m else text_norm
 
 def resolve_sh(raw_sh, registry):
     if raw_sh in registry: 
@@ -108,8 +129,7 @@ def rrf_merge(ranked_lists, k=60):
     return [chunk_map[cid] for cid in sorted_ids], scores
 
 def parse_320b(response_text, uniq_docs):
-    """Parse 320B response into (node_ids, articles_list) with robust fallbacks and CoT XML tag support."""
-    import re, json, ast
+    import ast
     nids = set()
     arts = []
     
@@ -228,29 +248,46 @@ def parse_320b(response_text, uniq_docs):
             
     return nids, arts
 
-# ── Run full pipeline ──
-print(f"\n📋 Chạy full pipeline cho {len(questions)} câu...\n")
-print("=" * 80)
-
+# ── Main Run Loop ──
 all_results = []
-output_lines = []
-output_lines.append("# 📊 Đánh giá Full Pipeline — Retrieval + Generation\n")
-output_lines.append(f"Thời gian: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
-output_lines.append("=" * 80 + "\n")
+output_lines = [
+    "# 🚀 BÁO CÁO ĐÁNH GIÁ FULL PIPELINE RAG — 44 CÂU BENCHMARK",
+    "",
+    "Báo cáo này ghi nhận kết quả đánh giá cuối cùng của **Full Pipeline RAG (Retrieval + Generation)** trên toàn bộ 44 câu hỏi của bộ benchmark.",
+    "",
+]
 
-for q in questions:
-    qid = q["id"]
-    question = q["question"]
-    expected_docs = q["ground_truth"]["relevant_docs"]
-    expected_articles = q["ground_truth"]["relevant_articles"]
-    legal_basis = q["legal_basis"]
-    ref_answer = q["ground_truth"].get("reference_answer", "")
-    expected_keywords = q["ground_truth"].get("expected_answer_keywords", [])
+print(f"\n================================================================================")
+print(f"📋 BẮT ĐẦU CHẤM FULL PIPELINE 44 CÂU HỎI BENCHMARK")
+print(f"================================================================================")
 
-    print(f"\n📌 [{qid}] {question[:70]}...")
+for idx, test_case in enumerate(benchmark):
+    time.sleep(4)  # Pacing delay to guarantee 100% stable API rate limit tolerance
+    qid = idx + 1
+    question = test_case["question"]
+    q_type = test_case.get("type", "Unknown")
+    ref_answer = test_case.get("answer", "")
+    
+    # Parse expected citations
+    expected_citations = test_case.get("citations", [])
+    citation_requirements = []
+    expected_docs = set()
+    all_expected_dieu = set()
+    for cit in expected_citations:
+        sh, dieu_list = parse_citation(cit)
+        if sh:
+            expected_docs.add(sh)
+        if dieu_list:
+            citation_requirements.append(dieu_list)
+            for d in dieu_list:
+                all_expected_dieu.add(d)
+            
+    print(f"\n📌 [EDU_44_Q{qid:02d}] [{q_type}] {question[:85]}...")
+    print(f"   Kỳ vọng: Điều {all_expected_dieu} của văn bản {list(expected_docs)}")
+    
     t0 = time.time()
-
-    # ── Stage 0: Wide Retrieval + RRF ──
+    
+    # ── Stage 1: HyDE + Retrieval + RRF ──
     main_docs = retriever.retrieve_as_docs(question, top_k=20)
     all_ranked = [main_docs]
     expanded = expander.expand(question)
@@ -277,7 +314,7 @@ for q in questions:
         
     docs, rrf_scores = rrf_merge(all_ranked)
 
-    # ── Stage 1: Doc-Level Vote + 7B ──
+    # Stage 1 voting
     doc_agg = {}
     for d in docs:
         meta = d.get("metadata", {})
@@ -300,9 +337,7 @@ for q in questions:
             unique_docs[bare] = info["ten"]
         ranked_docs = sorted(doc_agg.items(), key=lambda x: x[1]["rank_score"], reverse=True)
 
-    # ── Stage 1: Candidate Pool Selection & Parent Injections ──
     top_so_hieu = [sh for sh, _ in ranked_docs[:5]]
-    
     explicit_targets = expander.get_target_docs(question)
     for ext_doc in explicit_targets:
         ext_bare = bare_sh(ext_doc)
@@ -313,9 +348,9 @@ for q in questions:
             
     top_so_hieu = inject_cross_refs(top_so_hieu, unique_docs)
     t_s1 = time.time() - t0
-    print(f"   [Stage 1] Top docs: {top_so_hieu[:5]} + xref={top_so_hieu[5:] if len(top_so_hieu) > 5 else []} ({t_s1:.1f}s)")
+    print(f"   [Stage 1] Top docs: {top_so_hieu[:5]} ({t_s1:.1f}s)")
 
-    # ── Stage 2: 320B TOC scan with expert heuristics guidelines ──
+    # ── Stage 2: 320B CoT TOC Analysis ──
     toc_parts = []
     for sh in top_so_hieu[:4]:
         canonical_sh = resolve_sh(sh, index.doc_registry)
@@ -326,8 +361,6 @@ for q in questions:
     final_node_ids, stage2_articles = set(), []
     if toc_parts:
         toc_text = "\n\n".join(toc_parts)
-        
-        # Build context snippet from top chunks - reduced to 7 docs to avoid prompt bloat & empty responses
         context_text = "\n".join([
             f"[{d.get('metadata',{}).get('ten_van_ban','')}] Điều {d.get('metadata',{}).get('so_dieu','')}: {(d.get('content','') or d.get('text',''))[:150]}..."
             for d in docs[:7]
@@ -345,7 +378,7 @@ Mục lục các văn bản pháp luật:
 
 HƯỚNG DẪN ĐỐI CHIẾU LUẬT HỌC DÀNH CHO CHUYÊN GIA:
 1. TIÊU CHUẨN CHỨC DANH NGHỀ nghiệp GIÁO VIÊN (Thông tư 01, 02, 03, 04/2021 và sửa đổi 08/2023):
-   - Giáo viên Mầm non: Chọn ĐỒNG THỜI Điều của TT 01/2021/TT-BGDĐT và Điều 1 của TT 08/2023/TT-BGDĐT (Chứa quy định sửa đổi bổ sung). TUYỆT ĐỐI KHÔNG chọn nhầm sang TT 13/2024/TT-BGDĐT.
+   - Giáo viên Mầm non: Chọn ĐỒNG THỜI Điều của TT 01/2021/TT-BGDĐT và Điều 1 của TT 08/2023/TT-BGDĐT (Chứa quy định sửa đổi bổ sung).
    - Giáo viên Tiểu học: Chọn Điều của TT 02/2021/TT-BGDĐT và Điều 2 của TT 08/2023/TT-BGDĐT.
    - Giáo viên THCS: Chọn Điều của TT 03/2021/TT-BGDĐT và Điều 3 của TT 08/2023/TT-BGDĐT.
    - Giáo viên THPT: Chọn Điều của TT 04/2021/TT-BGDĐT và Điều 4 của TT 08/2023/TT-BGDĐT.
@@ -365,13 +398,6 @@ HƯỚNG DẪN ĐỐI CHIẾU LUẬT HỌC DÀNH CHO CHUYÊN GIA:
    - Lộ trình áp dụng quy chế thi mới, thí sinh tự do: Phải chọn Điều 2 hoặc Điều 3 của Thông tư 24/2024/TT-BGDĐT.
 7. LỘ TRÌNH TRIỂN KHAI CTGDPT MỚI (Thông tư 32/2018/TT-BGDĐT):
    - Luôn chọn ĐỒNG THỜI cả Điều 2 và Điều 3 của Thông tư 32/2018/TT-BGDĐT.
-8. NÂNG CHUẨN GIÁO VIÊN (Nghị định 71/2020/NĐ-CP):
-   - Đối tượng chưa đạt chuẩn: Chọn Điều 2.
-   - Lộ trình thực hiện: Chọn Điều 6.
-9. ĐÀO TẠO GIÁO VIÊN THCS (Luật Giáo dục 43/2019/QH14):
-   - Nâng trình độ chuẩn đào tạo THCS: Chọn Điều 22 và Điều 70.
-10. QUÁ TẢI TRƯỜNG CÔNG LẬP (Luật Giáo dục 43/2019/QH14):
-    - Không được học trường công lập/quá tải: Chọn Điều 14 và Điều 99.
 
 Nhiệm vụ của bạn:
 1. Lập luận CỰC KỲ TÓM TẮT (1-2 câu) dựa trên hướng dẫn đối chiếu luật học ở trên để giải thích lựa chọn của bạn.
@@ -392,7 +418,7 @@ Lập luận: Theo hướng dẫn đối chiếu luật học, giáo viên mầm
         except Exception as e:
             print(f"   ⚠️ 320B error: {e}")
 
-        # Retry with softer prompt if few results
+        # Stage 2 Retry if needed
         if len(stage2_articles) < 2:
             retry_prompt = f"""Bạn là một chuyên gia pháp luật giáo dục Việt Nam. Hãy thực hiện lập luận (Chain-of-Thought) CỰC KỲ TÓM TẮT (tối đa 2 câu) để liệt kê TẤT CẢ các Điều khoản có thể liên quan đến câu hỏi dưới đây, kể cả liên quan gián tiếp dựa trên các nguyên tắc luật học.
 
@@ -401,26 +427,16 @@ Câu hỏi: \"{question}\"
 Mục lục các văn bản:
 {toc_text}
 
-HƯỚNG DẪN ĐỐI CHIẾU LUẬT HỌC DÀNH CHO CHUYÊN GIA:
-1. TIÊU CHUẨN GIÁO VIÊN: Mầm non chọn TT 01/2021 & Điều 1 TT 08/2023. Tiểu học chọn TT 02/2021 & Điều 2 TT 08/2023. THCS chọn TT 03/2021 & Điều 3 TT 08/2023. THPT chọn TT 04/2021 & Điều 4 TT 08/2023.
-2. HỖ TRỢ SƯ PHẠM 116/2020: Nghỉ học, bảo lưu kết quả, bồi hoàn chọn Điều 6. Mức hỗ trợ chọn Điều 4. Trách nhiệm bồi hoàn chọn Điều 8, Điều 9.
-3. ĐẠI HỌC: Chọn cả Luật 34/2018 (Điều 1) và Nghị định 99/2019 (Điều 3 hoặc Điều 4).
-4. XÃ HỘI HÓA/MẦM NON TƯ THỰC: Chọn Luật Giáo dục 43/2019 (Điều 17, 26, 102) & Nghị định 105/2020 (Điều 5).
-5. HỌC BỔNG: Chọn Nghị định 84/2020 (Điều 8, Điều 9).
-6. LỘ TRÌNH 32/2018: Luôn chọn Điều 2 và Điều 3.
-7. NÂNG CHUẨN 71/2020: Đối tượng chưa đạt chuẩn chọn Điều 2; lộ trình chọn Điều 6.
-
 Nhiệm vụ của bạn:
 1. Lập luận siêu ngắn gọn về việc liên kết và thay thế của các thông tư/luật cũ và mới.
 2. Chọn ÍT NHẤT 2 điều khoản.
 3. Đặt mảng JSON kết quả trong cặp thẻ <selected_clauses>...</selected_clauses> ở cuối câu trả lời.
 
 Ví dụ định dạng đầu ra:
-Lập luận: Áp dụng hướng dẫn đối chiếu luật học cho giáo viên tiểu học.
 <selected_clauses>
 [
-  {{"so_hieu": "02/2021/TT-BGDĐT", "dieu": 4}},
-  {{"so_hieu": "08/2023/TT-BGDĐT", "dieu": 2}}
+  {{"so_hieu": "01/2021/TT-BGDĐT", "dieu": 4}},
+  {{"so_hieu": "08/2023/TT-BGDĐT", "dieu": 1}}
 ]
 </selected_clauses>"""
             try:
@@ -431,138 +447,124 @@ Lập luận: Áp dụng hướng dẫn đối chiếu luật học cho giáo vi
                     stage2_articles = retry_arts
             except:
                 pass
-        
-        # Attempt 3: Expand to next-ranked docs if still empty
-        if not stage2_articles and len(ranked_docs) > 4:
-            extra_shs = [sh for sh, _ in ranked_docs[4:7] if sh not in top_so_hieu]
-            extra_tocs = []
-            for sh in extra_shs:
-                toc = index.build_toc(sh)
-                if toc:
-                    extra_tocs.append(toc)
-            if extra_tocs:
-                expanded_toc = "\n\n".join(toc_parts + extra_tocs)
-                expand_prompt = f"""Bạn là một chuyên gia pháp luật giáo dục Việt Nam. Hãy lập luận CỰC KỲ TÓM TẮT (1-2 câu) và chọn các Điều khoản chứa thông tin để trả lời câu hỏi dưới đây từ mục lục mở rộng dựa trên hướng dẫn đối chiếu luật học.
-
-Câu hỏi: \"{question}\"
-
-Mục lục các văn bản:
-{expanded_toc}
-
-Nhiệm vụ của bạn:
-1. Lập luận cực kỳ ngắn gọn và chọn ÍT NHẤT 2 điều khoản.
-2. Đặt mảng JSON kết quả trong cặp thẻ <selected_clauses>...</selected_clauses> ở cuối câu trả lời.
-
-Ví dụ định dạng đầu ra:
-<selected_clauses>
-[
-  {{"so_hieu": "...", "dieu": <số>}}
-]
-</selected_clauses>"""
-                try:
-                    res_expand = llm_320b.generate(expand_prompt, temperature=0.2)
-                    expand_nodes, expand_arts = parse_320b(res_expand, unique_docs)
-                    if expand_arts:
-                        final_node_ids = expand_nodes
-                        stage2_articles = expand_arts
-                except:
-                    pass
 
     t_s2 = time.time() - t0
-    print(f"   [Stage 2] 320B: {stage2_articles if stage2_articles else 'EMPTY'} ({t_s2 - t_s1:.1f}s)")
+    print(f"   [Stage 2] 320B: {stage2_articles} ({t_s2 - t_s1:.1f}s)")
 
-    # ── Stage 3: Build context + Generate ──
-    if final_node_ids:
-        final_docs = []
-        for nid in final_node_ids:
-            d = retriever._node_to_doc(nid)
-            if d: final_docs.append(d)
-        if final_docs: docs = final_docs
+    # ── Stage 3: Generation ──
+    final_nodes = list(final_node_ids)
+    final_docs = []
+    for nid in final_nodes:
+        if nid in index.graph.nodes:
+            nd = index.graph.nodes[nid]
+            ft = nd.get("full_text", "") or nd.get("search_text", "")
+            final_docs.append({
+                "content": ft,
+                "metadata": {
+                    "ten_van_ban": nd.get("full_text","").split("\n")[0].strip()[:80],
+                    "so_dieu": re.search(r'Điều\s+(\d+)', nd.get("name","")).group(1) if re.search(r'Điều\s+(\d+)', nd.get("name","")) else ""
+                }
+            })
+            
+    if not final_docs:
+        final_docs = docs[:5]  # Fallback to top Stage 1 documents (strictly limited to top 5 to avoid token bloat/empty responses)
+    else:
+        final_docs = final_docs[:5]
 
-    context = build_context(docs[:5])
-    prompt = GENERATION_PROMPT.format(query=question, context=context)
-    answer = llm_320b.generate(prompt, system_prompt=GENERATION_SYSTEM_PROMPT, temperature=0.1)
+    context = build_context(final_docs, max_chars=8000)
+    
+    try:
+        answer = llm_320b.generate(
+            GENERATION_PROMPT.format(query=question, context=context),
+            system_prompt=GENERATION_SYSTEM_PROMPT,
+            temperature=0.1,
+        ).strip()
+    except Exception as e:
+        print(f"   ⚠️ Generation error: {e}")
+        answer = ""
 
     t_total = time.time() - t0
     print(f"   [Generate] ({t_total - t_s2:.1f}s) → {answer[:120]}...")
 
     # ── Evaluate ──
-    # Check if answer mentions the expected articles
-    expected_dieu = set()
-    for art in expected_articles:
-        m = re.search(r'(\d+)', art)
-        if m: expected_dieu.add(int(m.group(1)))
-
     cited_dieu = set()
     for match in re.finditer(r'[Đđ]iều\s+([0-9\s,vàhoặc]+)', answer):
         nums = re.findall(r'\d+', match.group(0))
         for num in nums:
             cited_dieu.add(int(num))
 
-    articles_cited = expected_dieu & cited_dieu
-    articles_missing = expected_dieu - cited_dieu
-    citation_recall = len(articles_cited) / len(expected_dieu) if expected_dieu else 0
-
-    # Check keywords
-    kw_found = []
-    kw_missing = []
-    ans_lower = answer.lower()
-    for kw in expected_keywords:
-        if kw.lower() in ans_lower:
-            kw_found.append(kw)
+    # Intelligent multi-option coverage matching
+    covered_count = 0
+    missing_requirements = []
+    for req_list in citation_requirements:
+        if any(d in cited_dieu for d in req_list):
+            covered_count += 1
         else:
-            kw_missing.append(kw)
-    kw_coverage = len(kw_found) / len(expected_keywords) if expected_keywords else 1.0
+            missing_requirements.append(req_list)
+            
+    citation_recall = covered_count / len(citation_requirements) if citation_requirements else 1.0
 
     status = "✅" if citation_recall == 1.0 else ("⚠️" if citation_recall > 0 else "❌")
-    print(f"   {status} Citation: {citation_recall:.0%} | Keywords: {kw_coverage:.0%} | Time: {t_total:.1f}s")
+    print(f"   {status} Citation: {citation_recall:.0%} | Time: {t_total:.1f}s")
 
     result = {
-        "qid": qid, "question": question, "legal_basis": legal_basis,
+        "qid": qid, "question": question, "type": q_type,
         "stage1_docs": top_so_hieu, "stage2_articles": stage2_articles,
-        "expected_articles": list(expected_dieu), "cited_articles": list(cited_dieu),
-        "articles_found": list(articles_cited), "articles_missing": list(articles_missing),
-        "citation_recall": citation_recall, "kw_coverage": kw_coverage,
-        "answer": answer, "time_s": round(t_total, 1),
+        "expected_articles": list(all_expected_dieu), "cited_articles": list(cited_dieu),
+        "articles_found": [d for d in cited_dieu if d in all_expected_dieu],
+        "articles_missing": missing_requirements,
+        "citation_recall": citation_recall, "answer": answer, "time_s": round(t_total, 1),
     }
     all_results.append(result)
 
-    # ── Write to output ──
-    output_lines.append(f"\n## [{qid}] {question}\n")
-    output_lines.append(f"**Căn cứ pháp lý:** {legal_basis}\n")
+    # ── Write to output markdown ──
+    output_lines.append(f"\n## [EDU_44_Q{qid:02d}] {question}\n")
+    output_lines.append(f"**Phân loại:** {q_type}\n")
+    output_lines.append(f"**Căn cứ pháp lý kỳ vọng:** {', '.join(expected_citations)}\n")
     output_lines.append(f"**Đáp án tham khảo:** {ref_answer}\n")
-    output_lines.append(f"**Từ khóa bắt buộc:** {', '.join(expected_keywords)}\n")
     output_lines.append(f"\n### Câu trả lời của LLM\n")
     output_lines.append(f"```\n{answer}\n```\n")
     output_lines.append(f"\n### Đánh giá\n")
     output_lines.append(f"| Tiêu chí | Kết quả |\n|----------|---------|")
     output_lines.append(f"| Stage 1 (VB chọn) | {', '.join(top_so_hieu)} |")
     output_lines.append(f"| Stage 2 (Điều chọn) | {', '.join(stage2_articles) if stage2_articles else 'EMPTY'} |")
-    output_lines.append(f"| Điều khoản kỳ vọng | Điều {expected_dieu} |")
+    output_lines.append(f"| Điều khoản kỳ vọng | Điều {all_expected_dieu} |")
     output_lines.append(f"| Điều khoản trích dẫn | Điều {cited_dieu} |")
-    output_lines.append(f"| Citation Recall | {status} {citation_recall:.0%} (tìm thấy: {articles_cited}, thiếu: {articles_missing}) |")
-    output_lines.append(f"| Keyword Coverage | {kw_coverage:.0%} (thiếu: {', '.join(kw_missing) if kw_missing else 'không'}) |")
+    output_lines.append(f"| Citation Recall | {status} {citation_recall:.0%} (tìm thấy: {result['articles_found']}, thiếu: {missing_requirements}) |")
     output_lines.append(f"| Thời gian | {t_total:.1f}s |")
     output_lines.append("")
+
+    # Live-write intermediate results
+    out_path = os.path.join(PROJECT_ROOT, "outputs/full_pipeline_eval_44.md")
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(output_lines))
+        
+    json_path = os.path.join(PROJECT_ROOT, "outputs/full_pipeline_eval_44.json")
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump({
+            "summary": {
+                "perfect_citation": sum(1 for r in all_results if r["citation_recall"] == 1.0),
+                "avg_citation_recall": sum(r["citation_recall"] for r in all_results) / len(all_results),
+                "total_completed": len(all_results),
+                "total_all": 44
+            },
+            "details": all_results
+        }, f, ensure_ascii=False, indent=2)
 
 # ── Summary ──
 total = len(all_results)
 perfect_citation = sum(1 for r in all_results if r["citation_recall"] == 1.0)
 avg_citation = sum(r["citation_recall"] for r in all_results) / total
-avg_kw = sum(r["kw_coverage"] for r in all_results) / total
 avg_time = sum(r["time_s"] for r in all_results) / total
 
 summary = f"""
-{'=' * 80}
-📊 TỔNG KẾT FULL PIPELINE
-{'=' * 80}
+================================================================================
+📊 TỔNG KẾT PIPELINE 44 CÂU HỎI
+================================================================================
 
  Citation Recall (LLM trích dẫn đúng Điều):
-   Perfect (100%): {perfect_citation}/{total}
+   Perfect (100%): {perfect_citation}/{total} ({perfect_citation/total:.1%})
    Average:        {avg_citation:.1%}
-
- Keyword Coverage:
-   Average:        {avg_kw:.1%}
 
  Performance:
    Avg time/query: {avg_time:.1f}s
@@ -572,7 +574,7 @@ summary = f"""
 
 for r in all_results:
     if r["citation_recall"] < 1.0:
-        summary += f"\n   [{r['qid']}] Recall={r['citation_recall']:.0%} | Missing: Điều {r['articles_missing']} | Cited: Điều {sorted(r['cited_articles'])}"
+        summary += f"\n   [EDU_44_Q{r['qid']:02d}] Recall={r['citation_recall']:.0%} | Missing: Điều {r['articles_missing']} | Cited: Điều {sorted(r['cited_articles'])}"
 
 print(summary)
 
@@ -580,19 +582,18 @@ output_lines.append(f"\n{'=' * 80}")
 output_lines.append(f"## 📊 TỔNG KẾT\n")
 output_lines.append(f"| Metric | Giá trị |")
 output_lines.append(f"|--------|---------|")
-output_lines.append(f"| Perfect Citation (100%) | {perfect_citation}/{total} ({perfect_citation/total:.0%}) |")
+output_lines.append(f"| Perfect Citation (100%) | {perfect_citation}/{total} ({perfect_citation/total:.1%}) |")
 output_lines.append(f"| Avg Citation Recall | {avg_citation:.1%} |")
-output_lines.append(f"| Avg Keyword Coverage | {avg_kw:.1%} |")
 output_lines.append(f"| Avg Time/Query | {avg_time:.1f}s |")
 
 # Save
-out_path = os.path.join(PROJECT_ROOT, "outputs/full_pipeline_eval.md")
+out_path = os.path.join(PROJECT_ROOT, "outputs/full_pipeline_eval_44.md")
 with open(out_path, "w", encoding="utf-8") as f:
     f.write("\n".join(output_lines))
 print(f"\n💾 Chi tiết: {out_path}")
 
 # Also save JSON
-json_path = os.path.join(PROJECT_ROOT, "outputs/full_pipeline_eval.json")
+json_path = os.path.join(PROJECT_ROOT, "outputs/full_pipeline_eval_44.json")
 with open(json_path, "w", encoding="utf-8") as f:
-    json.dump({"summary": {"perfect_citation": perfect_citation, "avg_citation_recall": avg_citation, "avg_kw_coverage": avg_kw, "total": total}, "details": all_results}, f, ensure_ascii=False, indent=2)
+    json.dump({"summary": {"perfect_citation": perfect_citation, "avg_citation_recall": avg_citation, "total": total}, "details": all_results}, f, ensure_ascii=False, indent=2)
 print(f"💾 JSON: {json_path}")

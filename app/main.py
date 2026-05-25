@@ -85,14 +85,14 @@ def init_pipeline():
     )
     logger.info(f"   Model: {agentic_llm.model}")
     
-    # Initialize Generator LLM (7B Local)
-    logger.info("🤖 Initializing 7B LLM Client (Generator)...")
+    # Initialize Generator LLM (320B Flagship)
+    logger.info("🤖 Initializing 320B LLM Client (Generator)...")
     generator_llm = LLMClient(
-        api_base=settings.generator_llm.api_base,
-        api_key=settings.generator_llm.api_key,
-        model=settings.generator_llm.model,
-        temperature=settings.generator_llm.temperature,
-        max_tokens=settings.generator_llm.max_tokens,
+        api_base=settings.llm.api_base,
+        api_key=settings.llm.api_key,
+        model=settings.llm.model,
+        temperature=settings.llm.temperature,
+        max_tokens=settings.llm.max_tokens,
     )
     logger.info(f"   Model: {generator_llm.model}")
 

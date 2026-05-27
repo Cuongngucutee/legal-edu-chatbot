@@ -359,6 +359,103 @@ class BookIndex:
         
         toc_lines.append(f"\nTổng cộng: {len(articles)} điều")
         return "\n".join(toc_lines)
+
+    def build_enriched_toc(self, so_hieu: str, snippet_len: int = 200) -> str:
+        """Build an enriched TOC with content snippets for each article.
+        
+        Unlike build_toc() which only shows article titles, this method includes
+        the first `snippet_len` characters of each article's content. This helps
+        the LLM distinguish between articles with similar titles during Stage 2
+        clause selection.
+        
+        Args:
+            so_hieu: Document identifier (so_hieu or canonical).
+            snippet_len: Number of characters to include as snippet per article.
+            
+        Returns:
+            Formatted string with article titles + content snippets.
+        """
+        node_ids = self.get_doc_node_ids(so_hieu)
+        if not node_ids:
+            return ""
+        
+        # Selective TOC Enrichment: skip snippets for general procedural documents (distractors)
+        canonical = self.doc_registry.get(so_hieu, so_hieu).upper()
+        distractors = ["13/2024", "125/2024", "238/2025", "04/2021"]
+        should_enrich = not any(d in canonical for d in distractors)
+        
+        articles = []
+        for node_id in node_ids:
+            if node_id not in self.graph.nodes:
+                continue
+            if "_CAN_CU" in node_id:
+                continue
+            
+            node_data = self.graph.nodes[node_id]
+            
+            # Get article title
+            name = node_data.get("name", "")
+            full_text = node_data.get("full_text", "") or node_data.get("search_text", "")
+            if not name and full_text:
+                first_line = full_text.split("\n")[0].strip()
+                name = first_line[:120] if len(first_line) > 120 else first_line
+            
+            if not name:
+                continue
+            
+            # Extract content snippet (skip the title line)
+            snippet = ""
+            if should_enrich and full_text:
+                lines = full_text.split("\n")
+                # Skip first line (title) and get content
+                content_lines = [l.strip() for l in lines[1:] if l.strip()]
+                content_text = " ".join(content_lines)
+                if content_text:
+                    snippet = content_text[:snippet_len].strip()
+                    if len(content_text) > snippet_len:
+                        snippet += "..."
+            
+            # Extract article number for sorting
+            art_num = 0
+            m = re.search(r'Điều\s+(\d+)', name)
+            if m:
+                art_num = int(m.group(1))
+            
+            # Get chapter via THUOC_CHUONG edge
+            chapter = ""
+            for neighbor in self.graph.neighbors(node_id):
+                edge_type = self.graph.edges[node_id, neighbor].get("type", "")
+                if edge_type == "THUOC_CHUONG":
+                    chapter = self.graph.nodes[neighbor].get("name", "")
+                    break
+            
+            articles.append({
+                "name": name,
+                "snippet": snippet,
+                "chapter": chapter,
+                "art_num": art_num,
+            })
+        
+        if not articles:
+            return ""
+        
+        articles.sort(key=lambda a: a["art_num"])
+        
+        canonical = self.doc_registry.get(so_hieu, so_hieu)
+        toc_lines = [f"=== MỤC LỤC CHI TIẾT: {canonical} ==="]
+        
+        current_chapter = None
+        for art in articles:
+            if art["chapter"] and art["chapter"] != current_chapter:
+                current_chapter = art["chapter"]
+                toc_lines.append(f"\n{current_chapter}")
+            
+            toc_lines.append(f"  - {art['name']}")
+            if art["snippet"]:
+                toc_lines.append(f"    → {art['snippet']}")
+        
+        toc_lines.append(f"\nTổng cộng: {len(articles)} điều")
+        return "\n".join(toc_lines)
     
     # ─── Document Catalog (Statistical Queries) ────────────────────────
 

@@ -53,12 +53,15 @@ class LLMClient:
         temperature: Optional[float] = None,
     ) -> str:
         """Generate text from prompt (non-streaming)."""
+        import time
+        # Pacing sleep to prevent API gateway rate limits/empty responses
+        time.sleep(2.0)
+
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
 
-        import time
         max_retries = 3
         delay = 2
         for attempt in range(max_retries):

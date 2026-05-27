@@ -66,7 +66,32 @@ def classify_intent(query: str, llm) -> str:
     if "so sánh" in q or " vs " in q or "đối chiếu" in q:
         return "COMPARISON"
 
-    # ── 320B LLM classification for non-obvious cases ──
+    # ── P2: Legal education keyword heuristic (no API call) ──
+    # If query contains ≥2 legal/education domain keywords → LOOKUP immediately
+    LEGAL_EDU_KEYWORDS = {
+        # Pháp luật chung
+        "điều", "khoản", "điểm", "luật", "nghị định", "thông tư", "quy định",
+        "quyết định", "văn bản", "pháp luật", "hiến pháp", "quyền", "nghĩa vụ",
+        "điều kiện", "tiêu chuẩn", "trách nhiệm", "xử phạt", "vi phạm",
+        "hướng dẫn", "thi hành", "hiệu lực", "bãi bỏ", "sửa đổi", "bổ sung",
+        "ban hành", "áp dụng", "chuyển đổi", "quyết nghị",
+        # Giáo dục
+        "giáo viên", "nhà giáo", "giảng viên", "học sinh", "sinh viên",
+        "trường", "đại học", "mầm non", "tiểu học", "trung học", "thcs", "thpt",
+        "giáo dục", "đào tạo", "tuyển sinh", "học phí", "học bổng",
+        "sư phạm", "chức danh", "nghề nghiệp", "thăng hạng", "bổ nhiệm",
+        "hội đồng", "hiệu trưởng", "cơ sở giáo dục", "chương trình",
+        "bằng cấp", "tốt nghiệp", "kỷ luật", "đánh giá", "kiểm tra",
+        "nâng chuẩn", "du học", "cử tuyển", "bồi hoàn", "thỉnh giảng",
+        "lợi nhuận", "tư thục", "công lập", "hỗ trợ", "chính sách",
+        "khu công nghiệp", "dân tộc", "nội trú",
+    }
+    match_count = sum(1 for kw in LEGAL_EDU_KEYWORDS if kw in q)
+    if match_count >= 2 and len(q) > 20:
+        logger.info(f"🏷️  Intent heuristic: LOOKUP (matched {match_count} legal keywords)")
+        return "LOOKUP"
+
+    # ── 320B LLM classification for truly ambiguous cases (< 5%) ──
     from app.llm.prompts import INTENT_PROMPT
     try:
         result = llm.generate(INTENT_PROMPT.format(query=query), max_tokens=10)

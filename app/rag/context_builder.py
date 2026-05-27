@@ -25,8 +25,8 @@ def build_context(docs: list, max_chars: int = 16000) -> str:
             status_note = " ❌ [Văn bản đã bị bãi bỏ]"
 
         content = doc.get("content", "")
-        if len(content) > 2000:
-            content = content[:2000] + "..."
+        if len(content) > 4000:
+            content = content[:4000] + "..."
 
         ngay_hieu_luc = meta.get("ngay_hieu_luc", "")
         ngay_str = f" (Hiệu lực: {ngay_hieu_luc})" if ngay_hieu_luc else ""

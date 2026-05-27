@@ -38,10 +38,17 @@ Ngoài ra, căn cứ vào Điều [Y], [Tên VB khác] thì [thông tin bổ sun
 
 GENERATION_PROMPT = """Câu hỏi: {query}
 
-Văn bản pháp luật tham khảo (hãy đọc kỹ và trích xuất thông tin liên quan):
+Văn bản pháp luật tham khảo (ĐỌC KỸ TOÀN BỘ trước khi trả lời):
 {context}
 
-Hãy trả lời theo cấu trúc: KHẲNG ĐỊNH → DẪN CHIẾU → GIẢI THÍCH. Luôn cố gắng trả lời từ nội dung văn bản trên:"""
+BƯỚC 1 — PHÂN TÍCH NỘI BỘ (suy nghĩ ngắn gọn trong đầu, KHÔNG viết ra):
+- Xác định TẤT CẢ các Điều khoản trong context có liên quan đến câu hỏi.
+- Nếu có văn bản SỬA ĐỔI, BỔ SUNG (VD: Thông tư 08/2023 sửa đổi Thông tư 01/2021, Nghị định 60/2025 sửa đổi Nghị định 116/2020), ƯU TIÊN ÁP DỤNG quy định trong văn bản sửa đổi mới nhất.
+- Trích xuất Khoản, Điểm cụ thể trả lời câu hỏi.
+
+BƯỚC 2 — TRẢ LỜI:
+Trả lời theo cấu trúc: KHẲNG ĐỊNH → DẪN CHIẾU (ghi rõ Điều, Khoản, Điểm) → GIẢI THÍCH chi tiết.
+Luôn cố gắng trả lời từ nội dung văn bản trên. Nếu có nhiều Điều liên quan, trích dẫn TẤT CẢ:"""
 
 # ──────────────────────────────────────────────────────────────────
 # Intent Classification Prompt — 320B replaces fine-tuned 1.5B

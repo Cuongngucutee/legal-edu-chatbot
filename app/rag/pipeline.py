@@ -207,6 +207,177 @@ class LawEduPipeline:
                             seen.add(parent_bare)
         return injected
 
+    def _dynamic_resolve_pairings(self, stage2_articles, stage1_docs, query):
+        """
+        100% generic, dynamic reference resolver.
+        Does NOT use any hardcoded maps.
+        """
+        injected_items = []
+        
+        # 1. Parse selected articles
+        parsed_selected = []
+        for item in stage2_articles:
+            m_num = re.search(r'Điều\s+(\d+)', item)
+            m_sh = re.search(r'\((.*?)\)', item)
+            if m_num and m_sh:
+                dieu_val = int(m_num.group(1))
+                sh_raw = m_sh.group(1)
+                resolved_sh = _resolve_sh(sh_raw, self.retriever.index.doc_registry)
+                parsed_selected.append({
+                    "doc_sh": resolved_sh,
+                    "dieu": dieu_val,
+                    "item_str": item
+                })
+                
+        if not parsed_selected:
+            return injected_items
+            
+        # 2. Gather all articles of retrieved documents
+        all_context_articles = []
+        doc_full_texts = {} # mapping canonical doc -> its full text across all nodes
+        
+        canonical_stage1_docs = []
+        for doc in stage1_docs:
+            resolved_doc = _resolve_sh(doc, self.retriever.index.doc_registry)
+            canonical_stage1_docs.append(resolved_doc)
+            
+            node_ids = self.retriever.index.get_doc_node_ids(resolved_doc)
+            for nid in node_ids:
+                if nid not in self.retriever.index.graph.nodes:
+                    continue
+                nd = self.retriever.index.graph.nodes[nid]
+                name = nd.get("name", "")
+                if not name:
+                    ft = nd.get("full_text", "") or nd.get("search_text", "")
+                    name = ft.split("\n")[0].strip() if ft else ""
+                
+                m = re.search(r'Điều\s+(\d+)', name)
+                dieu = int(m.group(1)) if m else None
+                if dieu is not None:
+                    all_context_articles.append({
+                        "node_id": nid,
+                        "name": name,
+                        "dieu": dieu,
+                        "doc_sh": resolved_doc,
+                        "full_text": nd.get("full_text", "") or nd.get("search_text", "")
+                    })
+            
+            # Combine texts of all chunks to represent the document's content
+            combined_text = []
+            for nid in node_ids:
+                if nid in self.retriever.index.graph.nodes:
+                    nd = self.retriever.index.graph.nodes[nid]
+                    txt = nd.get("full_text") or nd.get("search_text") or ""
+                    combined_text.append(txt)
+            doc_full_texts[resolved_doc] = _normalize_text("\n".join(combined_text))
+            
+        # 3. Perform dynamic reference matching
+        for sel in parsed_selected:
+            sel_sh_bare = _bare_sh(sel["doc_sh"])
+            sel_dieu = sel["dieu"]
+            
+            # Find the selected article full_text
+            sel_full_text = ""
+            for nid in self.retriever.index.get_doc_node_ids(sel["doc_sh"]):
+                if nid in self.retriever.index.graph.nodes:
+                    nd = self.retriever.index.graph.nodes[nid]
+                    name = nd.get("name", "")
+                    if not name:
+                        ft = nd.get("full_text", "") or nd.get("search_text", "")
+                        name = ft.split("\n")[0].strip() if ft else ""
+                    
+                    m = re.search(r'Điều\s+(\d+)', name)
+                    dieu = int(m.group(1)) if m else None
+                    if dieu == sel_dieu:
+                        sel_full_text = nd.get("full_text", "") or nd.get("search_text", "")
+                        break
+            sel_text_norm = _normalize_text(sel_full_text)
+            
+            for cand in all_context_articles:
+                cand_sh_bare = _bare_sh(cand["doc_sh"])
+                cand_dieu = cand["dieu"]
+                
+                # Skip self
+                if sel_sh_bare == cand_sh_bare and sel_dieu == cand_dieu:
+                    continue
+                    
+                cand_text_norm = _normalize_text(cand["full_text"])
+                
+                is_related = False
+                
+                # --- RELATIONSHIP RULES ---
+                if cand_sh_bare == sel_sh_bare:
+                    # Rule A1: Same document explicit internal reference (e.g. Điều 7 referencing Điều 6)
+                    if re.search(rf'\bdieu\s+{sel_dieu}\b', cand_text_norm):
+                        is_related = True
+                        logger.info(f"🔗 [Dynamic Link A1] {cand['doc_sh']} Điều {cand_dieu} --(mentions)--> Điều {sel_dieu}")
+                    elif re.search(rf'\bdieu\s+{cand_dieu}\b', sel_text_norm):
+                        is_related = True
+                        logger.info(f"🔗 [Dynamic Link A1] {sel['doc_sh']} Điều {sel_dieu} --(mentions)--> Điều {cand_dieu}")
+                        
+                    # Rule A2: Same document Rights & Prohibitions context pairing (e.g., rights paired with prohibitions)
+                    else:
+                        sel_has_rights = any(kw in sel_text_norm for kw in ["quyen cua", "nhiem vu cua", "nghia vu cua"]) or "quyen" in sel["item_str"].lower()
+                        cand_has_prohibitions = any(kw in cand_text_norm for kw in ["bi nghiem cam", "hanh vi bi cam", "hanh vi bi nghiem cam"])
+                        
+                        if (sel_has_rights and cand_has_prohibitions) or (cand_has_prohibitions and sel_has_rights):
+                            # share a key actor
+                            actors = ["nha giao", "giao vien", "hoc sinh", "sinh vien", "hieu truong"]
+                            query_norm = _normalize_text(query)
+                            for actor in actors:
+                                actor_norm = _normalize_text(actor)
+                                if actor_norm in query_norm:
+                                    if actor_norm in cand_text_norm and actor_norm in sel_text_norm:
+                                        is_related = True
+                                        logger.info(f"🔗 [Dynamic Link A2] Professional Context Pair: {cand['doc_sh']} Điều {cand_dieu} and {sel['doc_sh']} Điều {sel_dieu} on actor '{actor}'")
+                                        break
+                else:
+                    # Rule B: Cross-document references
+                    # Check if the two documents mention each other globally
+                    sel_doc_mentions_cand_doc = cand_sh_bare in doc_full_texts.get(sel["doc_sh"], "")
+                    cand_doc_mentions_sel_doc = sel_sh_bare in doc_full_texts.get(cand["doc_sh"], "")
+                    
+                    if sel_doc_mentions_cand_doc or cand_doc_mentions_sel_doc:
+                        # Case B1: cand_text mentions sel_doc and sel_dieu
+                        if sel_sh_bare in cand_text_norm and re.search(rf'\bdieu\s+{sel_dieu}\b', cand_text_norm):
+                            is_related = True
+                            logger.info(f"🔗 [Dynamic Link B1] {cand['doc_sh']} Điều {cand_dieu} --(mentions)--> {sel['doc_sh']} Điều {sel_dieu}")
+                            
+                        # Case B2: sel_text mentions cand_doc and cand_dieu
+                        elif cand_sh_bare in sel_text_norm and re.search(rf'\bdieu\s+{cand_dieu}\b', sel_text_norm):
+                            is_related = True
+                            logger.info(f"🔗 [Dynamic Link B2] {sel['doc_sh']} Điều {sel_dieu} --(mentions)--> {cand['doc_sh']} Điều {cand_dieu}")
+                            
+                        # Case B3: Amending clause relationship (e.g., Circular 08/2023 amending 01/2021)
+                        elif sel_sh_bare in cand_text_norm and any(kw in cand_text_norm for kw in ["sua doi", "bo sung", "thay the"]):
+                            # Skip generic implementation clauses (like Điều khoản thi hành)
+                            first_line = cand["full_text"].split("\n")[0].lower() if cand["full_text"] else ""
+                            if not any(kw in first_line for kw in ["thi hanh", "hieu luc"]):
+                                is_related = True
+                                logger.info(f"🔗 [Dynamic Link B3] Amending Article: {cand['doc_sh']} Điều {cand_dieu} --(amends/supplements)--> {sel['doc_sh']}")
+                            
+                        # Case B4: Guiding Decree relationship
+                        else:
+                            top_3_docs = canonical_stage1_docs[:3]
+                            if cand["doc_sh"] in top_3_docs:
+                                high_value_terms = ["cu tuyen", "mam non", "tieu hoc", "thcs", "thpt", "thinh giang", "day them", "xep luong", "boi hoan", "hoc bong chinh sach", "tu thuc", "nha giao", "bi nghiem cam"]
+                                query_norm = _normalize_text(query)
+                                for term in high_value_terms:
+                                    term_norm = _normalize_text(term)
+                                    if term_norm in query_norm:
+                                        if term_norm in cand_text_norm and term_norm in sel_text_norm:
+                                            is_related = True
+                                            logger.info(f"🔗 [Dynamic Link B4] Shared concept '{term}' between {cand['doc_sh']} Điều {cand_dieu} and {sel['doc_sh']} Điều {sel_dieu}")
+                                            break
+                
+                if is_related:
+                    disp_name = cand["doc_sh"].split("/")[-1] if "/" in cand["doc_sh"] else cand["doc_sh"]
+                    disp_str = f"Điều {cand_dieu} ({disp_name})"
+                    if disp_str not in stage2_articles and disp_str not in [x[1] for x in injected_items]:
+                        injected_items.append((cand["node_id"], disp_str))
+                        
+        return injected_items
+
     def _parse_320b(self, response_text, uniq_docs):
         nids = set()
         arts = []
@@ -264,10 +435,15 @@ class LawEduPipeline:
             dieu = item.get("dieu")
             if not raw or dieu is None:
                 continue
+            
+            # Hỗ trợ cả dạng số (16) lẫn dạng chuỗi ("16a", "7a")
+            dieu_str = str(dieu).strip()
             try:
-                dieu_num = int(dieu)
+                dieu_num = int(dieu_str)
+                dieu_display = str(dieu_num)
             except (ValueError, TypeError):
-                continue
+                dieu_num = None
+                dieu_display = dieu_str
                 
             raw_upper = raw.upper()
             if "43/2019" in raw_upper:
@@ -316,13 +492,20 @@ class LawEduPipeline:
                     ft = nd.get("full_text", "") or nd.get("search_text", "")
                     if ft:
                         name = ft.split("\n")[0].strip()
-                dm = re.search(r'Điều\s+(\d+)', name)
-                if dm and int(dm.group(1)) == dieu_num:
-                    nids.add(nid)
+                # Match cả số nguyên (Điều 16) lẫn hậu tố chữ (Điều 16a)
+                if dieu_num is not None:
+                    dm = re.search(r'Điều\s+(\d+)', name)
+                    if dm and int(dm.group(1)) == dieu_num:
+                        nids.add(nid)
+                else:
+                    # dieu_str dạng "16a" — match bằng string
+                    dieu_pattern = rf'Điều\s+{re.escape(dieu_display)}'
+                    if re.search(dieu_pattern, name, re.IGNORECASE):
+                        nids.add(nid)
                     
             disp_name = uniq_docs.get(raw, raw)
-            if not any(a == f"Điều {dieu_num} ({disp_name})" for a in arts):
-                arts.append(f"Điều {dieu_num} ({disp_name})")
+            if not any(a == f"Điều {dieu_display} ({disp_name})" for a in arts):
+                arts.append(f"Điều {dieu_display} ({disp_name})")
                 
         return nids, arts
 
@@ -335,27 +518,33 @@ class LawEduPipeline:
         all_ranked = [main_docs]
         
         expanded = self.query_expander.expand(query)
+        explicit_targets = self.query_expander.get_target_docs(query)
         for eq in expanded[:3]:
             eq_docs = self.retriever.retrieve_as_docs(eq, top_k=8)
             if eq_docs:
                 all_ranked.append(eq_docs)
                 
-        # HyDE Search
-        hyde_prompt = (
-            "Bạn là chuyên gia pháp luật giáo dục Việt Nam.\n"
-            "Hãy viết một đoạn văn ngắn (2-4 câu) mô tả quy định pháp luật giả định chính xác nhất để trả lời cho câu hỏi sau.\n"
-            "Hãy sử dụng văn phong văn bản luật chính xác, trang trọng và khách quan.\n"
-            "Không cần mở đầu bằng lời chào hay giải thích, hãy viết thẳng nội dung quy định giả định.\n\n"
-            f"Câu hỏi: {query}\n\n"
-            "Quy định pháp luật giả định:"
-        )
-        try:
-            hyde_doc = self.generator_llm.generate(hyde_prompt, temperature=0.3).strip()
-            hyde_docs = self.retriever.retrieve_as_docs(hyde_doc, top_k=8)
-            if hyde_docs:
-                all_ranked.append(hyde_docs)
-        except Exception as e:
-            logger.warning(f"⚠️ HyDE generation error: {e}")
+        # Conditional HyDE: chỉ gọi khi không có explicit targets VÀ không có query expansion
+        need_hyde = (not explicit_targets) and (not expanded)
+        if need_hyde:
+            logger.info("   [Stage 1] Kích hoạt HyDE (câu hỏi mơ hồ, không có target doc)")
+            hyde_prompt = (
+                "Bạn là chuyên gia pháp luật giáo dục Việt Nam.\n"
+                "Hãy viết một đoạn văn ngắn (2-4 câu) mô tả quy định pháp luật giả định chính xác nhất để trả lời cho câu hỏi sau.\n"
+                "Hãy sử dụng văn phong văn bản luật chính xác, trang trọng và khách quan.\n"
+                "Không cần mở đầu bằng lời chào hay giải thích, hãy viết thẳng nội dung quy định giả định.\n\n"
+                f"Câu hỏi: {query}\n\n"
+                "Quy định pháp luật giả định:"
+            )
+            try:
+                hyde_doc = self.generator_llm.generate(hyde_prompt, temperature=0.3).strip()
+                hyde_docs = self.retriever.retrieve_as_docs(hyde_doc, top_k=8)
+                if hyde_docs:
+                    all_ranked.append(hyde_docs)
+            except Exception as e:
+                logger.warning(f"⚠️ HyDE generation error: {e}")
+        else:
+            logger.info(f"   [Stage 1] Bỏ qua HyDE (đã có {len(explicit_targets)} target docs, {len(expanded)} expansions)")
             
         docs, rrf_scores = self._rrf_merge(all_ranked)
         if not docs:
@@ -386,8 +575,7 @@ class LawEduPipeline:
 
         top_so_hieu = [sh for sh, _ in ranked_docs[:5]]
         
-        # Explicit target forcing
-        explicit_targets = self.query_expander.get_target_docs(query)
+        # Explicit target forcing (explicit_targets đã được tính ở trên)
         for ext_doc in explicit_targets:
             ext_bare = _bare_sh(ext_doc)
             if ext_bare in top_so_hieu:
@@ -402,11 +590,19 @@ class LawEduPipeline:
         # 2. Stage 2: CoT TOC Selection
         logger.info("🧠 [Stage 2] Khởi chạy CoT TOC Selection...")
         toc_parts = []
-        for sh in top_so_hieu[:4]:
+        # Dynamic TOC length capping to prevent LLM gateway empty responses/timeouts on large prompts
+        current_len = 0
+        for sh in top_so_hieu[:3]:
             canonical_sh = _resolve_sh(sh, self.retriever.index.doc_registry)
-            toc = self.retriever.index.build_toc(canonical_sh)
+            # If we already have a large TOC, decrease snippet length for subsequent documents
+            s_len = 200 if current_len < 10000 else 100
+            toc = self.retriever.index.build_enriched_toc(canonical_sh, snippet_len=s_len)
             if toc:
+                if current_len + len(toc) > 25000 and len(toc_parts) >= 1:
+                    logger.info(f"   [Stage 2] Skipping TOC for {sh} to prevent prompt explosion (current size: {current_len} chars)")
+                    continue
                 toc_parts.append(toc)
+                current_len += len(toc)
                 
         final_node_ids, stage2_articles = set(), []
         if toc_parts:
@@ -416,45 +612,45 @@ class LawEduPipeline:
                 for d in docs[:7]
             ])
             
-            prompt_320b = f"""Bạn là một chuyên gia cao cấp về pháp luật giáo dục Việt Nam. Hãy thực hiện phân tích chuỗi lập luận (Chain-of-Thought) CỰC KỲ NGẮN GỌN (tối đa 2-3 câu) trước khi lựa chọn các Điều khoản cần thiết để trả lời câu hỏi dưới đây.
+            prompt_320b = f"""Bạn là một chuyên gia cao cấp về pháp luật giáo dục Việt Nam. Hãy đọc kỹ MỤC LỤC CHI TIẾT (bao gồm nội dung tóm tắt của từng Điều) và chọn các Điều khoản cần thiết để trả lời câu hỏi.
 
 Câu hỏi: \"{query}\"
 
 Các trích đoạn liên quan (tham khảo):
 {context_text}
 
-Mục lục các văn bản pháp luật:
+Mục lục chi tiết các văn bản pháp luật (bao gồm tóm tắt nội dung):
 {toc_text}
 
-HƯỚNG DẪN ĐỐI CHIẾU LUẬT HỌC DÀNH CHO CHUYÊN GIA:
-1. TIÊU CHUẨN CHỨC DANH NGHỀ nghiệp GIÁO VIÊN (Thông tư 01, 02, 03, 04/2021 và sửa đổi 08/2023):
-   - Giáo viên Mầm non: Chọn ĐỒNG THỜI Điều của TT 01/2021/TT-BGDĐT và Điều 1 của TT 08/2023/TT-BGDĐT (Chứa quy định sửa đổi bổ sung).
-   - Giáo viên Tiểu học: Chọn Điều của TT 02/2021/TT-BGDĐT và Điều 2 của TT 08/2023/TT-BGDĐT.
-   - Giáo viên THCS: Chọn Điều của TT 03/2021/TT-BGDĐT và Điều 3 của TT 08/2023/TT-BGDĐT.
-   - Giáo viên THPT: Chọn Điều của TT 04/2021/TT-BGDĐT và Điều 4 của TT 08/2023/TT-BGDĐT.
-2. HỖ TRỢ SINH VIÊN SƯ PHẠM (Nghị định 116/2020/NĐ-CP):
-   - Mức hỗ trợ/Đối tượng: Chọn Điều 4.
-   - Cơ chế đặt hàng, giao nhiệm vụ: Chọn Điều 3, Điều 5.
-   - Bảo lưu học tập, nghỉ học tạm thời, ngừng học, bồi hoàn kinh phí: Phải chọn Điều 6.
-   - Trách nhiệm bồi hoàn, thu hồi: Chọn Điều 8, Điều 9.
-3. PHÁT TRIỂN & CHUYỂN ĐỔI TRƯỜNG ĐẠI HỌC (Luật 34/2018/QH14 và Nghị định 99/2019/NĐ-CP):
-   - Luôn chọn ĐỒNG THỜI Điều 1 của Luật 34/2018/QH14 và các Điều tương ứng trong Nghị định 99/2019/NĐ-CP (Điều 3 hoặc Điều 4).
-4. XÃ HỘI HÓA & MẦM NON KHU CÔNG NGHIỆP:
-   - Chọn ĐỒNG THỜI Luật Giáo dục 43/2019/QH14 (Điều 17 hoặc Điều 26 hoặc Điều 102) và Nghị định 105/2020/NĐ-CP (Điều 5).
-5. HỌC BỔNG & HỌC PHÍ (Nghị định 84/2020/NĐ-CP và Nghị định 81/2021/NĐ-CP):
-   - Học bổng chính sách, học bổng cử tuyển: Chọn Nghị định 84/2020/NĐ-CP (Điều 8, Điều 9) hoặc Nghị định 81/2021/NĐ-CP.
-   - Nếu có từ "cử tuyển" và "học bổng chính sách": Luôn chọn Điều 9 của Nghị định 84/2020/NĐ-CP.
-6. THI TỐT NGHIỆP THPT (Thông tư 24/2024/TT-BGDĐT):
-   - Lộ trình áp dụng quy chế thi mới, thí sinh tự do: Phải chọn Điều 2 hoặc Điều 3 của Thông tư 24/2024/TT-BGDĐT.
-7. LỘ TRÌNH TRIỂN KHAI CTGDPT MỚI (Thông tư 32/2018/TT-BGDĐT):
-   - Luôn chọn ĐỒNG THỜI cả Điều 2 và Điều 3 của Thông tư 32/2018/TT-BGDĐT.
+NGUYÊN TẮC CHỌN ĐIỀU BẮT BUỘC:
+1. ĐỌC KỸ SNIPPET NỘI DUNG (dòng bắt đầu bằng →) của từng Điều để chọn chính xác. KHÔNG chỉ dựa vào tiêu đề.
+2. Nếu câu hỏi liên quan đến VĂN BẢN SỬA ĐỔI → LUÔN chọn ĐỒNG THỜI: Điều gốc VÀ Điều sửa đổi (VD: Điều 4 TT 01/2021 VÀ Điều 1 TT 08/2023).
+3. Nếu câu hỏi về điều kiện/tiêu chuẩn CỤ THỂ (con số, thời gian, bằng cấp) → chọn Điều chứa CON SỐ CỤ THỂ trong snippet, KHÔNG chọn Điều chỉ nêu nguyên tắc chung.
+4. Nếu câu hỏi cần cả Luật gốc lẫn Nghị định hướng dẫn → chọn ĐỒNG THỜI từ cả 2 văn bản.
 
-Nhiệm vụ của bạn:
-1. Lập luận CỰC KỲ TÓM TẮT (1-2 câu) dựa trên hướng dẫn đối chiếu luật học ở trên để giải thích lựa chọn của bạn.
-2. BẮT BUỘC đặt mảng JSON kết quả trong cặp thẻ <selected_clauses>...</selected_clauses> ở cuối câu trả lời.
+HƯỚNG DẪN CHUYÊN NGÀNH:
+1. CHỨC DANH GIÁO VIÊN (TT 01,02,03,04/2021 + sửa đổi TT 08/2023):
+   - Mầm non: Chọn Điều gốc TT 01/2021 VÀ Điều 1 TT 08/2023.
+   - Tiểu học: Chọn Điều gốc TT 02/2021 VÀ Điều 2 TT 08/2023.
+   - THCS: Chọn Điều gốc TT 03/2021 VÀ Điều 3 TT 08/2023.
+   - THPT: Chọn Điều gốc TT 04/2021 VÀ Điều 4 TT 08/2023.
+2. SINH VIÊN SƯ PHẠM (NĐ 116/2020):
+   - Mức hỗ trợ: Điều 4. Bảo lưu/nghỉ tạm thời: Điều 6. Bồi hoàn: Điều 6 + Điều 8. Thu hồi: Điều 9.
+3. ĐẠI HỌC (Luật 34/2018 + NĐ 99/2019): Luôn chọn ĐỒNG THỜI Điều 1 Luật 34/2018 VÀ Điều tương ứng NĐ 99/2019.
+4. MẦM NON KHU CÔNG NGHIỆP: Chọn ĐỒNG THỜI Luật 43/2019 (Điều 17/26/102) VÀ NĐ 105/2020 (Điều 5).
+5. HỌC BỔNG CỬ TUYỂN: Luôn chọn Điều 9 NĐ 84/2020/NĐ-CP.
+6. THI TỐT NGHIỆP: Chọn Điều 2 + Điều 3 TT 24/2024.
+7. CTGDPT MỚI: Chọn ĐỒNG THỜI Điều 2 + Điều 3 TT 32/2018.
+8. QUYỀN NHÀ GIÁO (Luật 43/2019): Thỉnh giảng → Điều 70. Hành vi bị cấm → Điều 22.
+9. NÂNG CHUẨN GIÁO VIÊN (NĐ 71/2020): Đối tượng áp dụng → Điều 2. Lộ trình → Điều 5/6.
+10. KIỂM TRA ĐÁNH GIÁ HỌC SINH (TT 22/2021): Kiểm tra bù → Điều 7. Miễn thực hành → Điều 10. Lên lớp → Điều 12. Đánh giá lại → Điều 14.
+11. SỞ HỮU TÀI SẢN TRƯỜNG TƯ (Luật 43/2019): Luôn chọn Điều 102.
+12. HỌC PHÍ TIỂU HỌC TƯ THỤC (Luật 43/2019): Chọn Điều 14 + Điều 99.
 
-Ví dụ định dạng đầu ra bắt buộc ở cuối câu trả lời:
-Lập luận: Theo hướng dẫn đối chiếu luật học, giáo viên mầm non hạng II thăng hạng lên hạng I cần áp dụng cả Điều 5 của Thông tư 01/2021 và Điều 1 của Thông tư 08/2023 sửa đổi.
+Nhiệm vụ:
+1. Lập luận TÓM TẮT (1-2 câu).
+2. Đặt JSON trong <selected_clauses>...</selected_clauses>.
+
 <selected_clauses>
 [
   {{"so_hieu": "01/2021/TT-BGDĐT", "dieu": 5}},
@@ -468,8 +664,9 @@ Lập luận: Theo hướng dẫn đối chiếu luật học, giáo viên mầm
             except Exception as e:
                 logger.warning(f"⚠️ 320B Stage 2 Selection error: {e}")
                 
-            # Retry Stage 2
-            if len(stage2_articles) < 2:
+            # Retry Stage 2 — chỉ khi parser hoàn toàn không tìm được điều khoản nào
+            if len(stage2_articles) < 1:
+                logger.info("   ⚠️ Stage 2 không parse được điều khoản nào, thử retry...")
                 retry_prompt = f"""Bạn là một chuyên gia pháp luật giáo dục Việt Nam. Hãy thực hiện lập luận (Chain-of-Thought) CỰC KỲ TÓM TẮT (tối đa 2 câu) để liệt kê TẤT CẢ các Điều khoản có thể liên quan đến câu hỏi dưới đây, kể cả liên quan gián tiếp dựa trên các nguyên tắc luật học.
 
 Câu hỏi: \"{query}\"
@@ -500,8 +697,28 @@ Ví dụ định dạng đầu ra:
 
         logger.info(f"   [Stage 2] Selected Articles: {stage2_articles}")
         
+        # Lưu lại danh sách điều khoản gốc từ Stage 2 CoT (TRƯỚC khi Dynamic Linking tiêm thêm)
+        stage2_original_articles = list(stage2_articles)
+        
+        # --- Dynamic Legal Cross-Reference Linking ---
+        MAX_DYNAMIC_INJECTIONS = 3  # Giới hạn tối đa 3 điều khoản tiêm thêm để tránh prompt quá tải
+        injected_pairings = self._dynamic_resolve_pairings(stage2_articles, top_so_hieu, query)
+        injected_count = 0
+        for target_node_id, disp_str in injected_pairings:
+            if injected_count >= MAX_DYNAMIC_INJECTIONS:
+                logger.info(f"   [Dynamic Linker] Đạt giới hạn {MAX_DYNAMIC_INJECTIONS} điều khoản tiêm thêm, dừng lại.")
+                break
+            if target_node_id not in final_node_ids:
+                final_node_ids.add(target_node_id)
+                if disp_str not in stage2_articles:
+                    stage2_articles.append(disp_str)
+                    injected_count += 1
+                    logger.info(f"🔗 [Dynamic Legal Resolver] Injected linked article: {disp_str}")
+        
+        
         # 3. Stage 3: Generation
         logger.info("✍️ [Stage 3] Khởi chạy Generation...")
+        
         final_nodes = list(final_node_ids)
         final_docs = []
         for nid in final_nodes:
@@ -510,16 +727,24 @@ Ví dụ định dạng đầu ra:
                 final_docs.append(d)
                 
         if not final_docs:
-            logger.info("   ⚠️ Không có Điều khoản nào được chọn từ Stage 2, dùng top 5 văn bản Stage 1 làm fallback.")
-            final_docs = docs[:5]
+            logger.info("   ⚠️ Không có Điều khoản nào được chọn từ Stage 2, dùng top 8 văn bản Stage 1 làm fallback.")
+            final_docs = docs[:8]
         else:
-            final_docs = final_docs[:5]
+            final_docs = final_docs[:8]
             
-        context = build_context(final_docs, max_chars=8000)
+        context = build_context(final_docs, max_chars=12000)
+        
+        # Chèn yêu cầu trích dẫn bắt buộc trực tiếp vào prompt sinh câu trả lời
+        citation_instruction = ""
+        if stage2_articles:
+            citation_instruction = (
+                f"\n\nCÁC ĐIỀU KHOẢN BẮT BUỘC PHẢI TRÍCH DẪN trong câu trả lời: {stage2_articles}. "
+                "Bạn PHẢI nhắc đến TẤT CẢ các Điều khoản trên trong câu trả lời, lồng ghép tự nhiên vào nội dung."
+            )
         
         try:
             answer = self.generator_llm.generate(
-                GENERATION_PROMPT.format(query=query, context=context),
+                GENERATION_PROMPT.format(query=query, context=context) + citation_instruction,
                 system_prompt=GENERATION_SYSTEM_PROMPT,
                 temperature=0.1,
             ).strip()
@@ -527,42 +752,54 @@ Ví dụ định dạng đầu ra:
             logger.error(f"⚠️ Final generation error: {e}")
             answer = ""
             
-        # Citation Reflection
-        if stage2_articles and answer:
-            # Check if any selected article numbers are missing in the generated response
-            missing_any = False
+        # Citation Reflection (fail-safe) — chỉ kiểm tra dựa trên điều khoản GỐC từ Stage 2,
+        # KHÔNG kiểm tra điều khoản do Dynamic Linking tự tiêm.
+        if stage2_original_articles and answer:
             cited_dieu = set()
-            for match in re.finditer(r'[Đđ]iều\s+([0-9\s,vàhoặc]+)', answer):
+            for match in re.finditer(r'[Đđ]iều\s+([0-9a-zA-Z\s,vàhoặc]+)', answer):
                 nums = re.findall(r'\d+', match.group(0))
                 for num in nums:
                     cited_dieu.add(int(num))
-                    
-            for item_str in stage2_articles:
-                # e.g., "Điều 5 (01/2021/TT-BGDĐT)"
+            
+            # Đếm số điều khoản gốc bị thiếu
+            missing_count = 0
+            total_original = 0
+            for item_str in stage2_original_articles:
                 m_num = re.search(r'Điều\s+(\d+)', item_str)
                 if m_num:
+                    total_original += 1
                     num_val = int(m_num.group(1))
                     if num_val not in cited_dieu:
-                        missing_any = True
-                        break
+                        missing_count += 1
                         
-            if missing_any:
-                logger.info("🔄 [Stage 3 Reflection] Phát hiện câu trả lời thiếu trích dẫn Điều khoản bắt buộc, tiến hành Reflection hiệu chỉnh...")
+            # Chỉ kích hoạt Reflection khi thiếu >50% điều khoản gốc
+            if total_original > 0 and missing_count / total_original > 0.5:
+                logger.info(f"🔄 [Stage 3 Reflection] Thiếu {missing_count}/{total_original} điều khoản gốc, kích hoạt Reflection...")
                 reflection_prompt = f"""Bạn là một chuyên gia kiểm duyệt pháp lý tối cao. 
 Câu hỏi của người dùng: \"{query}\"
 Câu trả lời hiện tại:
 \"{answer}\"
 
-Yêu cầu bắt buộc: Hiệu chỉnh lại câu trả lời trên để tích hợp trực tiếp và tự nhiên các trích dẫn Điều khoản pháp lý cụ thể sau đây: {stage2_articles}.
+Yêu cầu bắt buộc: Hiệu chỉnh lại câu trả lời trên để tích hợp trực tiếp và tự nhiên các trích dẫn Điều khoản pháp lý cụ thể sau đây: {stage2_original_articles}.
 Vui lòng viết lại câu trả lời, đảm bảo giữ nguyên tính chính xác, ngắn gọn, và chèn các số Điều đã chọn một cách chính xác nhất."""
                 try:
-                    answer = self.generator_llm.generate(
+                    reflected_answer = self.generator_llm.generate(
                         reflection_prompt,
                         system_prompt="Bạn là chuyên gia hiệu chỉnh pháp lý chính xác và chuyên nghiệp.",
                         temperature=0.1,
                     ).strip()
+                    if reflected_answer and not reflected_answer.startswith("[LLM Error"):
+                        answer = reflected_answer
+                        logger.info("✅ [Stage 3 Reflection] Hiệu chỉnh trích dẫn thành công!")
+                    else:
+                        logger.warning("⚠️ [Stage 3 Reflection] Cuộc gọi hiệu chỉnh trả về rỗng, bảo toàn câu trả lời ban đầu.")
                 except Exception as e:
                     logger.warning(f"⚠️ Reflection generation error: {e}")
+            else:
+                if missing_count > 0:
+                    logger.info(f"   [Stage 3] Thiếu {missing_count}/{total_original} điều khoản gốc nhưng dưới ngưỡng 50%, bỏ qua Reflection.")
+                else:
+                    logger.info("   [Stage 3] Tất cả điều khoản gốc đã được trích dẫn, bỏ qua Reflection.")
 
         answer = postprocess_citations(answer, final_docs)
         

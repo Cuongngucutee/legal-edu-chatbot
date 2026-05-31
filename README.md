@@ -110,6 +110,17 @@ REDIS_URL=redis://localhost:6379/0
 API_HOST=0.0.0.0
 API_PORT=8000
 API_KEY=lawedu-default-key
+
+# Data Paths
+DATA_DIR=data/final
+KG_PATH=outputs/knowledge_graph/entity_graph.json
+
+# Pro LLM API (GLM 4.7 320B)
+PRO_LLM_API_BASE=https://api.int2.net/v1
+PRO_LLM_API_KEY=your_api_key_here
+PRO_LLM_MODEL_NAME=glm-4.7
+PRO_LLM_TEMPERATURE=0.1
+PRO_LLM_MAX_TOKENS=4096
 ```
 
 ### 4. Run the Backend Server

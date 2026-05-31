@@ -13,21 +13,31 @@ load_dotenv(os.path.join(ROOT_DIR, ".env"))
 
 @dataclass
 class LLMConfig:
-    """Configuration for the 320B LLM API (Agentic tasks)."""
-    api_base: str = os.getenv("LLM_API_BASE", "https://api.int2.net/v1")
+    """Configuration for the Primary LLM API (120B for Generation)."""
+    api_base: str = os.getenv("LLM_API_BASE", "https://api.groq.com/openai/v1")
     api_key: str = os.getenv("LLM_API_KEY", "")
-    model: str = os.getenv("LLM_MODEL_NAME", "deepseek-chat")
+    model: str = os.getenv("LLM_MODEL_NAME", "openai/gpt-oss-120b")
     temperature: float = float(os.getenv("LLM_TEMPERATURE", "0.1"))
     max_tokens: int = int(os.getenv("LLM_MAX_TOKENS", "4096"))
 
 @dataclass
 class GeneratorLLMConfig:
-    """Configuration for the 7B LLM (Fast Generation tasks)."""
-    api_base: str = os.getenv("GEN_LLM_API_BASE", "http://localhost:11434/v1")
-    api_key: str = os.getenv("GEN_LLM_API_KEY", "ollama")
-    model: str = os.getenv("GEN_LLM_MODEL_NAME", "qwen2.5:7b")
-    temperature: float = float(os.getenv("GEN_LLM_TEMPERATURE", "0.3"))
+    """Configuration for the Secondary LLM (20B for intermediate reasoning)."""
+    api_base: str = os.getenv("GEN_LLM_API_BASE", "https://api.groq.com/openai/v1")
+    api_key: str = os.getenv("GEN_LLM_API_KEY", "")
+    model: str = os.getenv("GEN_LLM_MODEL_NAME", "openai/gpt-oss-20b")
+    temperature: float = float(os.getenv("GEN_LLM_TEMPERATURE", "0.1"))
     max_tokens: int = int(os.getenv("GEN_LLM_MAX_TOKENS", "2048"))
+
+
+@dataclass
+class ProLLMConfig:
+    """Configuration for the Pro LLM API (GLM 4.7 320B)."""
+    api_base: str = os.getenv("PRO_LLM_API_BASE", "https://api.int2.net/v1")
+    api_key: str = os.getenv("PRO_LLM_API_KEY", "")
+    model: str = os.getenv("PRO_LLM_MODEL_NAME", "glm-4.7")
+    temperature: float = float(os.getenv("PRO_LLM_TEMPERATURE", "0.1"))
+    max_tokens: int = int(os.getenv("PRO_LLM_MAX_TOKENS", "4096"))
 
 
 @dataclass
@@ -59,6 +69,7 @@ class AppConfig:
     """Master configuration object."""
     llm: LLMConfig = field(default_factory=LLMConfig)
     generator_llm: GeneratorLLMConfig = field(default_factory=GeneratorLLMConfig)
+    pro_llm: ProLLMConfig = field(default_factory=ProLLMConfig)
     redis: RedisConfig = field(default_factory=RedisConfig)
     api: APIConfig = field(default_factory=APIConfig)
     data: DataConfig = field(default_factory=DataConfig)

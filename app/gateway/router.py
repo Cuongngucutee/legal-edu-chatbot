@@ -19,6 +19,14 @@ from app.llm.prompts import GENERATION_PROMPT, GENERATION_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
 
+# Load doc_titles for full name resolution
+DOC_TITLES = {}
+_base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+_doc_titles_path = os.path.join(_base_dir, "data", "doc_titles.json")
+if os.path.exists(_doc_titles_path):
+    with open(_doc_titles_path, "r", encoding="utf-8") as f:
+        DOC_TITLES = json.load(f)
+
 router = APIRouter(prefix="/api")
 
 # These will be set during app initialization
@@ -36,12 +44,144 @@ def init_router(pipeline, cache, metrics):
     _metrics = metrics
 
 
+def save_session(sid, question, resolved, answer, sources, intent, latency_ms):
+    history_dir = os.path.join(_base_dir, "data", "chat_history")
+    os.makedirs(history_dir, exist_ok=True)
+    history_file = os.path.join(history_dir, f"{sid}.json")
+    
+    data = {
+        "session_id": sid,
+        "title": "Cuộc trò chuyện mới",
+        "created_at": time.time(),
+        "updated_at": time.time(),
+        "messages": []
+    }
+    if os.path.exists(history_file):
+        try:
+            with open(history_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception:
+            pass
+            
+    # Update title if it's new
+    if (not data.get("messages") or data.get("title") == "Cuộc trò chuyện mới") and question:
+        data["title"] = question[:40] + ("..." if len(question) > 40 else "")
+        
+    data["updated_at"] = time.time()
+    if "created_at" not in data:
+        data["created_at"] = time.time()
+        
+    user_msg = {
+        "role": "user",
+        "content": question,
+        "resolved": resolved,
+        "timestamp": time.time()
+    }
+    assistant_msg = {
+        "role": "assistant",
+        "content": answer,
+        "sources": sources,
+        "intent": intent,
+        "latency_ms": latency_ms,
+        "timestamp": time.time()
+    }
+    data["messages"].extend([user_msg, assistant_msg])
+    
+    try:
+        with open(history_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.error(f"Error saving chat history for {sid}: {e}")
+
+
+def load_session_history_if_exists(sid, mgr):
+    history_file = os.path.join(_base_dir, "data", "chat_history", f"{sid}.json")
+    if os.path.exists(history_file):
+        try:
+            with open(history_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            messages = data.get("messages", [])
+            mgr.history = []
+            for i in range(0, len(messages) - 1, 2):
+                if messages[i]["role"] == "user" and messages[i+1]["role"] == "assistant":
+                    mgr.history.append({
+                        "q": messages[i]["content"],
+                        "resolved": messages[i].get("resolved", messages[i]["content"]),
+                        "a": messages[i+1]["content"]
+                    })
+        except Exception as e:
+            logger.warning(f"Error loading history for session {sid}: {e}")
+
+
 @router.post("/session", response_model=SessionResponse)
 async def new_session():
     from app.rag.pipeline import ConversationManager
     sid = str(uuid.uuid4())[:8]
     _sessions[sid] = ConversationManager(_pipeline)
     return SessionResponse(session_id=sid)
+
+
+@router.get("/history")
+async def list_history():
+    history_dir = os.path.join(_base_dir, "data", "chat_history")
+    if not os.path.exists(history_dir):
+        return []
+    
+    sessions = []
+    for filename in os.listdir(history_dir):
+        if filename.endswith(".json"):
+            filepath = os.path.join(history_dir, filename)
+            try:
+                with open(filepath, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                sessions.append({
+                    "session_id": data.get("session_id"),
+                    "title": data.get("title", "Cuộc trò chuyện mới"),
+                    "created_at": data.get("created_at", 0),
+                    "updated_at": data.get("updated_at", 0)
+                })
+            except Exception as e:
+                logger.warning(f"Error reading session file {filename}: {e}")
+                
+    sessions.sort(key=lambda x: x.get("updated_at", 0), reverse=True)
+    return sessions
+
+
+@router.get("/history/{session_id}")
+async def get_history_detail(session_id: str):
+    history_file = os.path.join(_base_dir, "data", "chat_history", f"{session_id}.json")
+    if not os.path.exists(history_file):
+        if session_id in _sessions:
+            return {
+                "session_id": session_id,
+                "title": "Cuộc trò chuyện mới",
+                "created_at": time.time(),
+                "updated_at": time.time(),
+                "messages": []
+            }
+        raise HTTPException(status_code=404, detail="Session not found")
+        
+    try:
+        with open(history_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error reading history: {e}")
+
+
+@router.delete("/history/{session_id}")
+async def delete_history(session_id: str):
+    history_file = os.path.join(_base_dir, "data", "chat_history", f"{session_id}.json")
+    if os.path.exists(history_file):
+        try:
+            os.remove(history_file)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error deleting history file: {e}")
+            
+    if session_id in _sessions:
+        del _sessions[session_id]
+        
+    return {"status": "success", "message": f"Session {session_id} deleted"}
 
 
 @router.post("/chat")
@@ -54,6 +194,7 @@ async def chat(request: ChatRequest):
     sid = request.session_id or "default"
     if sid not in _sessions:
         _sessions[sid] = ConversationManager(_pipeline)
+        load_session_history_if_exists(sid, _sessions[sid])
     mgr = _sessions[sid]
 
     # Check cache
@@ -65,6 +206,11 @@ async def chat(request: ChatRequest):
         print(f"👉 BẮT ĐẦU VÀO LUỒNG CACHE CHO CÂU HỎI: {request.question}", flush=True)
         if _metrics:
             _metrics.record_request(cached.get("intent", "LOOKUP"), 0.1, cache_hit=True)
+        
+        # Thêm vào history và lưu lịch sử
+        mgr.history.append({"q": request.question, "resolved": request.question, "a": cached["answer"]})
+        save_session(sid, request.question, request.question, cached["answer"], cached.get("sources", []), cached.get("intent"), 0.1)
+        
         if request.stream:
             return StreamingResponse(
                 _stream_cached(cached),
@@ -84,7 +230,12 @@ async def chat(request: ChatRequest):
         )
 
     start = time.time()
-    result = mgr.chat(request.question)
+    result = mgr.chat(request.question, is_pro=request.is_pro)
+    
+    # Lưu lịch sử chat
+    resolved = mgr.history[-1]["resolved"] if mgr.history else request.question
+    save_session(sid, request.question, resolved, result["answer"], result.get("sources", []), result.get("intent"), (time.time() - start) * 1000)
+    
     if sid == "default" or len(mgr.history) <= 1:
         if _cache:
             _cache.put(request.question, result)
@@ -140,6 +291,7 @@ def _stream_response(mgr, request):
     from app.query.query_expander import EducationQueryExpander
 
     pipeline = mgr.pipeline
+    llm_client = pipeline.pro_generator_llm if (request.is_pro and hasattr(pipeline, "pro_generator_llm")) else pipeline.generator_llm
     start = time.time()
 
     # Resolve coreferences
@@ -232,10 +384,16 @@ def _stream_response(mgr, request):
 
     expander = EducationQueryExpander()
     expanded = expander.expand(resolved)
-    for eq in expanded[:3]:  # up to 3 expanded queries
-        eq_docs = pipeline.retriever.retrieve_as_docs(eq, top_k=8)
-        if eq_docs:
-            all_ranked_lists.append(eq_docs)
+    
+    import concurrent.futures
+    def fetch_eq(eq):
+        return pipeline.retriever.retrieve_as_docs(eq, top_k=8)
+        
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        results = list(executor.map(fetch_eq, expanded[:3]))
+        for eq_docs in results:
+            if eq_docs:
+                all_ranked_lists.append(eq_docs)
 
     docs, rrf_scores = _rrf_merge(all_ranked_lists)
 
@@ -299,7 +457,7 @@ Chỉ xuất mảng JSON. Ví dụ: ["02/2021/TT-BGDĐT", "13/2024/TT-BGDĐT"]""
 
         try:
             import ast
-            filter_res = pipeline.generator_llm.generate(filter_prompt, temperature=0.1)
+            filter_res = llm_client.generate(filter_prompt, temperature=0.1)
             match = re.search(r'\[(.*?)\]', filter_res)
             if match:
                 parsed = ast.literal_eval(f"[{match.group(1)}]")
@@ -331,7 +489,7 @@ Chỉ xuất mảng JSON. Ví dụ: ["02/2021/TT-BGDĐT", "13/2024/TT-BGDĐT"]""
 
     toc_parts = []
     for sh in top_so_hieu:
-        toc = pipeline.retriever.index.build_toc(sh)
+        toc = pipeline.retriever.index.build_toc(sh, query=resolved)
         if toc:
             toc_parts.append(toc)
 
@@ -471,13 +629,80 @@ Chỉ xuất mảng JSON, không giải thích."""
     prompt = GENERATION_PROMPT.format(query=resolved, context=context)
 
     full_answer = []
-    for token in pipeline.generator_llm.generate_stream(prompt, system_prompt=GENERATION_SYSTEM_PROMPT):
+    for token in llm_client.generate_stream(prompt, system_prompt=GENERATION_SYSTEM_PROMPT):
         full_answer.append(token)
         yield f"data: {json.dumps({'type': 'token', 'content': token}, ensure_ascii=False)}\n\n"
 
     answer = "".join(full_answer).strip()
     answer = postprocess_citations(answer, docs)
+    
+    # ── Chèn thêm chú thích (Footnote) bằng code Python ──
+    unique_so_hieu = []
+    for s in sources:
+        # Lấy bất kỳ thông tin nào có thể nhận diện được văn bản
+        sh = s.get("so_hieu") or s.get("doc_id") or s.get("ten_van_ban")
+        if sh and sh not in unique_so_hieu:
+            unique_so_hieu.append(sh)
+            
+    with open("debug_footnote.txt", "w", encoding="utf-8") as f:
+        f.write(f"unique_so_hieu: {unique_so_hieu}\n")
+        f.write(f"DOC_TITLES size: {len(DOC_TITLES)}\n")
+            
+    if unique_so_hieu and DOC_TITLES:
+        footnote_lines = ["\n\n---\n**Chú thích Tên văn bản đầy đủ:**\n"]
+        has_note = False
+        seen_notes = set()
+        for sh in unique_so_hieu:
+            title = DOC_TITLES.get(sh)
+            display_sh = sh
+            
+            # Cố gắng trích xuất mẫu Số/Năm (vd: 238_2025 -> 238/2025)
+            import re
+            if not title:
+                m = re.search(r'(\d+)[_/-](\d{4})', sh)
+                if m:
+                    pattern = f"{m.group(1)}/{m.group(2)}"
+                    for k, v in DOC_TITLES.items():
+                        if pattern in k:
+                            title = v
+                            display_sh = k
+                            break
+                            
+            # Nếu là Luật (vd: Luật43, Luat 43)
+            if not title:
+                m2 = re.search(r'Lu[aậ]t\s*(\d+)', sh, re.IGNORECASE)
+                if m2:
+                    pattern = f"Luật {m2.group(1)}"
+                    for k, v in DOC_TITLES.items():
+                        if k.startswith(pattern):
+                            title = v
+                            display_sh = k
+                            break
+
+            # Thử tìm kiếm gần đúng (substring match) nếu vẫn chưa thấy
+            if not title:
+                for k, v in DOC_TITLES.items():
+                    if (k in sh or sh in k) and len(k) > 5:
+                        title = v
+                        display_sh = k
+                        break
+            
+            with open("debug_footnote.txt", "a", encoding="utf-8") as f:
+                f.write(f"sh: {sh} -> title: {title}\n")
+
+            if title and title not in seen_notes:
+                footnote_lines.append(f"- **{display_sh}**: {title}\n")
+                seen_notes.add(title)
+                has_note = True
+                
+        if has_note:
+            footnote_text = "".join(footnote_lines)
+            answer += footnote_text
+            yield f"data: {json.dumps({'type': 'token', 'content': footnote_text}, ensure_ascii=False)}\n\n"
+    # ──────────────────────────────────────────────────────
+
     mgr.history.append({"q": request.question, "resolved": resolved, "a": answer})
+    save_session(request.session_id or "default", request.question, resolved, answer, sources, intent, (time.time() - start) * 1000)
 
     # Cache the result
     result = {"answer": answer, "sources": sources, "intent": intent}
@@ -492,7 +717,7 @@ Chỉ xuất mảng JSON, không giải thích."""
             warning = "⚠️ Lưu ý: Một số văn bản được trích dẫn đã được sửa đổi, bổ sung."
             break
 
-    yield f"data: {json.dumps({'type': 'done', 'answer': answer, 'sources': sources, 'intent': intent, 'warning': warning, 'latency_ms': (time.time()-start)*1000}, ensure_ascii=False)}\n\n"
+    yield f"data: {json.dumps({'type': 'done', 'answer': answer, 'sources': sources, 'intent': intent, 'warning': warning, 'is_pro': request.is_pro, 'latency_ms': (time.time()-start)*1000}, ensure_ascii=False)}\n\n"
 
 
 @router.get("/health")

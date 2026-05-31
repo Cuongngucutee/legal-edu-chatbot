@@ -85,4 +85,5 @@ def fmt_source(d: dict) -> dict:
         "so_dieu": m.get("so_dieu"),
         "breadcrumb": m.get("breadcrumb", ""),
         "tinh_trang": m.get("tinh_trang", ""),
+        "content": d.get("content") or d.get("text") or "",
     }

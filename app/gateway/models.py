@@ -12,6 +12,7 @@ class ChatRequest(BaseModel):
     session_id: Optional[str] = None
     include_sources: bool = True
     stream: bool = False
+    is_pro: Optional[bool] = False
 
 
 class ChatResponse(BaseModel):

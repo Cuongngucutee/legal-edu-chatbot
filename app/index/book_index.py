@@ -267,11 +267,12 @@ class BookIndex:
         canonical = self.doc_registry.get(so_hieu, so_hieu)
         return self.doc_nodes.get(canonical, set())
 
-    def build_toc(self, so_hieu: str) -> str:
+    def build_toc(self, so_hieu: str, query: str = None) -> str:
         """Build a structured Table of Contents (TOC) for a document.
         
         Returns a formatted string listing all articles grouped by chapter/section,
         using only article titles (not full text) to keep context compact.
+        If query is provided, filters TOC to only include top relevant articles.
         """
         node_ids = self.get_doc_node_ids(so_hieu)
         if not node_ids:
@@ -334,12 +335,28 @@ class BookIndex:
         if not articles:
             return ""
         
+        # Filter articles if query is provided (Local BM25)
+        filtered_msg = ""
+        if query:
+            query_tokens = self._tokenize(query)
+            if query_tokens and len(articles) > 15:
+                corpus = [self._tokenize(a["name"]) for a in articles]
+                local_bm25 = BM25Okapi(corpus)
+                scores = local_bm25.get_scores(query_tokens)
+                
+                import numpy as np
+                # Get top 20 articles
+                top_indices = np.argsort(scores)[::-1][:20]
+                keep_indices = set(top_indices)
+                articles = [a for i, a in enumerate(articles) if i in keep_indices]
+                filtered_msg = " (Đã lọc top 20 Điều khoản liên quan nhất)"
+        
         # Sort by article number
         articles.sort(key=lambda a: a["art_num"])
         
         # Build structured TOC grouped by chapter → section
         canonical = self.doc_registry.get(so_hieu, so_hieu)
-        toc_lines = [f"=== MỤC LỤC: {canonical} ==="]
+        toc_lines = [f"=== MỤC LỤC: {canonical}{filtered_msg} ==="]
         
         current_chapter = None
         current_section = None
@@ -468,6 +485,30 @@ class BookIndex:
         self.doc_catalog = []
         json_files = list(self.data_dir.glob("*.json"))
         
+        cache_dir = self.kg_path.parent / "index_cache"
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        catalog_faiss_path = cache_dir / "doc_catalog_faiss.index"
+        catalog_bm25_path = cache_dir / "doc_catalog_bm25.pkl"
+        catalog_data_path = cache_dir / "doc_catalog.pkl"
+        
+        if catalog_faiss_path.exists() and catalog_bm25_path.exists() and catalog_data_path.exists():
+            try:
+                print(" -> Loading Cached Document Catalog...")
+                with open(catalog_data_path, "rb") as f:
+                    cached_catalog = pickle.load(f)
+                if len(cached_catalog) == len(json_files):
+                    self.doc_catalog = cached_catalog
+                    self.doc_catalog_faiss = faiss.read_index(str(catalog_faiss_path))
+                    with open(catalog_bm25_path, "rb") as f:
+                        self.doc_catalog_bm25 = pickle.load(f)
+                    self.doc_catalog_mapping = {i: i for i in range(len(self.doc_catalog))}
+                    print(f"  Document Catalog: Loaded {len(self.doc_catalog)} documents from cache")
+                    return
+                else:
+                    print(" -> Data changed. Rebuilding catalog...")
+            except Exception as e:
+                print(f" -> Cache load failed: {e}. Rebuilding catalog...")
+        
         for file_path in json_files:
             try:
                 with open(file_path, 'r', encoding='utf-8') as f:
@@ -533,6 +574,7 @@ class BookIndex:
         
         # Build doc-level Hybrid index on summaries (FAISS + BM25)
         if self.doc_catalog:
+            print(" -> Generating Dense Embeddings for Catalog (FAISS)...")
             texts = [f"{entry['source']}: {entry['summary']}" for entry in self.doc_catalog]
             embeddings = self.encoder.encode(texts, normalize_embeddings=True)
             embeddings = np.array(embeddings).astype('float32')
@@ -540,10 +582,19 @@ class BookIndex:
             self.doc_catalog_faiss = faiss.IndexFlatIP(self.embed_dim)
             self.doc_catalog_faiss.add(embeddings)
             
+            print(" -> Generating Lexical Embeddings for Catalog (BM25)...")
             tokenized_corpus = [self._tokenize(text) for text in texts]
             self.doc_catalog_bm25 = BM25Okapi(tokenized_corpus)
             
             self.doc_catalog_mapping = {i: i for i in range(len(self.doc_catalog))}
+            
+            # Save to cache
+            print(" -> Saving Catalog Indexes to cache...")
+            faiss.write_index(self.doc_catalog_faiss, str(catalog_faiss_path))
+            with open(catalog_bm25_path, "wb") as f:
+                pickle.dump(self.doc_catalog_bm25, f)
+            with open(catalog_data_path, "wb") as f:
+                pickle.dump(self.doc_catalog, f)
         
         print(f"  Document Catalog: {len(self.doc_catalog)} documents indexed")
 

@@ -726,10 +726,15 @@ class BookRAGRetriever:
         if chaps:
             chapter = self.index.graph.nodes[chaps[0]].get("name", "")
         
-        # Extract article number
+        # Get article title: prefer 'name', fallback to first line of content
         name = node_data.get("name", "")
+        if not name:
+            first_line = content.split("\n")[0].strip()
+            name = first_line[:120] if len(first_line) > 120 else first_line
+        
+        # Extract article number
         so_dieu = ""
-        m = re.search(r'Điều\s+(\d+)', name or content[:100])
+        m = re.search(r'Điều\s+(\d+)', name or content[:100], re.IGNORECASE)
         if m:
             so_dieu = m.group(1)
         

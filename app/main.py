@@ -36,9 +36,17 @@ app = FastAPI(
 )
 
 # ── Middleware ──
+from fastapi.middleware.cors import CORSMiddleware
 from app.gateway.auth import AuthMiddleware
 from app.gateway.rate_limiter import RateLimiterMiddleware
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.add_middleware(RateLimiterMiddleware, requests_per_minute=settings.api.rate_limit_per_minute)
 app.add_middleware(AuthMiddleware, api_key=settings.api.api_key)
 
@@ -73,20 +81,20 @@ def init_pipeline():
     from app.rag.hybrid_search import BookRAGRetriever
     retriever = BookRAGRetriever(index)
 
-    # Initialize Agentic LLM (320B)
-    logger.info("🤖 Initializing 320B LLM Client (Agentic)...")
+    # Initialize Agentic LLM (Secondary 20B)
+    logger.info("🤖 Initializing Secondary LLM Client (Agentic 20B)...")
     from app.llm.client import LLMClient
     agentic_llm = LLMClient(
-        api_base=settings.llm.api_base,
-        api_key=settings.llm.api_key,
-        model=settings.llm.model,
-        temperature=settings.llm.temperature,
-        max_tokens=settings.llm.max_tokens,
+        api_base=settings.generator_llm.api_base,
+        api_key=settings.generator_llm.api_key,
+        model=settings.generator_llm.model,
+        temperature=settings.generator_llm.temperature,
+        max_tokens=settings.generator_llm.max_tokens,
     )
     logger.info(f"   Model: {agentic_llm.model}")
     
-    # Initialize Generator LLM (320B Flagship)
-    logger.info("🤖 Initializing 320B LLM Client (Generator)...")
+    # Initialize Generator LLM (Primary 120B)
+    logger.info("🤖 Initializing Primary LLM Client (Generator 120B)...")
     generator_llm = LLMClient(
         api_base=settings.llm.api_base,
         api_key=settings.llm.api_key,
@@ -96,10 +104,21 @@ def init_pipeline():
     )
     logger.info(f"   Model: {generator_llm.model}")
 
+    # Initialize Pro LLM Client (GLM 4.7 320B)
+    logger.info("🤖 Initializing Pro LLM Client (GLM 4.7 320B)...")
+    pro_generator_llm = LLMClient(
+        api_base=settings.pro_llm.api_base,
+        api_key=settings.pro_llm.api_key,
+        model=settings.pro_llm.model,
+        temperature=settings.pro_llm.temperature,
+        max_tokens=settings.pro_llm.max_tokens,
+    )
+    logger.info(f"   Model: {pro_generator_llm.model}")
+
     # 4. Build Pipeline
     logger.info("⚡ Building LawEduPipeline...")
     from app.rag.pipeline import LawEduPipeline
-    PIPELINE = LawEduPipeline(retriever, agentic_llm, generator_llm)
+    PIPELINE = LawEduPipeline(retriever, agentic_llm, generator_llm, pro_generator_llm)
 
     # 5. Initialize Cache
     logger.info("📦 Initializing Cache...")
@@ -114,6 +133,8 @@ def init_pipeline():
 
 @app.on_event("startup")
 async def startup():
+    # Khởi tạo thư mục lưu lịch sử chat
+    os.makedirs(os.path.join(ROOT_DIR, "data", "chat_history"), exist_ok=True)
     init_pipeline()
 
 

@@ -124,10 +124,11 @@ class LawEduPipeline:
     """
     MAX_ITER = 3
 
-    def __init__(self, retriever, agentic_llm, generator_llm):
+    def __init__(self, retriever, agentic_llm, generator_llm, pro_generator_llm=None):
         self.retriever = retriever
         self.llm = agentic_llm  # Used for intent, coref, rewrite
         self.generator_llm = generator_llm  # Used for final generation
+        self.pro_generator_llm = pro_generator_llm or generator_llm
         self.prober = FailureStateProber()
         self.query_expander = EducationQueryExpander()
         self.skills = {
@@ -142,9 +143,9 @@ class LawEduPipeline:
         self.listing_handler = ListingHandler()
         self.comparison_handler = ComparisonHandler()
 
-    def run(self, query: str) -> dict:
+    def run(self, query: str, is_pro: bool = False) -> dict:
         start = time.time()
-        logger.info(f"\n{'=' * 50}\n📨 Query: {query}")
+        logger.info(f"\n{'=' * 50}\n📨 Query: {query} (Pro Mode: {is_pro})")
 
         # Step 1: Intent Classification
         intent = classify_intent(query, self.llm)
@@ -171,12 +172,13 @@ class LawEduPipeline:
             "COMPARISON": self.comparison_handler,
         }
         if intent in handlers:
-            result = handlers[intent].handle(query, self.retriever, self.generator_llm)
+            gen_llm = self.pro_generator_llm if is_pro else self.generator_llm
+            result = handlers[intent].handle(query, self.retriever, gen_llm)
             result["latency_ms"] = (time.time() - start) * 1000
             return result
 
         # Step 4: Standard LOOKUP flow with failure detection
-        return self._lookup_flow(query, start, intent)
+        return self._lookup_flow(query, start, intent, is_pro=is_pro)
 
     def _rrf_merge(self, ranked_lists, k=60):
         scores, chunk_map = {}, {}
@@ -509,9 +511,10 @@ class LawEduPipeline:
                 
         return nids, arts
 
-    def _lookup_flow(self, query, start, intent):
+    def _lookup_flow(self, query, start, intent, is_pro: bool = False):
         """Unified 3-stage Agentic RAG flow: Stage 1 (Hybrid RRF), Stage 2 (CoT TOC), Stage 3 (Generation + Reflection)."""
-        logger.info("🎬 [Stage 1] Khởi chạy Hybrid Search + RRF + Cross-Reference...")
+        logger.info(f"🎬 [Stage 1] Khởi chạy Hybrid Search + RRF + Cross-Reference (Pro: {is_pro})...")
+        gen_llm = self.pro_generator_llm if is_pro else self.generator_llm
         
         # 1. Expand query + Retrieve
         main_docs = self.retriever.retrieve_as_docs(query, top_k=20)
@@ -519,10 +522,16 @@ class LawEduPipeline:
         
         expanded = self.query_expander.expand(query)
         explicit_targets = self.query_expander.get_target_docs(query)
-        for eq in expanded[:3]:
-            eq_docs = self.retriever.retrieve_as_docs(eq, top_k=8)
-            if eq_docs:
-                all_ranked.append(eq_docs)
+        
+        import concurrent.futures
+        def fetch_eq(eq):
+            return self.retriever.retrieve_as_docs(eq, top_k=8)
+            
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            results = list(executor.map(fetch_eq, expanded[:3]))
+            for eq_docs in results:
+                if eq_docs:
+                    all_ranked.append(eq_docs)
                 
         # Conditional HyDE: chỉ gọi khi không có explicit targets VÀ không có query expansion
         need_hyde = (not explicit_targets) and (not expanded)
@@ -537,7 +546,7 @@ class LawEduPipeline:
                 "Quy định pháp luật giả định:"
             )
             try:
-                hyde_doc = self.generator_llm.generate(hyde_prompt, temperature=0.3).strip()
+                hyde_doc = gen_llm.generate(hyde_prompt, temperature=0.3).strip()
                 hyde_docs = self.retriever.retrieve_as_docs(hyde_doc, top_k=8)
                 if hyde_docs:
                     all_ranked.append(hyde_docs)
@@ -659,7 +668,7 @@ Nhiệm vụ:
 </selected_clauses>"""
 
             try:
-                res_320b = self.generator_llm.generate(prompt_320b, temperature=0.1)
+                res_320b = gen_llm.generate(prompt_320b, temperature=0.1)
                 final_node_ids, stage2_articles = self._parse_320b(res_320b, unique_docs)
             except Exception as e:
                 logger.warning(f"⚠️ 320B Stage 2 Selection error: {e}")
@@ -687,7 +696,7 @@ Ví dụ định dạng đầu ra:
 ]
 </selected_clauses>"""
                 try:
-                    res_retry = self.generator_llm.generate(retry_prompt, temperature=0.2)
+                    res_retry = gen_llm.generate(retry_prompt, temperature=0.2)
                     retry_nodes, retry_arts = self._parse_320b(res_retry, unique_docs)
                     if len(retry_arts) > len(stage2_articles):
                         final_node_ids = retry_nodes
@@ -732,7 +741,7 @@ Ví dụ định dạng đầu ra:
         else:
             final_docs = final_docs[:8]
             
-        context = build_context(final_docs, max_chars=12000)
+        context = build_context(final_docs, max_chars=8000)
         
         # Chèn yêu cầu trích dẫn bắt buộc trực tiếp vào prompt sinh câu trả lời
         citation_instruction = ""
@@ -743,7 +752,7 @@ Ví dụ định dạng đầu ra:
             )
         
         try:
-            answer = self.generator_llm.generate(
+            answer = gen_llm.generate(
                 GENERATION_PROMPT.format(query=query, context=context) + citation_instruction,
                 system_prompt=GENERATION_SYSTEM_PROMPT,
                 temperature=0.1,
@@ -783,7 +792,7 @@ Câu trả lời hiện tại:
 Yêu cầu bắt buộc: Hiệu chỉnh lại câu trả lời trên để tích hợp trực tiếp và tự nhiên các trích dẫn Điều khoản pháp lý cụ thể sau đây: {stage2_original_articles}.
 Vui lòng viết lại câu trả lời, đảm bảo giữ nguyên tính chính xác, ngắn gọn, và chèn các số Điều đã chọn một cách chính xác nhất."""
                 try:
-                    reflected_answer = self.generator_llm.generate(
+                    reflected_answer = gen_llm.generate(
                         reflection_prompt,
                         system_prompt="Bạn là chuyên gia hiệu chỉnh pháp lý chính xác và chuyên nghiệp.",
                         temperature=0.1,
@@ -835,7 +844,7 @@ class ConversationManager:
         self.pipeline = pipeline
         self.history = []
 
-    def chat(self, user_query: str) -> dict:
+    def chat(self, user_query: str, is_pro: bool = False) -> dict:
         resolved = user_query
 
         # Resolve coreferences using 320B
@@ -852,6 +861,6 @@ class ConversationManager:
                 resolved = user_query
             logger.info(f"🔗 Resolved: '{user_query}' → '{resolved}'")
 
-        result = self.pipeline.run(resolved)
+        result = self.pipeline.run(resolved, is_pro=is_pro)
         self.history.append({"q": user_query, "resolved": resolved, "a": result["answer"]})
         return result

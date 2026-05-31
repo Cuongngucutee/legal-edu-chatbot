@@ -48,16 +48,16 @@ The system orchestrates an advanced retrieval-augmented generation pipeline usin
 
 ```mermaid
 flowchart TD
-    Client[👤 User Client] -->|Sends Legal Query| API[🛡️ API Gateway]
-    API -->|Auth & Rate Limit| Router[🚦 Chat Orchestrator]
-    Router -->|Check Redis| Cache{📦 Cache Hit?}
-    Cache -->|Yes| ReturnCache[✅ Return Cached Response]
-    Cache -->|No| Rewrite[🧠 Query Intent & Rewrite<br/>(Agentic 20B LLM)]
-    Rewrite --> Hybrid[🔍 Hybrid Search RAG]
-    Hybrid -->|Vector, BM25, Knowledge Graph| ReRank[📊 Re-Ranker]
-    ReRank --> Context[📑 Context Builder]
-    Context --> Generator[🤖 LLM Generator<br/>(Primary 120B LLM)]
-    Generator -->|Generate Legal Answer| SaveCache[💾 Update Cache]
+    Client["👤 User Client"] -->|Sends Legal Query| API["🛡️ API Gateway"]
+    API -->|Auth & Rate Limit| Router["🚦 Chat Orchestrator"]
+    Router -->|Check Redis| Cache{"📦 Cache Hit?"}
+    Cache -->|Yes| ReturnCache["✅ Return Cached Response"]
+    Cache -->|No| Rewrite["🧠 Query Intent & Rewrite<br/>(Agentic 20B LLM)"]
+    Rewrite --> Hybrid["🔍 Hybrid Search RAG"]
+    Hybrid -->|Vector, BM25, Knowledge Graph| ReRank["📊 Re-Ranker"]
+    ReRank --> Context["📑 Context Builder"]
+    Context --> Generator["🤖 LLM Generator<br/>(Primary 120B LLM)"]
+    Generator -->|Generate Legal Answer| SaveCache["💾 Update Cache"]
     SaveCache -->|Response| Client
 ```
 

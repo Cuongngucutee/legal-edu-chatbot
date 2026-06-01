@@ -47,7 +47,7 @@ legal-edu-chatbot/
 The system orchestrates an advanced retrieval-augmented generation pipeline using dual LLMs:
 
 ```mermaid
-flowchart TD
+flowchart LR    
     Client["👤 User Client<br/>(React 19)"] -->|Sends Legal Query| API["🛡️ FastAPI Gateway"]
     API -->|Auth & Rate Limit| Cache{"📦 Redis Cache Hit?"}
     Cache -->|Yes| ReturnCache["✅ Return Cached Response"]

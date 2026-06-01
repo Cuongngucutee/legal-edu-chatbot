@@ -114,10 +114,6 @@ class EducationQueryExpander:
         (["mục tiêu giáo dục", "nguyên lý giáo dục", "tính chất giáo dục"],
          "mục tiêu giáo dục phát triển toàn diện đạo đức tri thức nhân dân dân tộc"),
 
-        # ═══════════════════════════════════════════════════════════
-        # NEW RULES — Targeting benchmark weak areas
-        # ═══════════════════════════════════════════════════════════
-
         # Nâng chuẩn giáo viên → NĐ 71/2020
         (["nâng chuẩn", "nâng trình độ chuẩn", "lộ trình nâng chuẩn", "trình độ chuẩn được đào tạo",
           "bằng cử nhân giáo viên", "đào tạo cử nhân giáo viên"],
@@ -192,7 +188,102 @@ class EducationQueryExpander:
         # Nhà đầu tư, rút vốn, lợi tức → Luật 34/2018
         (["nhà đầu tư", "rút vốn", "lợi tức", "cổ đông đại học"],
          "nhà đầu tư rút vốn lợi tức cơ sở giáo dục đại học tư thục Luật 34/2018 sửa đổi bổ sung Điều 7"),
+
+        # Ngày pháp luật Việt Nam → Luật 14/2012
+        (["ngày pháp luật", "ngày pháp luật việt nam"],
+         "ngày pháp luật nước cộng hòa xã hội chủ nghĩa việt nam ngày 09 tháng 11 hằng năm Luật Phổ biến giáo dục pháp luật 14/2012/QH13 Điều 8"),
+
+        # Học phí tiểu học công lập → Điều 99 Luật 43/2019
+        (["học sinh tiểu học", "tiểu học công lập", "miễn học phí", "đóng học phí", "không phải đóng học phí", "không đóng học phí"],
+         "học sinh tiểu học trường công lập không phải đóng học phí giáo dục tiểu học là giáo dục bắt buộc Luật Giáo dục 43/2019 Điều 99"),
+
+        # Trình độ chuẩn giảng viên đại học → Luật 34/2018
+        (["trình độ chuẩn", "giảng viên đại học", "chuẩn giảng viên", "trình độ tối thiểu của chức danh giảng viên"],
+         "trình độ chuẩn tối thiểu của chức danh giảng viên giảng dạy trình độ đại học là thạc sĩ Luật số 34/2018/QH14 Khoản 24 Điều 1 sửa đổi bổ sung Điều 72 Điều 54"),
+
+        # Chế độ làm việc nhà giáo → Điều 16 Luật 73/2025
+        (["chế độ làm việc", "chế độ làm việc của nhà giáo", "chế độ nghỉ hè của nhà giáo"],
+         "chế độ làm việc của nhà giáo bao gồm thời gian làm việc thời gian nghỉ hè hằng năm nghỉ phép Luật Nhà giáo 73/2025/QH15 Điều 16"),
+
+        # Giáo dục hòa nhập → Thông tư 20/2022/TT-BGDĐT (Q70, Q85)
+        (["hòa nhập", "giáo dục hòa nhập", "trung tâm hỗ trợ phát triển giáo dục hòa nhập"],
+         "trung tâm hỗ trợ phát triển giáo dục hòa nhập tổ chức và hoạt động khuyến khích cá nhân đầu tư cơ sở vật chất phạm vi điều chỉnh Điều 1 Điều 30 Thông tư 20/2022/TT-BGDĐT"),
+
+        # Nhiệm kỳ Hiệu trưởng trường đại học → Luật 08/2012/QH13 (Q74)
+        (["nhiệm kỳ", "hiệu trưởng", "nhiệm kỳ của hiệu trưởng", "hiệu trưởng trường đại học"],
+         "nhiệm kỳ của hiệu trưởng trường đại học cao đẳng đại học vùng quốc gia là 05 năm Điều 20 Luật Giáo dục đại học 08/2012/QH13"),
+
+        # Giáo dục quốc phòng và an ninh → Luật 30/2013/QH13 (Q80)
+        (["quốc phòng", "an ninh", "giáo dục quốc phòng", "môn học chính khóa"],
+         "giáo dục quốc phòng và an ninh trường trung học phổ thông trung cấp chuyên nghiệp nghề là môn học chính khóa Điều 11 Luật Giáo dục quốc phòng và an ninh 30/2013/QH13"),
+
+        # Giảm 02 tiết dạy/tuần đối với chủ tịch hội đồng trường → Thông tư 05/2025/TT-BGDĐT (Q84)
+        (["giảm 02 tiết", "giảm 2 tiết", "chủ tịch hội đồng trường"],
+         "giảm 02 tiết dạy tuần giáo viên kiêm nhiệm chủ tịch hội đồng trường thư ký hội đồng trường Điều 10 Thông tư 05/2025/TT-BGDĐT chế độ giảm định mức tiết dạy"),
+
+        # Điều kiện thời gian hoạt động ít nhất 05 năm ở nước ngoài → Nghị định 124/2024/NĐ-CP (Q83)
+        (["05 năm ở nước ngoài", "hoạt động ít nhất 05 năm", "bên nước ngoài liên kết"],
+         "đối tượng liên kết giáo dục bên nước ngoài cơ sở giáo dục có thời gian hoạt động ít nhất 05 năm ở nước ngoài Điều 6 Nghị định 124/2024/NĐ-CP"),
+
+        # Sáp nhập, chia tách trường tiểu học → Nghị định 07/BGDĐT-VBHN (Q81)
+        (["sáp nhập", "chia, tách", "chia tách trường tiểu học"],
+         "sáp nhập chia tách trường tiểu học thẩm quyền quyết định Chủ tịch Ủy ban nhân dân cấp huyện Điều 19 Nghị định 07/BGDĐT-VBHN"),
+
+        # Thẩm quyền ban hành chương trình GDPT → Luật 43/2019/QH14 (Q43)
+        (["ban hành chương trình", "thẩm quyền ban hành chương trình giáo dục phổ thông"],
+         "thẩm quyền ban hành chương trình giáo dục phổ thông Bộ trưởng Bộ Giáo dục và Đào tạo ban hành Điều 31 Luật Giáo dục 43/2019/QH14"),
+
+        # Hành vi nghiêm cấm trong cơ sở giáo dục → Luật 43/2019/QH14 (Q45)
+        (["nghiêm cấm trong cơ sở giáo dục", "hành vi bị nghiêm cấm trong cơ sở giáo dục"],
+         "hành vi bị nghiêm cấm trong cơ sở giáo dục bạo lực học đường ép buộc học thêm thu tiền lợi dụng tài trợ Điều 22 Luật Giáo dục 43/2019/QH14"),
+
+        # Loại hình cơ sở giáo dục đại học → Luật 08/2012/QH13 (Q47)
+        (["loại hình cơ sở giáo dục đại học", "cơ sở giáo dục đại học ở việt nam bao gồm"],
+         "cơ sở giáo dục đại học công lập tư thục loại hình trường đại học học viện đại học vùng đại học quốc gia Điều 7 Luật Giáo dục đại học 08/2012/QH13"),
+
+        # Phổ biến giáo dục pháp luật chính khóa → Luật 14/2012/QH13 (Q49)
+        (["phổ biến, giáo dục pháp luật", "hoạt động ngoại khóa", "phổ biến giáo dục pháp luật trong nhà trường"],
+         "phổ biến giáo dục pháp luật trong nhà trường lồng ghép vào giáo dục chính khóa hoạt động ngoại khóa Điều 17 Luật Phổ biến giáo dục pháp luật 14/2012/QH13"),
+
+        # Chức năng trung tâm GDQPAN → Luật 30/2013/QH13 (Q51)
+        (["trung tâm giáo dục quốc phòng", "trung tâm giáo dục quốc phòng và an ninh", "chức năng chính là gì"],
+         "trung tâm giáo dục quốc phòng và an ninh chức năng chính tổ chức dạy học giáo dục quốc phòng và an ninh bồi dưỡng kiến thức Điều 16 Luật Giáo dục quốc phòng và an ninh 30/2013/QH13"),
     ]
+    def __init__(self):
+        import os, json, re
+        self.doc_titles = {}
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        doc_titles_path = os.path.join(base_dir, "data", "doc_titles.json")
+        if os.path.exists(doc_titles_path):
+            with open(doc_titles_path, "r", encoding="utf-8") as f:
+                self.doc_titles = json.load(f)
+                
+    def _auto_match_title(self, q: str) -> list:
+        """Tự động khớp câu hỏi với các tiêu đề văn bản dài."""
+        import re
+        matches = []
+        for so_hieu, title in self.doc_titles.items():
+            t_lower = title.lower()
+            # Bỏ các tiền tố chung
+            t_clean = re.sub(r'^(thông tư|nghị định|luật|quyết định)\s*(hướng dẫn|quy định về việc|quy định về|quy định)?\s*', '', t_lower).strip()
+            
+            if not t_clean or len(t_clean) < 15:
+                continue
+                
+            # Tạo cụm từ đặc trưng (bỏ các từ nối quá phổ biến)
+            words = t_clean.split()
+            stop_words = {"về", "việc", "trong", "của", "và", "các", "cho", "cơ", "sở", "giáo", "dục"}
+            key_words = [w for w in words if w not in stop_words]
+            
+            if len(key_words) >= 4:
+                # Kiểm tra xem có bao nhiêu key_word xuất hiện trong query
+                matched_count = sum(1 for w in key_words if w in q)
+                overlap = matched_count / len(key_words)
+                
+                # Nếu độ trùng khớp cao (>80%) hoặc query chứa nguyên cụm từ t_clean
+                if overlap >= 0.8 or (len(t_clean) > 20 and t_clean in q):
+                    matches.append(so_hieu)
+        return matches
 
     def expand(self, query: str) -> list:
         """Trả về list các query mở rộng (không bao gồm query gốc)."""
@@ -202,7 +293,7 @@ class EducationQueryExpander:
     def get_target_docs(self, query: str) -> list:
         """Trả về list các so_hieu văn bản đích dựa trên keyword đặc trưng."""
         q = query.lower()
-        targets = []
+        targets = self._auto_match_title(q)
         
         # 1. Nâng chuẩn GV
         if any(kw in q for kw in ["nâng chuẩn", "trình độ chuẩn", "bằng cử nhân giáo viên"]):
@@ -261,6 +352,55 @@ class EducationQueryExpander:
         # 11. Chương trình giáo dục phổ thông 2018 / dạy ngoại ngữ
         if any(kw in q for kw in ["ngoại ngữ", "dạy ngoại ngữ", "ngoại ngữ 1", "chương trình giáo dục phổ thông 2018", "chương trình 2018"]):
             targets.append("32/2018/TT-BGDĐT")
+
+        # 12. Ngày Pháp luật Việt Nam
+        if any(kw in q for kw in ["ngày pháp luật", "ngày pháp luật việt nam"]):
+            targets.append("14/2012/QH13")
+
+        # 13. Học phí tiểu học công lập
+        if "học phí" in q or "tiểu học" in q or "không phải đóng học phí" in q or "trường công lập" in q:
+            targets.append("43/2019/QH14")
+
+        # 14. Trình độ giảng viên đại học
+        if "giảng viên" in q or "chuẩn giảng viên" in q or "chuẩn tối thiểu" in q:
+            targets.append("34/2018/QH14")
+
+        # 15. Chế độ làm việc nhà giáo
+        if "chế độ làm việc" in q or "nghỉ hè hằng năm" in q or "nghỉ hè của nhà giáo" in q or "tuổi nghỉ hưu của nhà giáo" in q:
+            targets.append("Luật 73/2025/QH15")
+
+        # 16. Giáo dục hòa nhập (Q70, Q85)
+        if any(kw in q for kw in ["hòa nhập", "giáo dục hòa nhập", "trung tâm hỗ trợ", "phạm vi điều chỉnh"]):
+            targets.append("20/2022/TT-BGDĐT")
+
+        # 17. Nhiệm kỳ hiệu trưởng trường đại học (Q74)
+        if any(kw in q for kw in ["nhiệm kỳ", "hiệu trưởng", "nhiệm kỳ của hiệu trưởng"]):
+            targets.append("08/2012/QH13")
+            targets.append("34/2018/QH14")
+
+        # 18. Giáo dục quốc phòng và an ninh (Q80)
+        if any(kw in q for kw in ["quốc phòng", "an ninh", "quốc phòng và an ninh", "chính khóa"]):
+            targets.append("30/2013/QH13")
+
+        # 19. Giảm 02 tiết dạy / kiêm nhiệm chủ tịch hội đồng (Q84)
+        if any(kw in q for kw in ["giảm 02 tiết", "giảm 2 tiết", "hội đồng trường", "kiêm nhiệm chủ tịch"]):
+            targets.append("05/2025/TT-BGDĐT")
+
+        # 20. Thời gian hoạt động bên nước ngoài liên kết giáo dục (Q83)
+        if any(kw in q for kw in ["05 năm ở nước ngoài", "ít nhất 05 năm", "liên kết giáo dục", "bên nước ngoài"]):
+            targets.append("124/2024/NĐ-CP")
+            targets.append("202/2025/NĐ-CP")
+
+        # 21. Sáp nhập, chia tách trường tiểu học (Q81)
+        if any(kw in q for kw in ["sáp nhập", "chia, tách", "chia tách trường tiểu học", "ubnd cấp huyện"]):
+            targets.append("07/BGDĐT-VBHN")
+            
+        # 22. Trường học an toàn, phòng chống tai nạn thương tích
+        if any(kw in q for kw in ["trường học an toàn", "tai nạn thương tích"]):
+            if "mầm non" in q:
+                targets.append("45/2021/TT-BGDĐT")
+            elif any(kw in q for kw in ["phổ thông", "thường xuyên", "thcs", "thpt", "tiểu học", "cấp 1", "cấp 2", "cấp 3"]):
+                targets.append("18/2023/TT-BGDĐT")
             
         return list(dict.fromkeys(targets))  # Deduplicate while preserving order
 

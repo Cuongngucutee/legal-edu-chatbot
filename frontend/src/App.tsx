@@ -396,11 +396,17 @@ export default function App() {
       // 2. Phân tích cú pháp DANH SÁCH (List Item)
       if (trimmed.startsWith("-") || trimmed.startsWith("*") || trimmed.startsWith("•")) {
         const text = trimmed.substring(1).trim();
-        currentListItems.push(
-          <li key={`li-${i}`} className="pl-1">
-            {parseInlineStyles(text, sources)}
-          </li>
-        );
+        
+        // Bỏ qua các list item rỗng hoặc chỉ chứa ký tự rác (--, -)
+        if (text === "" || text === "--" || text === "-" || text.replace(/[-*]/g, "").trim() === "") {
+            // Nếu list item là rác, ta không làm gì cả để loại bỏ nó
+        } else {
+            currentListItems.push(
+              <li key={`li-${i}`} className="pl-1">
+                {parseInlineStyles(text, sources)}
+              </li>
+            );
+        }
         inList = true;
         continue;
       } else if (inList) {
@@ -474,7 +480,7 @@ export default function App() {
       if (subPart) parts.push(subPart);
     });
 
-    // 1. Nhận diện **chữ đậm**
+    // 1. Nhận diện **chữ đậm** (Bao gồm cả lỗi sinh markdown của LLM như *text**, **text*, *text*)
     let boldParts: (string | React.ReactNode)[] = [];
     parts.forEach((part, pIdx) => {
       if (typeof part !== "string") {
@@ -482,7 +488,8 @@ export default function App() {
         return;
       }
 
-      let boldRegex = /\*\*(.*?)\*\*/g;
+      // Regex mới bắt bất kỳ chuỗi nào nằm giữa 1 hoặc 2 dấu sao (asterisk)
+      let boldRegex = /(?:\*\*?)([^*]+)(?:\*\*?)/g;
       let boldMatches = Array.from(part.matchAll(boldRegex));
       if (boldMatches.length > 0) {
         let lastIndex = 0;
@@ -827,7 +834,7 @@ export default function App() {
                           {message.is_pro ? (
                             <span className="flex items-center gap-1 bg-gradient-to-r from-violet-500/10 to-indigo-500/10 border border-indigo-200/50 py-0.5 px-2.5 rounded-full text-indigo-600 font-bold scale-95 uppercase select-none">
                               <Sparkles className="w-3 h-3 text-indigo-500 animate-pulse" />
-                              GLM 4.7 320B (Pro) ⚡
+                              GPT 120B (Pro) ⚡
                             </span>
                           ) : (
                             <span className="flex items-center gap-1 bg-slate-100 py-0.5 px-2.5 rounded-full font-mono text-slate-500 scale-95 uppercase select-none">
@@ -885,9 +892,11 @@ export default function App() {
                                   </div>
 
                                   <div className="mt-2.5 pl-7">
-                                    <div className="text-[13px] font-bold text-blue-700 bg-blue-50/50 inline-block px-2.5 py-0.5 rounded border border-blue-100">
-                                      Điều {src.so_dieu || "Chưa rõ"}
-                                    </div>
+                                    {src.so_dieu && (
+                                      <div className="text-[13px] font-bold text-blue-700 bg-blue-50/50 inline-block px-2.5 py-0.5 rounded border border-blue-100">
+                                        Điều {src.so_dieu}
+                                      </div>
+                                    )}
                                     <p className="text-[14.5px] text-slate-600 leading-relaxed mt-2 text-justify italic bg-slate-50/50 p-2.5 rounded-lg border border-dashed border-slate-200">
                                       "{src.content || src.text || "Nội dung quy định"}"
                                     </p>
@@ -989,7 +998,7 @@ export default function App() {
                 <div className="flex items-center gap-2">
                   <div
                     onClick={() => setIsProMode(!isProMode)}
-                    title={isProMode ? "Đang sử dụng mô hình GLM 4.7 320B (Pro)" : "Đang sử dụng mô hình GPT 120B (Thường)"}
+                    title={isProMode ? "Đang sử dụng mô hình GPT 120B (Pro)" : "Đang sử dụng mô hình GPT 120B (Thường)"}
                     className={`py-1 px-2.5 rounded-full font-bold text-[10px] tracking-wide uppercase flex items-center gap-1.5 select-none shadow-sm cursor-pointer transition-all duration-300 ${
                       isProMode
                         ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-violet-500 scale-105 shadow-md shadow-indigo-100 hover:opacity-90 animate-pulse border"

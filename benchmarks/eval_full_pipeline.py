@@ -30,7 +30,7 @@ index = BookIndex(data_dir=data_dir, kg_path=kg_path)
 index.load_index()
 retriever = BookRAGRetriever(index)
 
-llm_320b = LLMClient(
+pro_llm = LLMClient(
     api_base=os.getenv("LLM_API_BASE", "https://api.int2.net/v1"),
     api_key=os.getenv("LLM_API_KEY", ""),
     model=os.getenv("LLM_MODEL_NAME", "glm-4.7"),
@@ -107,7 +107,7 @@ def rrf_merge(ranked_lists, k=60):
     sorted_ids = sorted(scores.keys(), key=lambda x: scores[x], reverse=True)
     return [chunk_map[cid] for cid in sorted_ids], scores
 
-def parse_320b(response_text, uniq_docs):
+def parse_pro_llm(response_text, uniq_docs):
     """Parse 320B response into (node_ids, articles_list) with robust fallbacks and CoT XML tag support."""
     import re, json, ast
     nids = set()
@@ -268,7 +268,7 @@ for q in questions:
         "Quy định pháp luật giả định:"
     )
     try:
-        hyde_doc = llm_320b.generate(hyde_prompt, temperature=0.3).strip()
+        hyde_doc = pro_llm.generate(hyde_prompt, temperature=0.3).strip()
         hyde_docs = retriever.retrieve_as_docs(hyde_doc, top_k=8)
         if hyde_docs:
             all_ranked.append(hyde_docs)
@@ -333,7 +333,7 @@ for q in questions:
             for d in docs[:7]
         ])
         
-        prompt_320b = f"""Bạn là một chuyên gia cao cấp về pháp luật giáo dục Việt Nam. Hãy thực hiện phân tích chuỗi lập luận (Chain-of-Thought) CỰC KỲ NGẮN GỌN (tối đa 2-3 câu) trước khi lựa chọn các Điều khoản cần thiết để trả lời câu hỏi dưới đây.
+        pro_prompt = f"""Bạn là một chuyên gia cao cấp về pháp luật giáo dục Việt Nam. Hãy thực hiện phân tích chuỗi lập luận (Chain-of-Thought) CỰC KỲ NGẮN GỌN (tối đa 2-3 câu) trước khi lựa chọn các Điều khoản cần thiết để trả lời câu hỏi dưới đây.
 
 Câu hỏi: \"{question}\"
 
@@ -387,8 +387,8 @@ Lập luận: Theo hướng dẫn đối chiếu luật học, giáo viên mầm
 </selected_clauses>"""
 
         try:
-            res_320b = llm_320b.generate(prompt_320b, temperature=0.1)
-            final_node_ids, stage2_articles = parse_320b(res_320b, unique_docs)
+            pro_res = pro_llm.generate(pro_prompt, temperature=0.1)
+            final_node_ids, stage2_articles = parse_pro_llm(pro_res, unique_docs)
         except Exception as e:
             print(f"   ⚠️ 320B error: {e}")
 
@@ -424,8 +424,8 @@ Lập luận: Áp dụng hướng dẫn đối chiếu luật học cho giáo vi
 ]
 </selected_clauses>"""
             try:
-                res_retry = llm_320b.generate(retry_prompt, temperature=0.2)
-                retry_nodes, retry_arts = parse_320b(res_retry, unique_docs)
+                res_retry = pro_llm.generate(retry_prompt, temperature=0.2)
+                retry_nodes, retry_arts = parse_pro_llm(res_retry, unique_docs)
                 if len(retry_arts) > len(stage2_articles):
                     final_node_ids = retry_nodes
                     stage2_articles = retry_arts
@@ -460,8 +460,8 @@ Ví dụ định dạng đầu ra:
 ]
 </selected_clauses>"""
                 try:
-                    res_expand = llm_320b.generate(expand_prompt, temperature=0.2)
-                    expand_nodes, expand_arts = parse_320b(res_expand, unique_docs)
+                    res_expand = pro_llm.generate(expand_prompt, temperature=0.2)
+                    expand_nodes, expand_arts = parse_pro_llm(res_expand, unique_docs)
                     if expand_arts:
                         final_node_ids = expand_nodes
                         stage2_articles = expand_arts
@@ -481,7 +481,7 @@ Ví dụ định dạng đầu ra:
 
     context = build_context(docs[:5])
     prompt = GENERATION_PROMPT.format(query=question, context=context)
-    answer = llm_320b.generate(prompt, system_prompt=GENERATION_SYSTEM_PROMPT, temperature=0.1)
+    answer = pro_llm.generate(prompt, system_prompt=GENERATION_SYSTEM_PROMPT, temperature=0.0)
 
     t_total = time.time() - t0
     print(f"   [Generate] ({t_total - t_s2:.1f}s) → {answer[:120]}...")

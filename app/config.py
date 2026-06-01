@@ -17,8 +17,8 @@ class LLMConfig:
     api_base: str = os.getenv("LLM_API_BASE", "https://api.groq.com/openai/v1")
     api_key: str = os.getenv("LLM_API_KEY", "")
     model: str = os.getenv("LLM_MODEL_NAME", "openai/gpt-oss-120b")
-    temperature: float = float(os.getenv("LLM_TEMPERATURE", "0.1"))
-    max_tokens: int = int(os.getenv("LLM_MAX_TOKENS", "4096"))
+    temperature: float = float(os.getenv("LLM_TEMPERATURE", "0.0"))
+    max_tokens: int = int(os.getenv("LLM_MAX_TOKENS", "8192"))
 
 @dataclass
 class GeneratorLLMConfig:
@@ -26,18 +26,18 @@ class GeneratorLLMConfig:
     api_base: str = os.getenv("GEN_LLM_API_BASE", "https://api.groq.com/openai/v1")
     api_key: str = os.getenv("GEN_LLM_API_KEY", "")
     model: str = os.getenv("GEN_LLM_MODEL_NAME", "openai/gpt-oss-20b")
-    temperature: float = float(os.getenv("GEN_LLM_TEMPERATURE", "0.1"))
-    max_tokens: int = int(os.getenv("GEN_LLM_MAX_TOKENS", "2048"))
+    temperature: float = float(os.getenv("GEN_LLM_TEMPERATURE", "0.0"))
+    max_tokens: int = int(os.getenv("GEN_LLM_MAX_TOKENS", "8192"))
 
 
 @dataclass
 class ProLLMConfig:
-    """Configuration for the Pro LLM API (GLM 4.7 320B)."""
+    """Configuration for the Pro LLM API (GPT 120B)."""
     api_base: str = os.getenv("PRO_LLM_API_BASE", "https://api.int2.net/v1")
     api_key: str = os.getenv("PRO_LLM_API_KEY", "")
     model: str = os.getenv("PRO_LLM_MODEL_NAME", "glm-4.7")
-    temperature: float = float(os.getenv("PRO_LLM_TEMPERATURE", "0.1"))
-    max_tokens: int = int(os.getenv("PRO_LLM_MAX_TOKENS", "4096"))
+    temperature: float = float(os.getenv("PRO_LLM_TEMPERATURE", "0.0"))
+    max_tokens: int = int(os.getenv("PRO_LLM_MAX_TOKENS", "8192"))
 
 
 @dataclass

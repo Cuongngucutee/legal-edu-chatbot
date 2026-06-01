@@ -48,7 +48,7 @@ index.load_index()
 
 retriever = BookRAGRetriever(index)
 
-llm_320b = LLMClient(
+pro_llm = LLMClient(
     api_base=os.getenv("LLM_API_BASE", "https://api.int2.net/v1"),
     api_key=os.getenv("LLM_API_KEY", ""),
     model=os.getenv("LLM_MODEL_NAME", "glm-4.7"),
@@ -193,7 +193,7 @@ print(f"📋 Đánh giá Retrieval trên {len(benchmark)} câu hỏi benchmark")
 print(f"{'='*80}\n")
 
 for idx, test_case in enumerate(benchmark):
-    time.sleep(4)
+    time.sleep(0.1)
     qid = idx + 1
     question = test_case["question"]
     q_type = test_case.get("type", "Unknown")
@@ -234,7 +234,7 @@ for idx, test_case in enumerate(benchmark):
         "Quy định pháp luật giả định:"
     )
     try:
-        hyde_doc = llm_320b.generate(hyde_prompt, temperature=0.3).strip()
+        hyde_doc = pro_llm.generate(hyde_prompt, temperature=0.3).strip()
         hyde_docs = retriever.retrieve_as_docs(hyde_doc, top_k=8)
         if hyde_docs:
             all_ranked.append(hyde_docs)
@@ -317,7 +317,7 @@ for idx, test_case in enumerate(benchmark):
     stage2_articles = []
     final_node_ids = set()
     
-    def parse_320b(response_text):
+    def parse_pro_llm(response_text):
         """Parse 320B response into (node_ids, articles_list) with robust fallbacks and CoT XML tag support."""
         import re, json, ast
         nids = set()
@@ -458,7 +458,7 @@ for idx, test_case in enumerate(benchmark):
             for d in docs[:7]
         ])
         
-        prompt_320b = f"""Bạn là một chuyên gia cao cấp về pháp luật giáo dục Việt Nam. Hãy thực hiện phân tích chuỗi lập luận (Chain-of-Thought) CỰC KỲ NGẮN GỌN (tối đa 2-3 câu) trước khi lựa chọn các Điều khoản cần thiết để trả lời câu hỏi dưới đây.
+        pro_prompt = f"""Bạn là một chuyên gia cao cấp về pháp luật giáo dục Việt Nam. Hãy thực hiện phân tích chuỗi lập luận (Chain-of-Thought) CỰC KỲ NGẮN GỌN (tối đa 2-3 câu) trước khi lựa chọn các Điều khoản cần thiết để trả lời câu hỏi dưới đây.
 
 Câu hỏi: \"{question}\"
 
@@ -512,8 +512,8 @@ Lập luận: Theo hướng dẫn đối chiếu luật học, giáo viên mầm
 </selected_clauses>"""
 
         try:
-            res_320b = llm_320b.generate(prompt_320b, temperature=0.1)
-            final_node_ids, stage2_articles = parse_320b(res_320b)
+            pro_res = pro_llm.generate(pro_prompt, temperature=0.1)
+            final_node_ids, stage2_articles = parse_pro_llm(pro_res)
         except Exception as e:
             print(f"   ⚠️ 320B error: {e}")
 
@@ -549,8 +549,8 @@ Lập luận: Áp dụng hướng dẫn đối chiếu luật học cho giáo vi
 ]
 </selected_clauses>"""
             try:
-                res_retry = llm_320b.generate(retry_prompt, temperature=0.2)
-                retry_nodes, retry_arts = parse_320b(res_retry)
+                res_retry = pro_llm.generate(retry_prompt, temperature=0.2)
+                retry_nodes, retry_arts = parse_pro_llm(res_retry)
                 if len(retry_arts) > len(stage2_articles):
                     final_node_ids = retry_nodes
                     stage2_articles = retry_arts
@@ -585,8 +585,8 @@ Ví dụ định dạng đầu ra:
 ]
 </selected_clauses>"""
                 try:
-                    res_expand = llm_320b.generate(expand_prompt, temperature=0.2)
-                    expand_nodes, expand_arts = parse_320b(res_expand)
+                    res_expand = pro_llm.generate(expand_prompt, temperature=0.2)
+                    expand_nodes, expand_arts = parse_pro_llm(res_expand)
                     if expand_arts:
                         final_node_ids = expand_nodes
                         stage2_articles = expand_arts

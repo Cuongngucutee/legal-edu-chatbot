@@ -296,7 +296,11 @@ def _stream_response(mgr, request):
 
     # Resolve coreferences
     resolved = request.question
-    if mgr.history:
+    
+    from app.query.intent_classifier import get_fast_intent, classify_intent
+    fast_intent = get_fast_intent(request.question)
+    
+    if mgr.history and not fast_intent:
         yield f"data: {json.dumps({'type': 'status', 'content': 'Đang phân tích ngữ cảnh...'}, ensure_ascii=False)}\n\n"
         from app.llm.prompts import CONVERSATION_RESOLVE_PROMPT
         hist = "\n".join(f"User: {h['q']}\nBot: {h['a'][:200]}..." for h in mgr.history[-3:])
@@ -496,7 +500,7 @@ Chỉ xuất mảng JSON. Ví dụ: ["02/2021/TT-BGDĐT", "13/2024/TT-BGDĐT"]""
     final_node_ids = set()
     stage2_selections = []
 
-    def _parse_320b_articles(response_text, toc_so_hieus):
+    def _parse_pro_articles(response_text, toc_so_hieus):
         """Parse 320B response into (node_ids, selections)."""
         node_ids = set()
         selections = []
@@ -533,7 +537,7 @@ Chỉ xuất mảng JSON. Ví dụ: ["02/2021/TT-BGDĐT", "13/2024/TT-BGDĐT"]""
         toc_text = "\n\n".join(toc_parts)
 
         # ── Attempt 1: Standard prompt ──
-        prompt_320b = f"""Câu hỏi: "{resolved}"
+        pro_prompt = f"""Câu hỏi: "{resolved}"
 
 Mục lục các văn bản:
 {toc_text}
@@ -543,8 +547,8 @@ Trả về JSON: [{{"so_hieu": "...", "dieu": <số>}}]
 Chỉ xuất mảng JSON, không giải thích."""
 
         try:
-            res_320b = pipeline.llm.generate(prompt_320b, temperature=0.1)
-            final_node_ids, stage2_selections = _parse_320b_articles(res_320b, top_so_hieu)
+            pro_res = pipeline.llm.generate(pro_prompt, temperature=0.1)
+            final_node_ids, stage2_selections = _parse_pro_articles(pro_res, top_so_hieu)
         except Exception as e:
             with open(trace_path, "a", encoding="utf-8") as f:
                 f.write(f"⚠️ [Stage 2 Attempt 1 Error] {e}\n")
@@ -563,7 +567,7 @@ Chỉ xuất mảng JSON, không giải thích."""
 
             try:
                 res_retry = pipeline.llm.generate(retry_prompt, temperature=0.2)
-                retry_nodes, retry_selections = _parse_320b_articles(res_retry, top_so_hieu)
+                retry_nodes, retry_selections = _parse_pro_articles(res_retry, top_so_hieu)
                 if len(retry_nodes) > len(final_node_ids):
                     final_node_ids = retry_nodes
                     stage2_selections = retry_selections
@@ -592,7 +596,7 @@ Chỉ xuất mảng JSON, không giải thích."""
 
                 try:
                     res_expand = pipeline.llm.generate(expand_prompt, temperature=0.2)
-                    expand_nodes, expand_selections = _parse_320b_articles(res_expand, top_so_hieu + extra_so_hieus)
+                    expand_nodes, expand_selections = _parse_pro_articles(res_expand, top_so_hieu + extra_so_hieus)
                     if expand_nodes:
                         final_node_ids = expand_nodes
                         stage2_selections = expand_selections

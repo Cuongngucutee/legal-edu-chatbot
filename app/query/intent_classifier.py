@@ -1,6 +1,6 @@
 """
 LawEdu AI — Intent Classifier.
-Replaces the QwenIntentClassifier (1.5B local model) with 320B API calls.
+Replaces the QwenIntentClassifier (1.5B local model) with Pro LLM API calls.
 Keeps the fast heuristic rules + uses 320B for ambiguous cases.
 """
 import re
@@ -17,26 +17,34 @@ VALID_INTENTS = {
 }
 
 
-def classify_intent(query: str, llm) -> str:
-    """
-    Classify query intent. Priority: fast heuristics → 320B LLM fallback.
-
-    Args:
-        query: User question
-        llm: LLMClient instance (320B API)
-
-    Returns:
-        Intent string (LOOKUP, SUMMARY, LISTING, etc.)
-    """
+def get_fast_intent(query: str) -> Optional[str]:
+    """Fast check for greetings and thanks without LLM."""
     q = query.lower().strip()
-
-    # ── P0: Greeting / Chitchat detection (instant, no API call) ──
     greetings = ["xin chào", "chào bạn", "hello", "hi ", "hey", "chào"]
     thanks = ["cảm ơn", "thank", "cám ơn", "tks"]
     if len(q) < 30 and any(q.startswith(g) or q == g for g in greetings):
         return "GREETING"
     if len(q) < 40 and any(kw in q for kw in thanks):
         return "THANKS"
+    return None
+
+def classify_intent(query: str, llm) -> str:
+    """
+    Classify query intent. Priority: fast heuristics → Pro LLM fallback.
+
+    Args:
+        query: User question
+        llm: LLMClient instance (Pro LLM API)
+
+    Returns:
+        Intent string (LOOKUP, SUMMARY, LISTING, etc.)
+    """
+    # ── P0: Greeting / Chitchat detection (instant, no API call) ──
+    fast_intent = get_fast_intent(query)
+    if fast_intent:
+        return fast_intent
+
+    q = query.lower().strip()
 
     # ── Heuristic rules (fast, no API call needed) ──
     if any(kw in q for kw in ["tóm tắt", "khái quát", "nội dung chính", "quy định những gì"]):
@@ -91,7 +99,7 @@ def classify_intent(query: str, llm) -> str:
         logger.info(f"🏷️  Intent heuristic: LOOKUP (matched {match_count} legal keywords)")
         return "LOOKUP"
 
-    # ── 320B LLM classification for truly ambiguous cases (< 5%) ──
+    # ── Pro LLM classification for truly ambiguous cases (< 5%) ──
     from app.llm.prompts import INTENT_PROMPT
     try:
         result = llm.generate(INTENT_PROMPT.format(query=query), max_tokens=10)

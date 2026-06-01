@@ -523,11 +523,13 @@ class BookRAGRetriever:
         node_contexts = []
         
         for node in articles_and_clauses:
-            text = self.index.graph.nodes.get(node, {}).get("full_text") or \
-                   self.index.graph.nodes.get(node, {}).get("text", "")
+            node_data = self.index.graph.nodes.get(node, {})
+            text = node_data.get("full_text") or node_data.get("text", "")
+            doc_title = node_data.get("doc_title", "")
             if text:
-                # Truncate để tránh OOM
-                candidate_pairs.append([query, text[:1024]])
+                # Truncate để tránh OOM, ghép doc_title vào để reranker hiểu context
+                rerank_text = f"{doc_title} - {text}" if doc_title else text
+                candidate_pairs.append([query, rerank_text[:1024]])
                 node_contexts.append((node, text))
         
         if not candidate_pairs:
@@ -566,10 +568,12 @@ class BookRAGRetriever:
             pairs = []
             nodes = []
             for node in articles:
-                text = self.index.graph.nodes.get(node, {}).get("full_text") or \
-                       self.index.graph.nodes.get(node, {}).get("text", "")
+                node_data = self.index.graph.nodes.get(node, {})
+                text = node_data.get("full_text") or node_data.get("text", "")
+                doc_title = node_data.get("doc_title", "")
                 if text:
-                    pairs.append([query, text[:1024]])
+                    rerank_text = f"{doc_title} - {text}" if doc_title else text
+                    pairs.append([query, rerank_text[:1024]])
                     nodes.append(node)
             
             if not pairs:
@@ -718,6 +722,15 @@ class BookRAGRetriever:
             doc_node_data = self.index.graph.nodes[docs[0]]
             doc_name = doc_node_data.get("name") or doc_node_data.get("search_text", docs[0])
             so_hieu = doc_node_data.get("so_hieu", "")
+        else:
+            # Fallback: Node có thể chính là Document Node hoặc thiếu cạnh kết nối
+            doc_name = node_data.get("ten_van_ban") or node_data.get("name") or node_data.get("source") or ""
+            so_hieu = node_data.get("so_hieu") or node_data.get("doc_id") or ""
+            
+            # Tự động map từ file doc_titles.json hoặc raw_id
+            if not doc_name:
+                raw_id = node_id.replace("node:", "").split("_D")[0]
+                doc_name = raw_id
         
         # Find chapter
         chapter = ""

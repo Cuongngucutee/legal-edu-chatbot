@@ -1,6 +1,6 @@
 """
 LawEdu AI — LLM Client.
-Unified 320B LLM API client replacing all local models (1.5B + 7B).
+Unified Pro LLM API client replacing all local models (1.5B + 7B).
 Uses OpenAI-compatible API via LiteLLM gateway.
 """
 import logging
@@ -24,7 +24,7 @@ class LLMClient:
         api_base: str = "https://api.int2.net/v1",
         api_key: str = "",
         model: str = "deepseek-chat",
-        temperature: float = 0.1,
+        temperature: float = 0.0,
         max_tokens: int = 4096,
     ):
         self.api_base = api_base
@@ -54,9 +54,8 @@ class LLMClient:
     ) -> str:
         """Generate text from prompt (non-streaming)."""
         import time
-        # Pacing sleep to prevent API gateway rate limits/empty responses
-        time.sleep(2.0)
-
+        # Pacing sleep removed due to Groq 250k TPM / 500k RPD limits
+        time.sleep(0.1)
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})

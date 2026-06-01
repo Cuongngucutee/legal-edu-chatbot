@@ -187,8 +187,8 @@ class EntityGraphBuilder:
         """Tạo SamplingParams một lần, tái sử dụng cho toàn bộ batch."""
         if guided_json and self._has_guided and GuidedDecodingParams is not None:
             guided = GuidedDecodingParams(json=json.dumps(guided_json))
-            return SamplingParams(temperature=0.1, max_tokens=32768, guided_decoding=guided)
-        return SamplingParams(temperature=0.1, max_tokens=32768)
+            return SamplingParams(temperature=0.0, max_tokens=32768, guided_decoding=guided)
+        return SamplingParams(temperature=0.0, max_tokens=32768)
 
     def _build_prompt(self, system_prompt: str, user_prompt: str,
                       guided_json: Optional[dict] = None) -> str:

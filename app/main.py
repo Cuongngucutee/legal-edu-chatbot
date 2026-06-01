@@ -5,7 +5,7 @@ Initializes all components and starts the server.
 Architecture (from diagram):
 CLIENT → API GATEWAY → CHAT ORCHESTRATOR → QUERY REWRITE → RAG PIPELINE
     → HYBRID SEARCH (BM25 + Vector) → RE-RANKER → CONTEXT BUILDER
-    → LLM GENERATOR (320B API) → TOOL CALLING → RESPONSE (Cache)
+    → LLM GENERATOR (Pro LLM API) → TOOL CALLING → RESPONSE (Cache)
 """
 import os
 import sys
@@ -32,7 +32,7 @@ setup_logging()
 app = FastAPI(
     title="LawEdu AI",
     version="5.0",
-    description="Legal Education Chatbot — 320B LLM + RAG Pipeline",
+    description="Legal Education Chatbot — Pro LLM + RAG Pipeline",
 )
 
 # ── Middleware ──
@@ -104,8 +104,8 @@ def init_pipeline():
     )
     logger.info(f"   Model: {generator_llm.model}")
 
-    # Initialize Pro LLM Client (GLM 4.7 320B)
-    logger.info("🤖 Initializing Pro LLM Client (GLM 4.7 320B)...")
+    # Initialize Pro LLM Client (GPT 120B)
+    logger.info("🤖 Initializing Pro LLM Client (GPT 120B)...")
     pro_generator_llm = LLMClient(
         api_base=settings.pro_llm.api_base,
         api_key=settings.pro_llm.api_key,

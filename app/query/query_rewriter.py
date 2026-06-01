@@ -1,6 +1,6 @@
 """
 LawEdu AI — Query Rewriter.
-Uses 320B LLM to rewrite queries into legal terminology.
+Uses Pro LLM to rewrite queries into legal terminology.
 """
 import json
 import re
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class QueryRewriteSkill:
-    """Viết lại câu hỏi bằng thuật ngữ pháp lý chuẩn (320B API)."""
+    """Viết lại câu hỏi bằng thuật ngữ pháp lý chuẩn (Pro LLM API)."""
 
     def apply(self, query, docs, llm, retriever=None):
         from app.llm.prompts import QUERY_REWRITE_PROMPT
@@ -31,7 +31,7 @@ class QueryRewriteSkill:
 
 
 class DecomposeSkill:
-    """Tách câu hỏi phức tạp thành nhiều câu hỏi con (320B API)."""
+    """Tách câu hỏi phức tạp thành nhiều câu hỏi con (Pro LLM API)."""
 
     def apply(self, query, docs, llm, retriever=None):
         from app.llm.prompts import DECOMPOSE_PROMPT
@@ -60,7 +60,7 @@ class DecomposeSkill:
 
 
 class EvidenceFocusSkill:
-    """Thu hẹp phạm vi tìm kiếm (320B API)."""
+    """Thu hẹp phạm vi tìm kiếm (Pro LLM API)."""
 
     def apply(self, query, docs, llm, retriever=None):
         from app.llm.prompts import EVIDENCE_FOCUS_PROMPT
@@ -82,7 +82,7 @@ class EvidenceFocusSkill:
 
 
 class HyDESkill:
-    """Sinh tài liệu giả định (Hypothetical Document Embedding) bằng 320B LLM để cải thiện truy vấn."""
+    """Sinh tài liệu giả định (Hypothetical Document Embedding) bằng Pro LLM để cải thiện truy vấn."""
 
     def apply(self, query, docs, llm, retriever=None):
         hyde_prompt = (

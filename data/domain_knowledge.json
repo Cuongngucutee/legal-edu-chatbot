@@ -1,0 +1,970 @@
+{
+    "intent_classifier": {
+        "keywords": {
+            "GREETING": [
+                "xin chào",
+                "chào bạn",
+                "hello",
+                "hi ",
+                "hey",
+                "chào"
+            ],
+            "THANKS": [
+                "cảm ơn",
+                "thank",
+                "cám ơn",
+                "tks"
+            ],
+            "SUMMARY": [
+                "tóm tắt",
+                "khái quát",
+                "nội dung chính",
+                "quy định những gì"
+            ],
+            "STATISTICAL": [
+                "bao nhiêu",
+                "số lượng",
+                "đếm",
+                "thống kê"
+            ],
+            "LISTING": [
+                "liệt kê",
+                "tất cả",
+                "những trường hợp nào",
+                "trường hợp nào",
+                "những đối tượng nào",
+                "đối tượng nào",
+                "bao gồm những gì",
+                "các loại",
+                "kể tên"
+            ],
+            "COMPARISON": [
+                "so sánh",
+                " vs ",
+                "đối chiếu"
+            ],
+            "UNANSWERABLE": [
+                "top 100",
+                "thế giới",
+                "xếp hạng quốc tế"
+            ]
+        },
+        "lookup_context": [
+            "bồi hoàn",
+            "mức",
+            "phí",
+            "lương",
+            "trợ cấp",
+            "hỗ trợ",
+            "phạt",
+            "tiền",
+            "chi phí",
+            "học phí",
+            "tuổi",
+            "học sinh",
+            "lớp",
+            "lâu",
+            "năm",
+            "tháng",
+            "ngày",
+            "tối đa",
+            "tối thiểu",
+            "giờ",
+            "tiết",
+            "điểm",
+            "hạng"
+        ],
+        "legal_keywords": [
+            "điều",
+            "khoản",
+            "điểm",
+            "luật",
+            "nghị định",
+            "thông tư",
+            "quy định",
+            "quyết định",
+            "văn bản",
+            "pháp luật",
+            "hiến pháp",
+            "quyền",
+            "nghĩa vụ",
+            "điều kiện",
+            "tiêu chuẩn",
+            "trách nhiệm",
+            "xử phạt",
+            "vi phạm",
+            "hướng dẫn",
+            "thi hành",
+            "hiệu lực",
+            "bãi bỏ",
+            "sửa đổi",
+            "bổ sung",
+            "ban hành",
+            "áp dụng",
+            "chuyển đổi",
+            "quyết nghị",
+            "giáo viên",
+            "nhà giáo",
+            "giảng viên",
+            "học sinh",
+            "sinh viên",
+            "trường",
+            "đại học",
+            "mầm non",
+            "tiểu học",
+            "trung học",
+            "thcs",
+            "thpt",
+            "giáo dục",
+            "đào tạo",
+            "tuyển sinh",
+            "học phí",
+            "học bổng",
+            "sư phạm",
+            "chức danh",
+            "nghề nghiệp",
+            "thăng hạng",
+            "bổ nhiệm",
+            "hội đồng",
+            "hiệu trưởng",
+            "cơ sở giáo dục",
+            "chương trình",
+            "bằng cấp",
+            "tốt nghiệp",
+            "kỷ luật",
+            "đánh giá",
+            "kiểm tra",
+            "nâng chuẩn",
+            "du học",
+            "cử tuyển",
+            "bồi hoàn",
+            "thỉnh giảng",
+            "lợi nhuận",
+            "tư thục",
+            "công lập",
+            "hỗ trợ",
+            "chính sách",
+            "khu công nghiệp",
+            "dân tộc",
+            "nội trú"
+        ]
+    },
+    "query_expander": {
+        "target_routing_rules": [
+            {
+                "keywords": [
+                    "nâng chuẩn",
+                    "trình độ chuẩn",
+                    "bằng cử nhân giáo viên"
+                ],
+                "targets": [
+                    "71/2020/NĐ-CP"
+                ]
+            },
+            {
+                "keywords": [
+                    "bổ nhiệm hạng",
+                    "thăng hạng",
+                    "hạng ii",
+                    "hạng iii"
+                ],
+                "conditions": [
+                    {
+                        "requires": [
+                            "mầm non"
+                        ],
+                        "targets": [
+                            "01/2021/TT-BGDĐT",
+                            "08/2023/TT-BGDĐT"
+                        ]
+                    },
+                    {
+                        "requires": [
+                            "tiểu học"
+                        ],
+                        "targets": [
+                            "02/2021/TT-BGDĐT",
+                            "08/2023/TT-BGDĐT"
+                        ]
+                    },
+                    {
+                        "requires": [],
+                        "targets": [
+                            "01/2021/TT-BGDĐT",
+                            "08/2023/TT-BGDĐT"
+                        ]
+                    }
+                ]
+            },
+            {
+                "keywords": [
+                    "giữa kỳ",
+                    "cuối kỳ",
+                    "bài kiểm tra",
+                    "kiểm tra định kỳ",
+                    "kiểm tra thường xuyên",
+                    "nghỉ học nhiều",
+                    "ở lại lớp",
+                    "lên lớp",
+                    "tai nạn",
+                    "kiểm tra giữa kỳ",
+                    "nghỉ học quá 45 buổi"
+                ],
+                "targets": [
+                    "22/2021/TT-BGDĐT"
+                ]
+            },
+            {
+                "keywords": [
+                    "chuyển đổi"
+                ],
+                "conditions": [
+                    {
+                        "requires": [
+                            "đại học"
+                        ],
+                        "targets": [
+                            "34/2018/QH14",
+                            "99/2019/NĐ-CP"
+                        ]
+                    }
+                ]
+            },
+            {
+                "keywords": [
+                    "đại học tư thục",
+                    "không vì lợi nhuận",
+                    "hội đồng trường",
+                    "đại học y"
+                ],
+                "targets": [
+                    "34/2018/QH14",
+                    "99/2019/NĐ-CP"
+                ]
+            },
+            {
+                "keywords": [
+                    "thi tốt nghiệp",
+                    "tốt nghiệp thpt",
+                    "2026",
+                    "24/2024"
+                ],
+                "targets": [
+                    "24/2024/TT-BGDĐT"
+                ]
+            },
+            {
+                "keywords": [
+                    "tuyển sinh năm 2022",
+                    "tuyển sinh 2022",
+                    "tuyển sinh đại học"
+                ],
+                "targets": [
+                    "08/2022/TT-BGDĐT"
+                ]
+            },
+            {
+                "keywords": [
+                    "học bổng",
+                    "cử tuyển",
+                    "dự bị đại học",
+                    "nội trú"
+                ],
+                "targets": [
+                    "84/2020/NĐ-CP"
+                ]
+            },
+            {
+                "keywords": [
+                    "du học",
+                    "nghiên cứu khoa học nước ngoài",
+                    "gia hạn du học",
+                    "sinh viên cử đi học",
+                    "giảng viên đại học cử ra nước ngoài"
+                ],
+                "targets": [
+                    "86/2021/NĐ-CP"
+                ]
+            },
+            {
+                "keywords": [
+                    "sinh viên sư phạm",
+                    "hỗ trợ sinh hoạt phí",
+                    "bồi hoàn",
+                    "116/2020",
+                    "bảo lưu sư phạm"
+                ],
+                "targets": [
+                    "116/2020/NĐ-CP"
+                ]
+            },
+            {
+                "keywords": [
+                    "chuyển trường khác tỉnh",
+                    "giấy giới thiệu",
+                    "thủ tục chuyển trường"
+                ],
+                "targets": [
+                    "43/2019/QH14"
+                ]
+            },
+            {
+                "keywords": [
+                    "ngoại ngữ",
+                    "dạy ngoại ngữ",
+                    "ngoại ngữ 1",
+                    "chương trình giáo dục phổ thông 2018",
+                    "chương trình 2018"
+                ],
+                "targets": [
+                    "32/2018/TT-BGDĐT"
+                ]
+            },
+            {
+                "keywords": [
+                    "ngày pháp luật",
+                    "ngày pháp luật việt nam"
+                ],
+                "targets": [
+                    "14/2012/QH13"
+                ]
+            },
+            {
+                "keywords": [
+                    "học phí",
+                    "tiểu học",
+                    "không phải đóng học phí",
+                    "trường công lập"
+                ],
+                "targets": [
+                    "43/2019/QH14"
+                ],
+                "match_type": "any"
+            },
+            {
+                "keywords": [
+                    "giảng viên",
+                    "chuẩn giảng viên",
+                    "chuẩn tối thiểu"
+                ],
+                "targets": [
+                    "34/2018/QH14"
+                ],
+                "match_type": "any"
+            },
+            {
+                "keywords": [
+                    "chế độ làm việc",
+                    "nghỉ hè hằng năm",
+                    "nghỉ hè của nhà giáo",
+                    "tuổi nghỉ hưu của nhà giáo"
+                ],
+                "targets": [
+                    "Luật 73/2025/QH15"
+                ],
+                "match_type": "any"
+            },
+            {
+                "keywords": [
+                    "hòa nhập",
+                    "giáo dục hòa nhập",
+                    "trung tâm hỗ trợ",
+                    "phạm vi điều chỉnh"
+                ],
+                "targets": [
+                    "20/2022/TT-BGDĐT"
+                ]
+            },
+            {
+                "keywords": [
+                    "nhiệm kỳ",
+                    "hiệu trưởng",
+                    "nhiệm kỳ của hiệu trưởng"
+                ],
+                "targets": [
+                    "08/2012/QH13",
+                    "34/2018/QH14"
+                ]
+            },
+            {
+                "keywords": [
+                    "quốc phòng",
+                    "an ninh",
+                    "quốc phòng và an ninh",
+                    "chính khóa"
+                ],
+                "targets": [
+                    "30/2013/QH13"
+                ]
+            },
+            {
+                "keywords": [
+                    "giảm 02 tiết",
+                    "giảm 2 tiết",
+                    "hội đồng trường",
+                    "kiêm nhiệm chủ tịch"
+                ],
+                "targets": [
+                    "05/2025/TT-BGDĐT"
+                ]
+            },
+            {
+                "keywords": [
+                    "05 năm ở nước ngoài",
+                    "ít nhất 05 năm",
+                    "liên kết giáo dục",
+                    "bên nước ngoài"
+                ],
+                "targets": [
+                    "124/2024/NĐ-CP",
+                    "202/2025/NĐ-CP"
+                ]
+            },
+            {
+                "keywords": [
+                    "sáp nhập",
+                    "chia, tách",
+                    "chia tách trường tiểu học",
+                    "ubnd cấp huyện"
+                ],
+                "targets": [
+                    "07/BGDĐT-VBHN"
+                ]
+            },
+            {
+                "keywords": [
+                    "trường học an toàn",
+                    "tai nạn thương tích"
+                ],
+                "conditions": [
+                    {
+                        "requires": [
+                            "mầm non"
+                        ],
+                        "targets": [
+                            "45/2021/TT-BGDĐT"
+                        ]
+                    },
+                    {
+                        "requires": [
+                            "phổ thông",
+                            "thường xuyên",
+                            "thcs",
+                            "thpt",
+                            "tiểu học",
+                            "cấp 1",
+                            "cấp 2",
+                            "cấp 3"
+                        ],
+                        "match_type": "any",
+                        "targets": [
+                            "18/2023/TT-BGDĐT"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "expansion_rules": [
+            {
+                "keywords": [
+                    "tuổi vào lớp 1",
+                    "tuổi vào học",
+                    "nhập học lớp 1"
+                ],
+                "expansion": "tuổi của học sinh vào học lớp 1 là 6 tuổi phát triển sớm trí tuệ Luật Giáo dục 43/2019 Điều 28"
+            },
+            {
+                "keywords": [
+                    "sổ sách",
+                    "hồ sơ giáo viên tiểu học",
+                    "hồ sơ quản lý",
+                    "giáo án"
+                ],
+                "expansion": "hồ sơ quản lý hoạt động giáo dục kế hoạch bài dạy sổ ghi chép"
+            },
+            {
+                "keywords": [
+                    "tiểu học",
+                    "lớp 1",
+                    "lớp 2",
+                    "lớp 3",
+                    "lớp 4",
+                    "lớp 5"
+                ],
+                "expansion": "quy định trường tiểu học giáo dục tiểu học"
+            },
+            {
+                "keywords": [
+                    "thcs",
+                    "thpt",
+                    "trung học cơ sở",
+                    "trung học phổ thông",
+                    "cấp 2",
+                    "cấp 3"
+                ],
+                "expansion": "trường trung học cơ sở trung học phổ thông quy định"
+            },
+            {
+                "keywords": [
+                    "điện thoại",
+                    "điện thoại di động",
+                    "sử dụng điện thoại"
+                ],
+                "expansion": "học sinh sử dụng điện thoại di động trong giờ học an sinh số"
+            },
+            {
+                "keywords": [
+                    "sĩ số",
+                    "tối đa bao nhiêu học sinh",
+                    "số học sinh trong lớp"
+                ],
+                "expansion": "số lượng học sinh trong một lớp sĩ số tối đa quy định"
+            },
+            {
+                "keywords": [
+                    "kỷ luật",
+                    "đình chỉ",
+                    "đuổi học",
+                    "kỷ luật học sinh",
+                    "kỷ luật đình chỉ"
+                ],
+                "expansion": "hình thức kỷ luật học sinh đình chỉ học tập thời hạn"
+            },
+            {
+                "keywords": [
+                    "chuyển trường",
+                    "chuyển trường khác tỉnh"
+                ],
+                "expansion": "chuyển trường tiếp nhận học sinh giấy giới thiệu thủ tục chuyển trường"
+            },
+            {
+                "keywords": [
+                    "tốt nghiệp thcs",
+                    "xét tốt nghiệp",
+                    "công nhận tốt nghiệp"
+                ],
+                "expansion": "xét công nhận tốt nghiệp trung học cơ sở điều kiện 21 tuổi hạnh kiểm học lực lớp 9"
+            },
+            {
+                "keywords": [
+                    "nghỉ hè",
+                    "nghỉ hè giáo viên"
+                ],
+                "expansion": "thời gian nghỉ hè hằng năm giáo viên cơ sở giáo dục phổ thông 08 tuần nghỉ phép Nghị định 84/2020"
+            },
+            {
+                "keywords": [
+                    "dân tộc thiểu số",
+                    "miễn giảm học phí",
+                    "miễn học phí"
+                ],
+                "expansion": "đối tượng miễn học phí dân tộc thiểu số vùng khó khăn"
+            },
+            {
+                "keywords": [
+                    "thi bù",
+                    "kiểm tra bù",
+                    "bị ốm không thi",
+                    "không tham gia thi",
+                    "không tham gia kiểm tra"
+                ],
+                "expansion": "học sinh không tham gia kiểm tra đánh giá bất khả kháng được kiểm tra đánh giá bù"
+            },
+            {
+                "keywords": [
+                    "hạng ii",
+                    "hạng iii",
+                    "bổ nhiệm hạng",
+                    "thăng hạng",
+                    "chức danh nghề nghiệp"
+                ],
+                "expansion": "bổ nhiệm xếp lương viên chức giáo viên hạng chức danh Thông tư 01/2021 08/2023 sửa đổi"
+            },
+            {
+                "keywords": [
+                    "quỹ lớp",
+                    "ban đại diện",
+                    "cha mẹ học sinh",
+                    "phụ huynh thu tiền"
+                ],
+                "expansion": "Ban đại diện cha mẹ học sinh Điều lệ Ban đại diện"
+            },
+            {
+                "keywords": [
+                    "đánh giá học sinh",
+                    "điểm số",
+                    "xếp loại học lực"
+                ],
+                "expansion": "đánh giá xếp loại kết quả học tập rèn luyện học sinh"
+            },
+            {
+                "keywords": [
+                    "xử phạt",
+                    "vi phạm tuyển sinh",
+                    "phạt tiền giáo dục",
+                    "tổ chức tuyển sinh"
+                ],
+                "expansion": "vi phạm quy định về tổ chức tuyển sinh phạt tiền thông báo tuyển sinh đề án"
+            },
+            {
+                "keywords": [
+                    "tuyển sinh vượt chỉ tiêu",
+                    "vượt chỉ tiêu"
+                ],
+                "expansion": "tuyển sinh vượt chỉ tiêu trung học phổ thông phạt tiền mức phạt"
+            },
+            {
+                "keywords": [
+                    "giáo viên tiểu học thăng hạng",
+                    "thăng hạng tiểu học"
+                ],
+                "expansion": "tiêu chuẩn chức danh nghề nghiệp giáo viên tiểu học hạng III hạng II mã số V.07.03 Thông tư 02/2021 08/2023"
+            },
+            {
+                "keywords": [
+                    "thành lập trường"
+                ],
+                "expansion": "điều kiện thành lập trường mầm non đề án quy hoạch cơ sở vật chất Luật Giáo dục 43/2019"
+            },
+            {
+                "keywords": [
+                    "hệ thống giáo dục",
+                    "cấp học",
+                    "trình độ đào tạo",
+                    "giáo dục quốc dân"
+                ],
+                "expansion": "hệ thống giáo dục quốc dân cấp học trình độ đào tạo mầm non tiểu học"
+            },
+            {
+                "keywords": [
+                    "học phí",
+                    "khung học phí",
+                    "nguyên tắc học phí"
+                ],
+                "expansion": "khung học phí nguyên tắc xác định bù đắp chi phí mức trần UBND"
+            },
+            {
+                "keywords": [
+                    "đánh giá thường xuyên",
+                    "đánh giá định kỳ",
+                    "giữa kỳ",
+                    "cuối kỳ",
+                    "bài kiểm tra",
+                    "kiểm tra giữa kỳ",
+                    "kiểm tra định kỳ"
+                ],
+                "expansion": "đánh giá thường xuyên đánh giá định kỳ giữa kỳ cuối kỳ điểm số kiểm tra đánh giá xếp loại học sinh trung học cơ sở trung học phổ thông Thông tư 22/2021/TT-BGDĐT"
+            },
+            {
+                "keywords": [
+                    "nghỉ học",
+                    "tai nạn",
+                    "nghỉ quá 45 buổi",
+                    "lên lớp",
+                    "ở lại lớp",
+                    "nghỉ học nhiều",
+                    "cho phép lên lớp"
+                ],
+                "expansion": "học sinh nghỉ học vượt quá 45 buổi học trong năm học lên lớp ở lại lớp đánh giá kết quả học tập rèn luyện Thông tư 22/2021/TT-BGDĐT"
+            },
+            {
+                "keywords": [
+                    "học bổng",
+                    "dự bị đại học",
+                    "dân tộc nội trú",
+                    "cử tuyển"
+                ],
+                "expansion": "học bổng chính sách cử tuyển bồi hoàn dự bị đại học phổ thông dân tộc nội trú Nghị định 84/2020"
+            },
+            {
+                "keywords": [
+                    "mục tiêu giáo dục",
+                    "nguyên lý giáo dục",
+                    "tính chất giáo dục"
+                ],
+                "expansion": "mục tiêu giáo dục phát triển toàn diện đạo đức tri thức nhân dân dân tộc"
+            },
+            {
+                "keywords": [
+                    "nâng chuẩn",
+                    "nâng trình độ chuẩn",
+                    "lộ trình nâng chuẩn",
+                    "trình độ chuẩn được đào tạo",
+                    "bằng cử nhân giáo viên",
+                    "đào tạo cử nhân giáo viên"
+                ],
+                "expansion": "nâng trình độ chuẩn được đào tạo giáo viên lộ trình giai đoạn Nghị định 71/2020"
+            },
+            {
+                "keywords": [
+                    "chương trình giáo dục phổ thông 2018",
+                    "chương trình mới",
+                    "sách giáo khoa mới",
+                    "chương trình 2018",
+                    "chương trình phổ thông mới",
+                    "lộ trình sgk"
+                ],
+                "expansion": "chương trình giáo dục phổ thông 2018 lộ trình áp dụng ngoại ngữ Thông tư 32/2018 Quyết định 16/2006"
+            },
+            {
+                "keywords": [
+                    "giáo dục đại học",
+                    "đại học tư thục",
+                    "không vì lợi nhuận",
+                    "chuyển đổi đại học",
+                    "cơ sở giáo dục đại học",
+                    "chuyển trường đại học thành đại học"
+                ],
+                "expansion": "cơ sở giáo dục đại học tư thục không vì lợi nhuận chuyển đổi Luật 34/2018 sửa đổi Nghị định 99/2019"
+            },
+            {
+                "keywords": [
+                    "sinh viên sư phạm",
+                    "chính sách sư phạm",
+                    "hỗ trợ sư phạm",
+                    "sinh hoạt phí sư phạm",
+                    "bồi hoàn sư phạm",
+                    "bảo lưu sư phạm"
+                ],
+                "expansion": "sinh viên sư phạm chính sách hỗ trợ sinh hoạt phí bồi hoàn thôi học bảo lưu Nghị định 116/2020"
+            },
+            {
+                "keywords": [
+                    "du học",
+                    "du học sinh",
+                    "học bổng ngân sách",
+                    "cử đi học nước ngoài",
+                    "lưu ban du học",
+                    "gia hạn du học",
+                    "tư vấn du học"
+                ],
+                "expansion": "du học sinh học bổng ngân sách nhà nước gia hạn lưu ban chuyển ngành Nghị định 86/2021"
+            },
+            {
+                "keywords": [
+                    "phát triển sớm",
+                    "học vượt lớp",
+                    "vượt lớp"
+                ],
+                "expansion": "phát triển sớm về trí tuệ học vượt lớp tuổi vào học Luật Giáo dục 43/2019 Điều 28"
+            },
+            {
+                "keywords": [
+                    "thỉnh giảng",
+                    "quyền nhà giáo",
+                    "quyền giáo viên",
+                    "hợp đồng thỉnh giảng"
+                ],
+                "expansion": "nhà giáo quyền hợp đồng thỉnh giảng nghiên cứu khoa học Luật Giáo dục 43/2019 Điều 70"
+            },
+            {
+                "keywords": [
+                    "ép buộc học thêm",
+                    "ép học sinh học thêm",
+                    "dạy thêm thu tiền"
+                ],
+                "expansion": "ép buộc học sinh học thêm thu tiền hành vi bị nghiêm cấm Luật Giáo dục 43/2019 Điều 22"
+            },
+            {
+                "keywords": [
+                    "khu công nghiệp",
+                    "mầm non khu công nghiệp",
+                    "hỗ trợ cơ sở vật chất mầm non",
+                    "con công nhân"
+                ],
+                "expansion": "cơ sở mầm non khu công nghiệp hỗ trợ trang bị cơ sở vật chất Nghị định 105/2020 Luật 43/2019"
+            },
+            {
+                "keywords": [
+                    "giáo dục bắt buộc",
+                    "tiểu học tư thục",
+                    "hỗ trợ học phí tiểu học",
+                    "không đủ trường công lập"
+                ],
+                "expansion": "giáo dục tiểu học bắt buộc trường tư thục hỗ trợ tiền đóng học phí Luật Giáo dục 43/2019 Điều 99"
+            },
+            {
+                "keywords": [
+                    "tài sản trường",
+                    "sở hữu trường tư thục",
+                    "vốn góp nhà đầu tư"
+                ],
+                "expansion": "tài sản trường tư thục sở hữu nhà đầu tư vốn góp Luật Giáo dục 43/2019 Điều 102"
+            },
+            {
+                "keywords": [
+                    "nhà trẻ",
+                    "mẫu giáo",
+                    "trường mầm non",
+                    "lớp mầm non độc lập"
+                ],
+                "expansion": "cơ sở giáo dục mầm non nhà trẻ mẫu giáo trường mầm non 03 tháng tuổi Luật Giáo dục 43/2019 Điều 26"
+            },
+            {
+                "keywords": [
+                    "hoàn thành tiểu học",
+                    "bằng tốt nghiệp tiểu học",
+                    "xác nhận học bạ"
+                ],
+                "expansion": "hoàn thành chương trình tiểu học hiệu trưởng xác nhận học bạ Luật Giáo dục 43/2019 Điều 34"
+            },
+            {
+                "keywords": [
+                    "giảng viên nước ngoài",
+                    "nghiên cứu khoa học nước ngoài",
+                    "trao đổi học thuật"
+                ],
+                "expansion": "giảng viên giảng dạy nghiên cứu khoa học trao đổi học thuật nước ngoài Nghị định 86/2021 Điều 19"
+            },
+            {
+                "keywords": [
+                    "thời gian giữ hạng",
+                    "mã số v.07",
+                    "chuyển xếp",
+                    "tương đương hạng"
+                ],
+                "expansion": "thời gian giữ chức danh nghề nghiệp tương đương mã số V.07 Thông tư 01/2021 08/2023 sửa đổi"
+            },
+            {
+                "keywords": [
+                    "còn công tác",
+                    "tuổi nghỉ hưu",
+                    "07 năm công tác",
+                    "84 tháng"
+                ],
+                "expansion": "giáo viên còn đủ 07 năm công tác nghỉ hưu nâng trình độ chuẩn Nghị định 71/2020 Điều 2"
+            },
+            {
+                "keywords": [
+                    "nhà đầu tư",
+                    "rút vốn",
+                    "lợi tức",
+                    "cổ đông đại học"
+                ],
+                "expansion": "nhà đầu tư rút vốn lợi tức cơ sở giáo dục đại học tư thục Luật 34/2018 sửa đổi bổ sung Điều 7"
+            },
+            {
+                "keywords": [
+                    "ngày pháp luật",
+                    "ngày pháp luật việt nam"
+                ],
+                "expansion": "ngày pháp luật nước cộng hòa xã hội chủ nghĩa việt nam ngày 09 tháng 11 hằng năm Luật Phổ biến giáo dục pháp luật 14/2012/QH13 Điều 8"
+            },
+            {
+                "keywords": [
+                    "học sinh tiểu học",
+                    "tiểu học công lập",
+                    "miễn học phí",
+                    "đóng học phí",
+                    "không phải đóng học phí",
+                    "không đóng học phí"
+                ],
+                "expansion": "học sinh tiểu học trường công lập không phải đóng học phí giáo dục tiểu học là giáo dục bắt buộc Luật Giáo dục 43/2019 Điều 99"
+            },
+            {
+                "keywords": [
+                    "trình độ chuẩn",
+                    "giảng viên đại học",
+                    "chuẩn giảng viên",
+                    "trình độ tối thiểu của chức danh giảng viên"
+                ],
+                "expansion": "trình độ chuẩn tối thiểu của chức danh giảng viên giảng dạy trình độ đại học là thạc sĩ Luật số 34/2018/QH14 Khoản 24 Điều 1 sửa đổi bổ sung Điều 72 Điều 54"
+            },
+            {
+                "keywords": [
+                    "chế độ làm việc",
+                    "chế độ làm việc của nhà giáo",
+                    "chế độ nghỉ hè của nhà giáo"
+                ],
+                "expansion": "chế độ làm việc của nhà giáo bao gồm thời gian làm việc thời gian nghỉ hè hằng năm nghỉ phép Luật Nhà giáo 73/2025/QH15 Điều 16"
+            },
+            {
+                "keywords": [
+                    "hòa nhập",
+                    "giáo dục hòa nhập",
+                    "trung tâm hỗ trợ phát triển giáo dục hòa nhập"
+                ],
+                "expansion": "trung tâm hỗ trợ phát triển giáo dục hòa nhập tổ chức và hoạt động khuyến khích cá nhân đầu tư cơ sở vật chất phạm vi điều chỉnh Điều 1 Điều 30 Thông tư 20/2022/TT-BGDĐT"
+            },
+            {
+                "keywords": [
+                    "nhiệm kỳ",
+                    "hiệu trưởng",
+                    "nhiệm kỳ của hiệu trưởng",
+                    "hiệu trưởng trường đại học"
+                ],
+                "expansion": "nhiệm kỳ của hiệu trưởng trường đại học cao đẳng đại học vùng quốc gia là 05 năm Điều 20 Luật Giáo dục đại học 08/2012/QH13"
+            },
+            {
+                "keywords": [
+                    "quốc phòng",
+                    "an ninh",
+                    "giáo dục quốc phòng",
+                    "môn học chính khóa"
+                ],
+                "expansion": "giáo dục quốc phòng và an ninh trường trung học phổ thông trung cấp chuyên nghiệp nghề là môn học chính khóa Điều 11 Luật Giáo dục quốc phòng và an ninh 30/2013/QH13"
+            },
+            {
+                "keywords": [
+                    "giảm 02 tiết",
+                    "giảm 2 tiết",
+                    "chủ tịch hội đồng trường"
+                ],
+                "expansion": "giảm 02 tiết dạy tuần giáo viên kiêm nhiệm chủ tịch hội đồng trường thư ký hội đồng trường Điều 10 Thông tư 05/2025/TT-BGDĐT chế độ giảm định mức tiết dạy"
+            },
+            {
+                "keywords": [
+                    "05 năm ở nước ngoài",
+                    "hoạt động ít nhất 05 năm",
+                    "bên nước ngoài liên kết"
+                ],
+                "expansion": "đối tượng liên kết giáo dục bên nước ngoài cơ sở giáo dục có thời gian hoạt động ít nhất 05 năm ở nước ngoài Điều 6 Nghị định 124/2024/NĐ-CP"
+            },
+            {
+                "keywords": [
+                    "sáp nhập",
+                    "chia, tách",
+                    "chia tách trường tiểu học"
+                ],
+                "expansion": "sáp nhập chia tách trường tiểu học thẩm quyền quyết định Chủ tịch Ủy ban nhân dân cấp huyện Điều 19 Nghị định 07/BGDĐT-VBHN"
+            },
+            {
+                "keywords": [
+                    "ban hành chương trình",
+                    "thẩm quyền ban hành chương trình giáo dục phổ thông"
+                ],
+                "expansion": "thẩm quyền ban hành chương trình giáo dục phổ thông Bộ trưởng Bộ Giáo dục và Đào tạo ban hành Điều 31 Luật Giáo dục 43/2019/QH14"
+            },
+            {
+                "keywords": [
+                    "nghiêm cấm trong cơ sở giáo dục",
+                    "hành vi bị nghiêm cấm trong cơ sở giáo dục"
+                ],
+                "expansion": "hành vi bị nghiêm cấm trong cơ sở giáo dục bạo lực học đường ép buộc học thêm thu tiền lợi dụng tài trợ Điều 22 Luật Giáo dục 43/2019/QH14"
+            },
+            {
+                "keywords": [
+                    "loại hình cơ sở giáo dục đại học",
+                    "cơ sở giáo dục đại học ở việt nam bao gồm"
+                ],
+                "expansion": "cơ sở giáo dục đại học công lập tư thục loại hình trường đại học học viện đại học vùng đại học quốc gia Điều 7 Luật Giáo dục đại học 08/2012/QH13"
+            },
+            {
+                "keywords": [
+                    "phổ biến, giáo dục pháp luật",
+                    "hoạt động ngoại khóa",
+                    "phổ biến giáo dục pháp luật trong nhà trường"
+                ],
+                "expansion": "phổ biến giáo dục pháp luật trong nhà trường lồng ghép vào giáo dục chính khóa hoạt động ngoại khóa Điều 17 Luật Phổ biến giáo dục pháp luật 14/2012/QH13"
+            },
+            {
+                "keywords": [
+                    "trung tâm giáo dục quốc phòng",
+                    "trung tâm giáo dục quốc phòng và an ninh",
+                    "chức năng chính là gì"
+                ],
+                "expansion": "trung tâm giáo dục quốc phòng và an ninh chức năng chính tổ chức dạy học giáo dục quốc phòng và an ninh bồi dưỡng kiến thức Điều 16 Luật Giáo dục quốc phòng và an ninh 30/2013/QH13"
+            }
+        ]
+    }
+}

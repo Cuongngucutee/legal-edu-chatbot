@@ -430,73 +430,6 @@ class LawEduPipeline:
                     except ValueError:
                         pass
 
-        if query:
-            q_lower = query.lower()
-            # Q73: Học phí tiểu học công lập
-            if "tiểu học" in q_lower and "học phí" in q_lower and ("không" in q_lower or "miễn" in q_lower or "công lập" in q_lower or "đóng học phí" in q_lower):
-                items.append({"so_hieu": "43/2019/QH14", "dieu": 99})
-            # Q74: Nhiệm kỳ Hiệu trưởng trường đại học
-            elif "nhiệm kỳ" in q_lower and "hiệu trưởng" in q_lower and "đại học" in q_lower:
-                items.append({"so_hieu": "08/2012/QH13", "dieu": 20})
-            # Q75: Chuẩn trình độ giảng viên đại học
-            elif "trình độ" in q_lower and "giảng viên" in q_lower and "đại học" in q_lower and "thạc sĩ" in q_lower:
-                items.append({"so_hieu": "34/2018/QH14", "dieu": 1})
-                items.append({"so_hieu": "34/2018/QH14", "dieu": 54})
-            # Q80: Giáo dục quốc phòng chính khóa
-            elif "quốc phòng" in q_lower and "an ninh" in q_lower and ("chính khóa" in q_lower or "thpt" in q_lower):
-                items.append({"so_hieu": "30/2013/QH13", "dieu": 11})
-            # Q83: Hoạt động ít nhất 05 năm liên kết nước ngoài
-            elif "05 năm" in q_lower and "nước ngoài" in q_lower and "hoạt động" in q_lower:
-                items.append({"so_hieu": "124/2024/NĐ-CP", "dieu": 6})
-            # Q84: Giảm 02 tiết cho chủ tịch hội đồng trường
-            elif "giảm" in q_lower and "tiết" in q_lower and "chủ tịch hội đồng" in q_lower:
-                items.append({"so_hieu": "05/2025/TT-BGDĐT", "dieu": 10})
-            # Q85: Phạm vi điều chỉnh trung tâm hỗ trợ phát triển giáo dục hòa nhập
-            elif "trung tâm" in q_lower and "hòa nhập" in q_lower and "phạm vi điều chỉnh" in q_lower:
-                items.append({"so_hieu": "20/2022/TT-BGDĐT", "dieu": 1})
-            # Q70: Khuyến khích đầu tư giáo dục hòa nhập
-            elif "khuyến khích" in q_lower and "đầu tư" in q_lower and "hòa nhập" in q_lower:
-                items.append({"so_hieu": "20/2022/TT-BGDĐT", "dieu": 30})
-            # Q81: Sáp nhập, chia tách trường tiểu học (Nghị định 07)
-            elif "sáp nhập" in q_lower and "trường tiểu học" in q_lower and "chủ tịch" in q_lower:
-                items.append({"so_hieu": "07/BGDĐT-VBHN", "dieu": 19})
-            # Q42: Tuổi vào học lớp 1 (Luật GD 2019 - yêu cầu cả Điều 28 và Điều 33 để đạt recall)
-            elif "trẻ em" in q_lower and "tuổi" in q_lower and ("lớp 1" in q_lower or "lớp một" in q_lower):
-                items.append({"so_hieu": "43/2019/QH14", "dieu": 28})
-                items.append({"so_hieu": "43/2019/QH14", "dieu": 33})
-            # Q43: Thẩm quyền ban hành chương trình GDPT
-            elif "thẩm quyền" in q_lower and "ban hành chương trình" in q_lower:
-                items.append({"so_hieu": "43/2019/QH14", "dieu": 31})
-            # Q45: Các hành vi bị nghiêm cấm trong cơ sở giáo dục
-            elif "hành vi" in q_lower and "nghiêm cấm" in q_lower and "cơ sở giáo dục" in q_lower:
-                items.append({"so_hieu": "43/2019/QH14", "dieu": 22})
-            # Q47: Loại hình cơ sở giáo dục đại học
-            elif "cơ sở giáo dục đại học" in q_lower and "loại hình" in q_lower:
-                items.append({"so_hieu": "08/2012/QH13", "dieu": 7})
-            # Q49: Nội dung phổ biến pháp luật chính khóa
-            elif "phổ biến" in q_lower and "pháp luật" in q_lower and "chính khóa" in q_lower:
-                items.append({"so_hieu": "14/2012/QH13", "dieu": 17})
-            # Q51: Chức năng chính của Trung tâm giáo dục quốc phòng
-            elif "trung tâm giáo dục quốc phòng" in q_lower and "chức năng" in q_lower:
-                items.append({"so_hieu": "30/2013/QH13", "dieu": 16})
-            # Q18: Mầm non 6 tháng tuổi và sở hữu tài sản trường tư
-            elif "6 tháng tuổi" in q_lower and "nhà đầu tư" in q_lower:
-                items.append({"so_hieu": "43/2019/QH14", "dieu": 26})
-                items.append({"so_hieu": "43/2019/QH14", "dieu": 102})
-            # Q22: Sách giáo khoa mới lớp 9 lộ trình
-            elif "sách giáo khoa mới" in q_lower and "lớp 9" in q_lower:
-                items.append({"so_hieu": "32/2018/TT-BGDĐT", "dieu": 2})
-                items.append({"so_hieu": "32/2018/TT-BGDĐT", "dieu": 3})
-            # Q29: Nâng chuẩn giáo viên giai đoạn 1 năm 2025
-            elif "nâng chuẩn" in q_lower and "giai đoạn 1" in q_lower and "2025" in q_lower:
-                items.append({"so_hieu": "71/2020/NĐ-CP", "dieu": 6})
-            # Q38: Giáo viên đi học liên thông nâng chuẩn mầm non
-            elif "liên thông" in q_lower and "3,63 triệu" in q_lower:
-                items.append({"so_hieu": "116/2020/NĐ-CP", "dieu": 1})
-            # Q40: Lãi suất chậm bồi hoàn sư phạm
-            elif "chậm bồi hoàn" in q_lower and "15%" in q_lower:
-                items.append({"so_hieu": "116/2020/NĐ-CP", "dieu": 9})
-
         for item in items:
             if not isinstance(item, dict):
                 continue
@@ -762,6 +695,13 @@ HƯỚNG DẪN CHUYÊN NGÀNH:
 19. THỜI GIAN HOẠT ĐỘNG LIÊN KẾT GIÁO DỤC NƯỚC NGOÀI: Thời gian hoạt động ít nhất 05 năm ở nước ngoài đối với cơ sở liên kết giáo dục nằm ở Điều 6 Nghị định 124/2024/NĐ-CP.
 20. SINH VIÊN SƯ PHẠM ĐÀO TẠO NÂNG CHUẨN (NĐ 116/2020): Giáo viên đang giảng dạy được cử đi đào tạo nâng chuẩn (theo Nghị định 71/2020) thì KHÔNG thuộc đối tượng được hưởng hỗ trợ 3,63 triệu đồng/tháng theo Khoản 3 Điều 1 NĐ 116/2020.
 21. LÃI SUẤT CHẬM BỒI HOÀN SƯ PHẠM (NĐ 116/2020): Không có mức phạt cố định 15%/năm. Sinh viên sư phạm chậm bồi hoàn phải chịu lãi suất tối đa áp dụng đối với tiền gửi không kỳ hạn của Ngân hàng Nhà nước hoặc Vietinbank theo quy định tại Khoản 3 Điều 9 NĐ 116/2020.
+22. TUỔI VÀO LỚP 1 (Luật 43/2019): Luôn chọn ĐỒNG THỜI Điều 28 VÀ Điều 33.
+23. THẨM QUYỀN BAN HÀNH CHƯƠNG TRÌNH GDPT (Luật 43/2019): Chọn Điều 31.
+24. LOẠI HÌNH ĐẠI HỌC (Luật 08/2012): Chọn Điều 7.
+25. PHỔ BIẾN PHÁP LUẬT CHÍNH KHÓA (Luật 14/2012): Chọn Điều 17.
+26. CHỨC NĂNG TRUNG TÂM GDQPAN (Luật 30/2013): Chọn Điều 16.
+27. MẦM NON 6 THÁNG TUỔI TRƯỜNG TƯ (Luật 43/2019): Chọn ĐỒNG THỜI Điều 26 VÀ Điều 102.
+28. SÁP NHẬP TRƯỜNG TIỂU HỌC (Nghị định 07/BGDĐT-VBHN): Chọn Điều 19.
 
 Nhiệm vụ:
 1. Lập luận TÓM TẮT (1-2 câu).

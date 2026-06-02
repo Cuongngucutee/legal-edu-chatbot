@@ -1,7 +1,7 @@
 """
 LawEdu AI — Specialized Handlers.
 Handle specific intent types: Summary, Listing, Statistical, Comparison.
-All use 320B API instead of local models.
+All use Pro LLM API instead of local models.
 """
 import json
 import re
@@ -16,28 +16,41 @@ from app.llm.prompts import (
 
 logger = logging.getLogger(__name__)
 
+from app.query.query_expander import EducationQueryExpander
 
 class SummaryHandler:
     """Xử lý câu hỏi tóm tắt văn bản."""
 
     def handle(self, query, retriever, llm):
+        expander = EducationQueryExpander()
+        explicit_targets = expander.get_target_docs(query)
+        
         docs = retriever.retrieve_as_docs(query, top_k=8)
-        if not docs:
+        if not docs and not explicit_targets:
             return {"answer": "Không tìm thấy văn bản để tóm tắt.", "sources": [], "intent": "SUMMARY"}
 
-        # Focus on dominant document
+        dominant = None
         doc_ids = {}
-        for d in docs:
-            did = d.get("metadata", {}).get("doc_id", "")
-            doc_ids[did] = doc_ids.get(did, 0) + 1
+        if explicit_targets:
+            dominant = explicit_targets[0]
+            # Strip trailing slash if any, although get_target_docs returns exact names like '45/2021/TT-BGDĐT'
+        else:
+            # Focus on dominant document from retrieved chunks
+            for d in docs:
+                did = d.get("metadata", {}).get("doc_id", "")
+                doc_ids[did] = doc_ids.get(did, 0) + 1
+            dominant = max(doc_ids, key=doc_ids.get) if doc_ids else None
+            
+        # Check if we should override docs with full document chunks
+        if dominant and hasattr(retriever, 'retrieve_by_doc_id'):
+            if explicit_targets or (doc_ids and doc_ids.get(dominant, 0) >= 3):
+                all_chunks = retriever.retrieve_by_doc_id(dominant)
+                if all_chunks:
+                    # Nhồi toàn bộ các điều luật của văn bản vào Context
+                    docs = all_chunks
 
-        dominant = max(doc_ids, key=doc_ids.get) if doc_ids else None
-        if dominant and doc_ids[dominant] >= 3 and hasattr(retriever, 'retrieve_by_doc_id'):
-            all_chunks = retriever.retrieve_by_doc_id(dominant)
-            if all_chunks:
-                docs = all_chunks[:5] + all_chunks[-2:] if len(all_chunks) > 10 else all_chunks[:8]
-
-        context = build_context(docs, max_chars=5000)
+        # Mở khóa giới hạn ngữ cảnh cho GeneralHandler
+        context = build_context(docs, max_chars=100000)
         answer = llm.generate(
             SUMMARY_PROMPT.format(query=query, context=context),
             system_prompt=GENERATION_SYSTEM_PROMPT,
@@ -47,6 +60,7 @@ class SummaryHandler:
         return {
             "answer": answer,
             "sources": [fmt_source(d) for d in docs[:5]],
+            "context": context,
             "intent": "SUMMARY",
             "skill_log": [{"skill": "SUMMARY_HANDLER"}],
             "iterations": 1,
@@ -76,7 +90,7 @@ class StatisticalHandler:
             if stats:
                 answer = llm.generate(STATISTICAL_PROMPT.format(query=query, stats=stats))
                 return {
-                    "answer": answer, "sources": [], "intent": "STATISTICAL",
+                    "answer": answer, "sources": [], "context": str(stats), "intent": "STATISTICAL",
                     "skill_log": [{"skill": "STATISTICAL_HANDLER"}],
                     "iterations": 1, "final_query": query,
                 }
@@ -103,7 +117,8 @@ class ListingHandler:
                 seen.add(cid)
 
         logger.info(f"  📋 LISTING: {len(all_docs)} chunks")
-        context = build_context(all_docs[:12], max_chars=6000)
+        # Mở khóa giới hạn ngữ cảnh cho ComparisonHandler
+        context = build_context(all_docs, max_chars=100000)
         answer = llm.generate(
             LISTING_PROMPT.format(query=query, context=context),
             system_prompt=GENERATION_SYSTEM_PROMPT,
@@ -113,6 +128,7 @@ class ListingHandler:
         return {
             "answer": answer,
             "sources": [fmt_source(d) for d in all_docs[:8]],
+            "context": context,
             "intent": "LISTING",
             "skill_log": [{"skill": "LISTING_HANDLER"}],
             "iterations": 1,
@@ -169,7 +185,8 @@ class ComparisonHandler:
 
         logger.info(f"  ⚖️  Total unique chunks: {len(all_docs)}")
 
-        context = build_context(all_docs[:10], max_chars=5000)
+        # Mở khóa giới hạn ngữ cảnh cho ProcessHandler
+        context = build_context(all_docs, max_chars=100000)
         answer = llm.generate(
             COMPARISON_PROMPT.format(query=query, context=context),
             system_prompt=GENERATION_SYSTEM_PROMPT,
@@ -179,6 +196,7 @@ class ComparisonHandler:
         return {
             "answer": answer,
             "sources": [fmt_source(d) for d in all_docs[:8]],
+            "context": context,
             "intent": "COMPARISON",
             "skill_log": [{"skill": "COMPARISON_HANDLER"}],
             "iterations": 1,

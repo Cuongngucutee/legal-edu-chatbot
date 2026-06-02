@@ -1,39 +1,6 @@
 [
     {
         "type": "Scenario-based",
-        "question": "Hội đồng quản trị của trường Đại học tư thục Y (hiện đang là cơ sở giáo dục đại học tư thục hoạt động không vì lợi nhuận) đang muốn thay đổi chiến lược. Họ ra quyết nghị chuyển đổi trường trở lại thành mô hình 'cơ sở giáo dục đại học tư thục' thông thường nhằm thu hút thêm vốn đầu tư từ các tập đoàn và có thể chia lợi tức cho các cổ đông. Quyết nghị này của Hội đồng quản trị có phù hợp với Luật Giáo dục Đại học không?",
-        "answer": "Quyết nghị này là hoàn toàn trái pháp luật. Căn cứ theo Khoản 2 Điều 7 Luật Giáo dục đại học 2012 (được sửa đổi, bổ sung bởi Khoản 4 Điều 1 Luật số 34/2018/QH14), quy định về việc chuyển đổi loại hình cơ sở giáo dục đại học chỉ cho phép một chiều: 'Chỉ chuyển đổi cơ sở giáo dục đại học tư thục sang cơ sở giáo dục đại học tư thục hoạt động không vì lợi nhuận'. Pháp luật nghiêm cấm quá trình chuyển đổi ngược lại (từ không vì lợi nhuận sang có vì lợi nhuận). Ngoài ra, phần lợi nhuận tích lũy của trường không vì lợi nhuận là tài sản chung hợp nhất không phân chia. Do đó, việc Hội đồng quản trị muốn chuyển đổi để chia lợi tức là vi phạm pháp luật.",
-        "citations": [
-            "Khoản 4, Điều 1, Luật số 34/2018/QH14 (sửa đổi Điều 7 Luật Giáo dục Đại học)"
-        ]
-    },
-    {
-        "type": "Multi-hop Reasoning",
-        "question": "Tôi là giáo viên mầm non công lập. Tôi đã được bổ nhiệm hạng III tính đến nay là tròn 4 năm. Theo tôi tìm hiểu trong Thông tư 01/2021/TT-BGDĐT thì yêu cầu phải làm việc 9 năm mới được thăng lên hạng II. Nhưng tôi nghe nói có văn bản sửa đổi mới đây. Vậy bằng việc kết nối các văn bản pháp luật, xin hỏi hiện tại tôi đã đủ điều kiện về thời gian giữ hạng để đăng ký dự thi thăng hạng lên giáo viên mầm non hạng II chưa?",
-        "answer": "Bằng việc tra cứu chéo giữa các văn bản, bạn hoàn toàn ĐÃ ĐỦ ĐIỀU KIỆN về mặt thời gian để dự thi thăng hạng. Cụ thể quá trình suy luận như sau:\n1. Đúng là trước đây, theo Điểm e Khoản 4 Điều 4 Thông tư 01/2021/TT-BGDĐT, để thăng hạng lên giáo viên mầm non hạng II, viên chức 'phải có thời gian giữ chức danh nghề nghiệp giáo viên mầm non hạng III... từ đủ 09 (chín) năm trở lên'.\n2. Tuy nhiên, quy định này đã bị bãi bỏ/sửa đổi bởi Thông tư 08/2023/TT-BGDĐT. Cụ thể, căn cứ theo Khoản 6 Điều 1 Thông tư 08/2023/TT-BGDĐT, tiêu chuẩn về thời gian đã được rút ngắn thành: 'phải có thời gian giữ chức danh nghề nghiệp giáo viên mầm non hạng III... từ đủ 03 (ba) năm trở lên (không kể thời gian tập sự)'.\nDo bạn đã có 4 năm công tác ở hạng III (vượt mức 3 năm theo luật mới sửa đổi), bạn đã đủ điều kiện về thâm niên để xét thăng hạng.",
-        "citations": [
-            "Điểm e, Khoản 4, Điều 4, Thông tư 01/2021/TT-BGDĐT",
-            "Khoản 6, Điều 1, Thông tư 08/2023/TT-BGDĐT"
-        ]
-    },
-    {
-        "type": "Temporal QA",
-        "question": "Cháu tôi đang học lớp 11 và sẽ tham gia thi tốt nghiệp THPT vào năm 2026. Cháu thuộc lứa học sinh học theo Chương trình giáo dục phổ thông 2018 mới. Liệu đến năm 2026, khi cháu thi, Bộ Giáo dục có còn duy trì song song 2 bộ đề thi (1 đề cho chương trình cũ 2006 và 1 đề cho chương trình mới 2018) để thí sinh tự chọn như năm 2025 không?",
-        "answer": "Đến năm 2026 sẽ KHÔNG CÒN duy trì song song 2 bộ đề thi để thí sinh tự chọn. Việc tổ chức thi song song 2 bộ đề (chương trình 2006 và chương trình 2018) chỉ là giải pháp chuyển tiếp dành riêng cho năm 2025. Cụ thể, căn cứ Khoản 3 Điều 2 Quy chế thi tốt nghiệp THPT (ban hành kèm theo Thông tư 24/2024/TT-BGDĐT), quy định nêu rõ mốc thời gian: 'Từ năm 2026, tổ chức Kỳ thi với 01 (một) loại đề thi duy nhất ra theo Chương trình giáo dục phổ thông năm 2018'. Vì vậy, khi cháu bạn thi vào năm 2026, toàn bộ kỳ thi sẽ chỉ áp dụng duy nhất 1 loại đề theo chương trình mới 2018.",
-        "citations": [
-            "Khoản 3, Điều 2, Thông tư 24/2024/TT-BGDĐT"
-        ]
-    },
-    {
-        "type": "Adversarial / Hallucination",
-        "question": "Theo sự kết hợp giữa tinh thần của Luật Viên chức và các nghị định ưu đãi nhân tài, Thông tư 01/2021/TT-BGDĐT có quy định: Sinh viên sư phạm mầm non mới ra trường, nếu có bằng Thạc sĩ Giáo dục mầm non tốt nghiệp loại xuất sắc ở nước ngoài thì sẽ được đặc cách bỏ qua hạng III và bổ nhiệm thẳng vào giáo viên mầm non hạng II để thu hút nhân tài. Điều kiện đặc cách này nằm ở Khoản mấy, Điều mấy của Thông tư?",
-        "answer": "Đây là thông tin hoàn toàn sai lệch và quy định đặc cách này KHÔNG TỒN TẠI. Pháp luật hiện hành nghiêm cấm việc dùng trình độ đào tạo vượt mức để bổ nhiệm vọt hạng đối với giáo viên mới trúng tuyển. Căn cứ Khoản 3 Điều 6 Thông tư 01/2021/TT-BGDĐT (quy định về Nguyên tắc bổ nhiệm), văn bản khẳng định rõ: 'Không căn cứ trình độ được đào tạo để bổ nhiệm vào hạng chức danh nghề nghiệp cao hơn hạng chức danh nghề nghiệp đã trúng tuyển đối với giáo viên mầm non mới được tuyển dụng'. Do đó, dù có bằng Thạc sĩ xuất sắc nước ngoài, giáo viên mới tuyển dụng vẫn bị ràng buộc bởi vị trí trúng tuyển và không được đặc cách lên thẳng hạng II.",
-        "citations": [
-            "Khoản 3, Điều 6, Thông tư 01/2021/TT-BGDĐT"
-        ]
-    },
-    {
-        "type": "Scenario-based",
         "question": "Tôi là giáo viên trung học phổ thông. Hiệu trưởng trường tôi vừa thông báo năm nay giáo viên chỉ được nghỉ hè 4 tuần, thời gian còn lại phải tham gia trực trường và làm các công việc hành chính do chưa có đủ nhân sự. Xin hỏi theo quy định pháp luật, thời gian nghỉ hè của giáo viên phổ thông là bao lâu và quyết định của hiệu trưởng có đúng không?",
         "answer": "Quyết định của Hiệu trưởng là không đúng quy định. Giáo viên cơ sở giáo dục phổ thông có thời gian nghỉ hè hằng năm là 08 tuần, bao gồm cả nghỉ phép hằng năm. Việc Hiệu trưởng tự ý rút ngắn thời gian nghỉ hè của giáo viên xuống còn 4 tuần trong điều kiện bình thường (không thuộc trường hợp đột xuất, khẩn cấp do thiên tai, dịch bệnh hoặc cấp bách theo quyết định của cấp có thẩm quyền) là vi phạm quyền lợi của nhà giáo. (Căn cứ: Điểm a và Điểm d, Khoản 1, Điều 3, Nghị định 84/2020/NĐ-CP).",
         "citations": [
@@ -368,6 +335,366 @@
         "answer": "Quy định phạt lãi suất cố định 15%/năm là thông tin bịa đặt và KHÔNG TỒN TẠI trong văn bản. Trường hợp sinh viên hoặc gia đình chậm thực hiện nghĩa vụ bồi hoàn quá thời hạn, pháp luật quy định phải chịu lãi suất tối đa áp dụng đối với tiền gửi không kỳ hạn do Ngân hàng Nhà nước Việt Nam quy định. Nếu Ngân hàng Nhà nước không quy định thì mới áp dụng lãi suất tiền gửi không kỳ hạn của Ngân hàng Thương mại cổ phần Công thương Việt Nam (Vietinbank) tại thời điểm bồi hoàn (Căn cứ: Khoản 3, Điều 9, Nghị định 116/2020/NĐ-CP).",
         "citations": [
             "Khoản 3, Điều 9, Nghị định 116/2020/NĐ-CP"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Học sinh tiểu học tại các cơ sở giáo dục công lập có phải đóng học phí không theo Luật Giáo dục 2019?",
+        "answer": "Học sinh tiểu học trong cơ sở giáo dục công lập không phải đóng học phí.",
+        "citations": [
+            "Điều 99, Luật_43_2019_QH14"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Theo Luật Giáo dục 2019, trẻ em bao nhiêu tuổi thì được vào học lớp 1?",
+        "answer": "Tuổi của trẻ em vào học lớp một là 06 tuổi và được tính theo năm.",
+        "citations": [
+            "Điều 33, Luật_43_2019_QH14"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Cơ quan, chức danh nào có thẩm quyền ban hành chương trình giáo dục phổ thông?",
+        "answer": "Bộ trưởng Bộ Giáo dục và Đào tạo ban hành chương trình giáo dục phổ thông.",
+        "citations": [
+            "Điều 31, Luật_43_2019_QH14"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Hệ thống giáo dục quốc dân theo quy định mới nhất bao gồm những cấp học và trình độ đào tạo nào?",
+        "answer": "Bao gồm giáo dục mầm non, giáo dục phổ thông, giáo dục nghề nghiệp và giáo dục đại học.",
+        "citations": [
+            "Điều 6, Luật_43_2019_QH14"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Những hành vi nào bị nghiêm cấm trong cơ sở giáo dục theo Luật Giáo dục 2019?",
+        "answer": "Bao gồm: xúc phạm nhân phẩm, bạo lực; xuyên tạc nội dung; gian lận; hút thuốc, uống rượu bia; ép buộc học thêm để thu tiền; lợi dụng tài trợ để ép đóng góp.",
+        "citations": [
+            "Điều 22, Luật_43_2019_QH14"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Nhiệm kỳ của Hiệu trưởng trường đại học tối đa là bao nhiêu năm theo Luật Giáo dục đại học 2012?",
+        "answer": "Nhiệm kỳ của hiệu trưởng trường đại học là 05 năm.",
+        "citations": [
+            "Điều 20, Luật_08_2012_QH13"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Cơ sở giáo dục đại học ở Việt Nam bao gồm những loại hình nào theo quy định ban đầu của Luật 08/2012/QH13?",
+        "answer": "Bao gồm trường đại học, học viện; đại học vùng, đại học quốc gia; và viện nghiên cứu khoa học được phép đào tạo tiến sĩ.",
+        "citations": [
+            "Điều 7, Luật_08_2012_QH13"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Ngày Pháp luật nước Cộng hòa xã hội chủ nghĩa Việt Nam được tổ chức vào ngày nào hàng năm?",
+        "answer": "Đó là Ngày 09 tháng 11 hàng năm.",
+        "citations": [
+            "Điều 8, Luật_14_2012_QH13"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Nội dung phổ biến, giáo dục pháp luật trong nhà trường có phải là nội dung giáo dục chính khóa không?",
+        "answer": "Phổ biến, giáo dục pháp luật trong nhà trường được lồng ghép vào giáo dục chính khóa và hoạt động ngoại khóa.",
+        "citations": [
+            "Điều 17, Luật_14_2012_QH13"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Môn học giáo dục quốc phòng và an ninh được áp dụng là môn học chính khóa bắt đầu từ cấp học nào?",
+        "answer": "Là môn học chính khóa từ cấp trung học phổ thông (THPT) trở lên.",
+        "citations": [
+            "Điều 11, Luật_30_2013_QH13"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Trung tâm giáo dục quốc phòng và an ninh được lập ra với chức năng chính là gì?",
+        "answer": "Chức năng chính là tổ chức dạy, học giáo dục quốc phòng và an ninh; bồi dưỡng kiến thức quốc phòng và an ninh.",
+        "citations": [
+            "Điều 16, Luật_30_2013_QH13"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Luật Giáo dục nghề nghiệp quy định các trình độ đào tạo nào?",
+        "answer": "Bao gồm trình độ sơ cấp, trình độ trung cấp và trình độ cao đẳng.",
+        "citations": [
+            "Điều 3, Luật_74_2014_QH1"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Người có bằng tốt nghiệp trung học cơ sở nếu học tiếp lên trình độ trung cấp thì thời gian đào tạo là bao lâu?",
+        "answer": "Thời gian đào tạo là từ 01 đến 02 năm học tùy theo chuyên ngành.",
+        "citations": [
+            "Điều 33, Luật_74_2014_QH13"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Sinh viên tốt nghiệp trình độ cao đẳng giáo dục nghề nghiệp được cấp danh hiệu gì?",
+        "answer": "Được công nhận danh hiệu Cử nhân thực hành hoặc Kỹ sư thực hành.",
+        "citations": [
+            "Điều 38, Luật_74_2014_QH13"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Theo Luật sửa đổi Giáo dục đại học 2018, trình độ chuẩn tối thiểu của chức danh giảng viên giảng dạy trình độ đại học là gì?",
+        "answer": "Trình độ chuẩn tối thiểu của giảng viên giảng dạy đại học là thạc sĩ (trừ chức danh trợ giảng).",
+        "citations": [
+            "Khoản 24 Điều 1 (sửa đổi Điều 54), Luật_34_2018_QH14"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Chức danh Chủ tịch Hội đồng trường của trường đại học công lập do cơ quan nào quyết định công nhận?",
+        "answer": "Do cơ quan quản lý có thẩm quyền ra quyết định công nhận.",
+        "citations": [
+            "Khoản 10 Điều 1 (sửa đổi Điều 16), Luật_34_2018_QH14"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Tiền lương của nhà giáo được ưu tiên sắp xếp như thế nào trong thang bậc lương theo quy định của Luật Nhà giáo 2025?",
+        "answer": "Tiền lương của nhà giáo được ưu tiên xếp cao nhất trong hệ thống thang bậc lương hành chính sự nghiệp.",
+        "citations": [
+            "Điều 23, Luật_73_2025_QH15"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Theo Luật số 73/2025/QH15, quy định về thời gian làm việc, thời gian nghỉ hè hằng năm và chế độ làm việc của nhà giáo được nêu như thế nào?",
+        "answer": "Được bố trí phù hợp đối với nhà giáo từng cấp học, trình độ đào tạo và do Bộ trưởng Bộ Giáo dục và Đào tạo quy định chi tiết.",
+        "citations": [
+            "Điều 16, Luật_73_2025_QH15"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Việc sửa đổi, bổ sung một số điều của Luật Giáo dục được quy định tại điều mấy của Luật số 123/2025/QH15?",
+        "answer": "Được quy định tại Điều 1 của Luật số 123/2025/QH15.",
+        "citations": [
+            "Điều 1, Luật_123_2025_QH15"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Luật số 123/2025/QH15 tập trung vào việc sửa đổi, bổ sung cho văn bản luật nào trong hệ thống giáo dục quốc dân?",
+        "answer": "Tập trung sửa đổi, bổ sung một số điều của Luật Giáo dục.",
+        "citations": [
+            "Điều 1, Luật_123_2025_QH15"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Thành phần Phó Trưởng ban tổ chức Cuộc thi khoa học kỹ thuật cấp quốc gia dành cho học sinh trung học bao gồm những ai?",
+        "answer": "Gồm Lãnh đạo Vụ Giáo dục Phổ thông, Lãnh đạo một số đơn vị thuộc Bộ và lãnh đạo tỉnh, thành phố nơi đăng cai tổ chức.",
+        "citations": [
+            "Điều 1 (sửa đổi Điều 7), Thông tư 24/2025/TT-BGDĐT"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Cơ quan, cá nhân nào có thẩm quyền quyết định sáp nhập, chia, tách trường tiểu học?",
+        "answer": "Chủ tịch Ủy ban nhân dân cấp huyện có thẩm quyền quyết định.",
+        "citations": [
+            "Điều 19, Nghị định 07/BGDĐT-VBHN"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Đề án sáp nhập, chia, tách trường tiểu học yêu cầu phải có phương án bảo đảm quyền lợi cho những đối tượng nào?",
+        "answer": "Bảo đảm quyền, lợi ích hợp pháp của học sinh, giáo viên, cán bộ quản lý và nhân viên.",
+        "citations": [
+            "Điều 19, Nghị định 07/BGDĐT-VBHN"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Thông tư 20/2022/TT-BGDĐT quy định về tổ chức và hoạt động của loại hình trung tâm nào?",
+        "answer": "Quy định về Trung tâm hỗ trợ phát triển giáo dục hòa nhập.",
+        "citations": [
+            "Điều 1, Thông tư 20/2022/TT-BGDĐT"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Ngoài các trường phổ thông dân tộc nội trú, những trường đặc thù nào khác được áp dụng quy chế này để thực hiện nhiệm vụ giáo dục học sinh dân tộc nội trú?",
+        "answer": "Gồm Trường Hữu Nghị 80, Trường Hữu Nghị T78 và Trường Phổ thông Vùng cao Việt Bắc.",
+        "citations": [
+            "Điều 1, Thông tư 04/2023/TT-BGDĐT"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Hồ sơ đề nghị khen thưởng đột xuất cần được gửi lên cấp có thẩm quyền vào thời điểm nào?",
+        "answer": "Gửi ngay sau khi tập thể, cá nhân lập được thành tích.",
+        "citations": [
+            "Điều 9, Thông tư 22/2018/TT-BGDĐT"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Đối với đơn vị xét thi đua theo năm học, thời hạn nộp hồ sơ đề nghị công nhận danh hiệu thi đua cấp Bộ là khi nào?",
+        "answer": "Gửi về Bộ Giáo dục và Đào tạo trước ngày 30 tháng 8 hàng năm.",
+        "citations": [
+            "Điều 9, Thông tư 22/2018/TT-BGDĐT"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Cơ sở giáo dục được thành lập ở nước ngoài muốn liên kết giáo dục tại Việt Nam thì cần có thời gian hoạt động tối thiểu bao nhiêu năm?",
+        "answer": "Cần có thời gian hoạt động ít nhất 05 năm ở nước ngoài tính đến ngày nộp hồ sơ.",
+        "citations": [
+            "Điều 6, Nghị định 124/2024/NĐ-CP"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Chương trình giáo dục tích hợp trong liên kết giáo dục phải bảo đảm nguyên tắc gì để tránh gây áp lực cho học sinh?",
+        "answer": "Không bắt buộc người học học lại cùng một nội dung, bảo đảm tính tự nguyện tham gia và không gây quá tải cho học sinh.",
+        "citations": [
+            "Điều 6 (Sửa đổi Điều 7), Nghị định 124/2024/NĐ-CP"
+        ]
+    },
+    {
+        "type": "Retrieval",
+        "question": "Nhà nước có khuyến khích cá nhân đầu tư cơ sở vật chất cho Trung tâm hỗ trợ phát triển giáo dục hòa nhập không?",
+        "answer": "Có, pháp luật khuyến khích các tổ chức và cá nhân đầu tư cơ sở vật chất, thiết bị dạy học.",
+        "citations": [
+            "Điều 30, Thông tư 20/2022/TT-BGDĐT"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Hệ thống giáo dục quốc dân bao gồm các cấp học và trình độ đào tạo nào được quy định tại Điều mấy của Luật số 43/2019/QH14?",
+        "answer": "Điều 6 Luật số 43/2019/QH14.",
+        "citations": [
+            "Điều 6, Luật_43_2019_QH14"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Các hành vi bị nghiêm cấm trong cơ sở giáo dục được liệt kê chi tiết tại Điều khoản nào của Luật số 43/2019/QH14?",
+        "answer": "Điều 22 Luật số 43/2019/QH14.",
+        "citations": [
+            "Điều 22, Luật_43_2019_QH14"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Quy định về việc học sinh tiểu học trường công lập không phải đóng học phí nằm ở Điều nào của Luật số 43/2019/QH14?",
+        "answer": "Quy định tại Điều 99 Luật số 43/2019/QH14.",
+        "citations": [
+            "Điều 99, Luật_43_2019_QH14"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Nhiệm kỳ của Hiệu trưởng trường đại học được ấn định là 05 năm tại Điều khoản nào của Luật số 08/2012/QH13?",
+        "answer": "Điều 20 Luật số 08/2012/QH13.",
+        "citations": [
+            "Điều 20, Luật_08_2012_QH13"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Trình độ chuẩn tối thiểu của chức danh giảng viên giảng dạy đại học là thạc sĩ được quy định sửa đổi tại khoản nào, Điều nào của Luật số 34/2018/QH14?",
+        "answer": "Khoản 24 Điều 1 Luật số 34/2018/QH14.",
+        "citations": [
+            "Khoản 24 Điều 1, Luật_34_2018_QH14"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Trong Luật số 74/2014/QH13, các trình độ đào tạo (sơ cấp, trung cấp, cao đẳng) được quy định tại Điều mấy?",
+        "answer": "Điều 3 Luật số 74/2014/QH13.",
+        "citations": [
+            "Điều 3, Luật_74_2014_QH13"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Chính sách ưu tiên xếp tiền lương của nhà giáo cao nhất trong hệ thống thang bậc lương hành chính sự nghiệp được quy định tại Điều nào của Luật số 73/2025/QH15?",
+        "answer": "Điều 23 Luật số 73/2025/QH15.",
+        "citations": [
+            "Điều 23, Luật_73_2025_QH15"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Quy định về thời gian làm việc, thời gian nghỉ hè hằng năm và chế độ làm việc của nhà giáo nằm ở Điều nào của Luật số 73/2025/QH15?",
+        "answer": "Điều 16 Luật số 73/2025/QH15.",
+        "citations": [
+            "Điều 16, Luật_73_2025_QH15"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Ngày 09 tháng 11 hàng năm là Ngày Pháp luật Việt Nam được quy định tại Điều mấy của Luật số 14/2012/QH13?",
+        "answer": "Điều 8 Luật số 14/2012/QH13.",
+        "citations": [
+            "Điều 8, Luật_14_2012_QH13"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Môn học giáo dục quốc phòng và an ninh là môn học chính khóa từ cấp trung học phổ thông được quy định ở Điều nào của Luật số 30/2013/QH13?",
+        "answer": "Điều 11 Luật số 30/2013/QH13.",
+        "citations": [
+            "Điều 11, Luật_30_2013_QH13"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Việc sáp nhập, chia, tách trường tiểu học thuộc thẩm quyền quyết định của Chủ tịch UBND cấp huyện được quy định tại Điều khoản nào của Nghị định 07/BGDĐT-VBHN?",
+        "answer": "Điều 19 Nghị định 07/BGDĐT-VBHN.",
+        "citations": [
+            "Điều 19, Nghị định 07/BGDĐT-VBHN"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Thời điểm nhận hồ sơ đề nghị công nhận danh hiệu thi đua cấp Bộ (trước ngày 30/8 hàng năm) được căn cứ vào Điều mấy của Thông tư 22/2018/TT-BGDĐT?",
+        "answer": "Quy định tại Điều 9 Thông tư 22/2018/TT-BGDĐT.",
+        "citations": [
+            "Điều 9, Thông tư 22/2018/TT-BGDĐT"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Điều kiện về thời gian hoạt động ít nhất 05 năm ở nước ngoài đối với cơ sở liên kết giáo dục được quy định tại Điều nào của Nghị định 124/2024/NĐ-CP?",
+        "answer": "Nằm tại Điều 6 Nghị định 124/2024/NĐ-CP.",
+        "citations": [
+            "Điều 6, Nghị định 124/2024/NĐ-CP"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Văn bản nào quy định cụ thể việc giảm 02 tiết dạy/tuần đối với giáo viên kiêm nhiệm chức danh chủ tịch hội đồng trường?",
+        "answer": "Điều 10 Thông tư 05/2025/TT-BGDĐT.",
+        "citations": [
+            "Điều 10, Thông tư 05/2025/TT-BGDĐT"
+        ]
+    },
+    {
+        "type": "Citation",
+        "question": "Phạm vi điều chỉnh về tổ chức và hoạt động của Trung tâm hỗ trợ phát triển giáo dục hòa nhập nằm ở Điều số mấy của Thông tư 20/2022/TT-BGDĐT?",
+        "answer": "Điều 1 Thông tư 20/2022/TT-BGDĐT.",
+        "citations": [
+            "Điều 1, Thông tư 20/2022/TT-BGDĐT"
         ]
     }
 ]

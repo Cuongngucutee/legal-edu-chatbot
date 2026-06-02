@@ -4,7 +4,7 @@ Uses the known timings from the last full pipeline eval run.
 """
 
 # Data collected from the console output of the full pipeline eval
-# Format: (qid, stage0_retrieval, stage1_7b, stage2_320b, stage3_gen, total)
+# Format: (qid, stage0_retrieval, stage1_7b, stage2_pro_llm, stage3_gen, total)
 timing_data = [
     # qid,    retrieval,  7B_select, 320B_scan,  7B_gen,  total
     ("Q01",    8.0,       20.8,      47.8,       23.9,    92.4),
@@ -27,7 +27,7 @@ print("=" * 90)
 print(f"{'QID':<6} {'Retrieval':>10} {'7B Select':>10} {'320B Scan':>10} {'7B Gen':>10} {'TOTAL':>10} {'Bottleneck':>12}")
 print("-" * 90)
 
-stage_totals = {"retrieval": 0, "s1_7b": 0, "s2_320b": 0, "s3_gen": 0}
+stage_totals = {"retrieval": 0, "s1_7b": 0, "s2_pro_llm": 0, "s3_gen": 0}
 for qid, ret, s1, s2, gen, total in timing_data:
     stages = {"Retrieval": ret, "7B Select": s1, "320B Scan": s2, "7B Gen": gen}
     bottleneck = max(stages, key=stages.get)
@@ -35,13 +35,13 @@ for qid, ret, s1, s2, gen, total in timing_data:
     print(f"  {qid:<4} {ret:>8.1f}s {s1:>8.1f}s {s2:>8.1f}s{retry} {gen:>8.1f}s {total:>8.1f}s  → {bottleneck}")
     stage_totals["retrieval"] += ret
     stage_totals["s1_7b"] += s1
-    stage_totals["s2_320b"] += s2
+    stage_totals["s2_pro_llm"] += s2
     stage_totals["s3_gen"] += gen
 
 n = len(timing_data)
 total_all = sum(t[5] for t in timing_data)
 print("-" * 90)
-print(f"  {'AVG':<4} {stage_totals['retrieval']/n:>8.1f}s {stage_totals['s1_7b']/n:>8.1f}s {stage_totals['s2_320b']/n:>8.1f}s  {stage_totals['s3_gen']/n:>8.1f}s {total_all/n:>8.1f}s")
+print(f"  {'AVG':<4} {stage_totals['retrieval']/n:>8.1f}s {stage_totals['s1_7b']/n:>8.1f}s {stage_totals['s2_pro_llm']/n:>8.1f}s  {stage_totals['s3_gen']/n:>8.1f}s {total_all/n:>8.1f}s")
 
 print(f"\n{'=' * 90}")
 print("📊 PHÂN BỐ THỜI GIAN TRUNG BÌNH")
@@ -49,7 +49,7 @@ print("=" * 90)
 
 avg_ret = stage_totals['retrieval'] / n
 avg_s1 = stage_totals['s1_7b'] / n
-avg_s2 = stage_totals['s2_320b'] / n
+avg_s2 = stage_totals['s2_pro_llm'] / n
 avg_gen = stage_totals['s3_gen'] / n
 avg_total = avg_ret + avg_s1 + avg_s2 + avg_gen
 
@@ -81,7 +81,7 @@ print(f"\n{'=' * 90}")
 print("💡 NHẬN ĐỊNH")
 print("=" * 90)
 print("""
-  🔴 BOTTLENECK #1: Stage 2 (320B API) chiếm 48.5% thời gian
+  🔴 BOTTLENECK #1: Stage 2 (Pro LLM API) chiếm 48.5% thời gian
      - Gọi API 320B qua mạng, latency phụ thuộc server
      - Retry (khi <2 articles) thêm 30-40s mỗi lần
      - 4/12 câu bị retry → tăng thời gian đáng kể

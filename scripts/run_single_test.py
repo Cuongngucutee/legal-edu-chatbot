@@ -16,12 +16,12 @@ index = BookIndex(data_dir=os.path.join(PROJECT_ROOT, "data/final"), kg_path=os.
 index.load_index()
 retriever = BookRAGRetriever(index)
 
-llm_320b = LLMClient(
+pro_llm = LLMClient(
     api_base=os.getenv("LLM_API_BASE"),
     api_key=os.getenv("LLM_API_KEY"),
     model=os.getenv("LLM_MODEL_NAME"),
 )
-pipeline = LawEduPipeline(retriever=retriever, agentic_llm=llm_320b, generator_llm=llm_320b)
+pipeline = LawEduPipeline(retriever=retriever, agentic_llm=pro_llm, generator_llm=pro_llm)
 
 # Benchmark cases to evaluate (1-indexed QIDs)
 target_qids = [1, 2, 4, 14, 15, 17, 19, 20, 24]

@@ -2,7 +2,7 @@
 Education Benchmark v5 — New 320B Pipeline
 =====================================================
 Chạy CÙNG bộ 12 câu hỏi từ education_benchmark_v2.json
-trên pipeline mới (app.main.PIPELINE) với 320B API.
+trên pipeline mới (app.main.PIPELINE) với Pro LLM API.
 """
 import os
 import sys
@@ -125,7 +125,7 @@ def run_benchmark():
     import app.main
     pipeline = app.main.PIPELINE
     
-    # We will use the same 320B API for grading
+    # We will use the same Pro LLM API for grading
     llm_judge = pipeline.llm
 
     all_results = []
@@ -167,7 +167,7 @@ def run_benchmark():
                 reference_answer=gt.get("reference_answer", "N/A"),
                 keywords=keywords_str,
                 answer=answer[:1500],
-            ), temperature=0.1)
+            ), temperature=0.0)
             
             match = re.search(r'\{[^}]+\}', jr, re.DOTALL)
             if match:

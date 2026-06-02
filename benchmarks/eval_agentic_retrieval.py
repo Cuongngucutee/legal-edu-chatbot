@@ -45,7 +45,7 @@ llm_7b = LLMClient(
     model=os.getenv("GENERATOR_MODEL", "qwen2.5:7b"),
 )
 
-llm_320b = LLMClient(
+pro_llm = LLMClient(
     api_base=os.getenv("LLM_API_BASE"),
     api_key=os.getenv("LLM_API_KEY"),
     model=os.getenv("LLM_MODEL", "glm-4.7"),
@@ -194,7 +194,7 @@ Chỉ xuất mảng JSON. Ví dụ: ["02/2021/TT-BGDĐT", "13/2024/TT-BGDĐT"]""
     stage2_articles = []
     final_node_ids = set()
 
-    def parse_320b(response_text):
+    def parse_pro_llm(response_text):
         """Parse 320B response into (node_ids, articles)."""
         nids = set()
         arts = []
@@ -230,7 +230,7 @@ Chỉ xuất mảng JSON. Ví dụ: ["02/2021/TT-BGDĐT", "13/2024/TT-BGDĐT"]""
         toc_text = "\n\n".join(toc_parts)
 
         # Attempt 1: Standard prompt
-        prompt_320b = f"""Câu hỏi: "{question}"
+        pro_prompt = f"""Câu hỏi: "{question}"
 
 Mục lục các văn bản:
 {toc_text}
@@ -240,8 +240,8 @@ Trả về JSON: [{{"so_hieu": "...", "dieu": <số>}}]
 Chỉ xuất mảng JSON, không giải thích."""
         
         try:
-            res_320b = llm_320b.generate(prompt_320b, temperature=0.1)
-            final_node_ids, stage2_articles = parse_320b(res_320b)
+            pro_res = pro_llm.generate(pro_prompt, temperature=0.1)
+            final_node_ids, stage2_articles = parse_pro_llm(pro_res)
         except Exception as e:
             print(f"   ⚠️ 320B attempt 1 error: {e}")
 
@@ -257,8 +257,8 @@ Chọn ÍT NHẤT 2 điều khoản.
 Trả về JSON: [{{"so_hieu": "...", "dieu": <số>}}]
 Chỉ xuất mảng JSON, không giải thích."""
             try:
-                res_retry = llm_320b.generate(retry_prompt, temperature=0.2)
-                retry_nodes, retry_arts = parse_320b(res_retry)
+                res_retry = pro_llm.generate(retry_prompt, temperature=0.2)
+                retry_nodes, retry_arts = parse_pro_llm(res_retry)
                 if len(retry_nodes) > len(final_node_ids):
                     final_node_ids = retry_nodes
                     stage2_articles = retry_arts
@@ -285,8 +285,8 @@ Chọn ÍT NHẤT 2 điều khoản.
 Trả về JSON: [{{"so_hieu": "...", "dieu": <số>}}]
 Chỉ xuất mảng JSON, không giải thích."""
                 try:
-                    res_expand = llm_320b.generate(expand_prompt, temperature=0.2)
-                    expand_nodes, expand_arts = parse_320b(res_expand)
+                    res_expand = pro_llm.generate(expand_prompt, temperature=0.2)
+                    expand_nodes, expand_arts = parse_pro_llm(res_expand)
                     if expand_nodes:
                         final_node_ids = expand_nodes
                         stage2_articles = expand_arts

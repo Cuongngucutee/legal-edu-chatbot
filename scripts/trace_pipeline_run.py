@@ -66,12 +66,12 @@ index = BookIndex(data_dir=os.path.join(PROJECT_ROOT, "data/final"), kg_path=os.
 index.load_index()
 retriever = BookRAGRetriever(index)
 
-llm_320b = LLMClient(
+pro_llm = LLMClient(
     api_base=os.getenv("LLM_API_BASE"),
     api_key=os.getenv("LLM_API_KEY"),
     model=os.getenv("LLM_MODEL_NAME"),
 )
-pipeline = LawEduPipeline(retriever=retriever, agentic_llm=llm_320b, generator_llm=llm_320b)
+pipeline = LawEduPipeline(retriever=retriever, agentic_llm=pro_llm, generator_llm=pro_llm)
 
 # Select Q1 as the perfect complex scenario to trace
 BENCHMARK_PATH = os.path.join(PROJECT_ROOT, "benmark.json")
@@ -88,7 +88,7 @@ t_total_start = time.time()
 # ── 1. PHÂN LOẠI Ý ĐỊNH (INTENT CLASSIFICATION) ──
 print("🏷️  Chặng 1: Phân loại ý định...")
 t_start = time.time()
-intent = classify_intent(query, llm_320b)
+intent = classify_intent(query, pro_llm)
 t_end = time.time()
 latency = t_end - t_start
 trace_steps.append({
@@ -121,7 +121,7 @@ hyde_prompt = (
     f"Câu hỏi: {query}\n\n"
     "Quy định pháp luật giả định:"
 )
-hyde_doc = llm_320b.generate(hyde_prompt, temperature=0.3).strip()
+hyde_doc = pro_llm.generate(hyde_prompt, temperature=0.3).strip()
 hyde_docs = retriever.retrieve_as_docs(hyde_doc, top_k=8)
 if hyde_docs:
     all_ranked.append(hyde_docs)
@@ -228,7 +228,7 @@ context_text = "\n".join([
     for d in docs[:7]
 ])
 
-prompt_320b = f"""Bạn là một chuyên gia cao cấp về pháp luật giáo dục Việt Nam. Hãy đọc kỹ MỤC LỤC CHI TIẾT (bao gồm nội dung tóm tắt của từng Điều) và chọn các Điều khoản cần thiết để trả lời câu hỏi.
+pro_prompt = f"""Bạn là một chuyên gia cao cấp về pháp luật giáo dục Việt Nam. Hãy đọc kỹ MỤC LỤC CHI TIẾT (bao gồm nội dung tóm tắt của từng Điều) và chọn các Điều khoản cần thiết để trả lời câu hỏi.
 
 Câu hỏi: \"{query}\"
 
@@ -274,17 +274,17 @@ Nhiệm vụ:
 ]
 </selected_clauses>"""
 
-res_320b = llm_320b.generate(prompt_320b, temperature=0.1)
-final_node_ids, stage2_articles = pipeline._parse_320b(res_320b, unique_docs)
+pro_res = pro_llm.generate(pro_prompt, temperature=0.1)
+final_node_ids, stage2_articles = pipeline._parse_pro(pro_res, unique_docs)
 
 t_end = time.time()
 latency = t_end - t_start
 trace_steps.append({
     "stage": "Chặng 6: Trích xuất Điều khoản chính xác bằng LLM (Stage 2 CoT Selection)",
-    "description": "Gửi mục lục chi tiết và các trích đoạn tham khảo đến mô hình LLM 320B để thực hiện suy luận chuỗi lập luận (Chain-of-Thought) để chọn ra chính xác các số Điều chứa câu trả lời.",
+    "description": "Gửi mục lục chi tiết và các trích đoạn tham khảo đến mô hình Pro LLM để thực hiện suy luận chuỗi lập luận (Chain-of-Thought) để chọn ra chính xác các số Điều chứa câu trả lời.",
     "latency": latency,
-    "input": f"Kích thước Prompt gửi đến LLM (ký tự): {len(prompt_320b)}",
-    "output": f"Câu trả lời CoT của LLM: \"{res_320b.strip()}\"\nCác Điều khoản phân tích được: {stage2_articles}"
+    "input": f"Kích thước Prompt gửi đến LLM (ký tự): {len(pro_prompt)}",
+    "output": f"Câu trả lời CoT của LLM: \"{pro_res.strip()}\"\nCác Điều khoản phân tích được: {stage2_articles}"
 })
 
 # ── 7. LIÊN KẾT THAM CHIẾU PHÁP LÝ ĐỘNG (DYNAMIC LEGAL RESOLVER) ──
@@ -324,20 +324,20 @@ if not final_docs:
 else:
     final_docs = final_docs[:8]
     
-context = build_context(final_docs, max_chars=16000)
+context = build_context(final_docs, max_chars=100000)
 generation_input_prompt = GENERATION_PROMPT.format(query=query, context=context)
 
-answer = llm_320b.generate(
+answer = pro_llm.generate(
     generation_input_prompt,
     system_prompt=GENERATION_SYSTEM_PROMPT,
-    temperature=0.1,
+    temperature=0.0,
 ).strip()
 
 t_end = time.time()
 latency = t_end - t_start
 trace_steps.append({
     "stage": "Chặng 8: Sinh câu trả lời RAG lần một (Stage 3 Generation)",
-    "description": "Xây dựng context hoàn chỉnh lên tới tối đa 16000 ký tự chứa toàn bộ nội dung chi tiết của các Điều khoản đã chọn lọc và truyền vào LLM 320B để sinh ra câu trả lời chi tiết kèm trích dẫn.",
+    "description": "Xây dựng context hoàn chỉnh lên tới tối đa 16000 ký tự chứa toàn bộ nội dung chi tiết của các Điều khoản đã chọn lọc và truyền vào Pro LLM để sinh ra câu trả lời chi tiết kèm trích dẫn.",
     "latency": latency,
     "input": f"Kích thước Context (ký tự): {len(context)}\nKích thước Prompt gửi đến LLM (ký tự): {len(generation_input_prompt)}",
     "output": f"Câu trả lời thô của LLM: \"{answer}\""
@@ -371,10 +371,10 @@ Câu trả lời hiện tại:
 Yêu cầu bắt buộc: Hiệu chỉnh lại câu trả lời trên để tích hợp trực tiếp và tự nhiên các trích dẫn Điều khoản pháp lý cụ thể sau đây: {stage2_articles}.
 Vui lòng viết lại câu trả lời, đảm bảo giữ nguyên tính chính xác, ngắn gọn, và chèn các số Điều đã chọn một cách chính xác nhất."""
 
-    reflected_answer_raw = llm_320b.generate(
+    reflected_answer_raw = pro_llm.generate(
         reflection_prompt,
         system_prompt="Bạn là chuyên gia hiệu chỉnh pháp lý chính xác và chuyên nghiệp.",
-        temperature=0.1,
+        temperature=0.0,
     ).strip()
     if reflected_answer_raw and not reflected_answer_raw.startswith("[LLM Error"):
         answer = reflected_answer_raw

@@ -30,13 +30,13 @@ index = BookIndex(data_dir=data_dir, kg_path=kg_path)
 index.load_index()
 retriever = BookRAGRetriever(index)
 
-llm_320b = LLMClient(
+pro_llm = LLMClient(
     api_base=os.getenv("LLM_API_BASE", "https://api.int2.net/v1"),
     api_key=os.getenv("LLM_API_KEY", ""),
     model=os.getenv("LLM_MODEL_NAME", "glm-4.7"),
 )
 
-pipeline = LawEduPipeline(retriever=retriever, agentic_llm=llm_320b, generator_llm=llm_320b)
+pipeline = LawEduPipeline(retriever=retriever, agentic_llm=pro_llm, generator_llm=pro_llm)
 
 # ── Parsing Helpers ──
 def parse_citation(citation_str: str):
@@ -77,7 +77,7 @@ print(f"📋 BẮT ĐẦU CHẤM FULL PIPELINE 44 CÂU HỎI BENCHMARK")
 print(f"================================================================================")
 
 for idx, test_case in enumerate(benchmark):
-    time.sleep(4)  # Pacing delay to guarantee 100% stable API rate limit tolerance
+    time.sleep(0.1)  # Đã nâng cấp API lên 250k TPM / 500k RPD nên không cần pacing
     qid = idx + 1
     question = test_case["question"]
     q_type = test_case.get("type", "Unknown")

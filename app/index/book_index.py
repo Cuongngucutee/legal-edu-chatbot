@@ -117,8 +117,19 @@ class BookIndex:
             print(f"Data dir {self.data_dir} does not exist. Skipping augmentation.")
             return
             
+        doc_titles = {}
+        doc_titles_path = self.data_dir / "doc_titles.json"
+        if doc_titles_path.exists():
+            try:
+                with open(doc_titles_path, 'r', encoding='utf-8') as f:
+                    doc_titles = json.load(f)
+            except Exception as e:
+                print(f"Error loading doc_titles: {e}")
+            
         json_files = list(self.data_dir.glob("*.json"))
         for file_path in json_files:
+            if file_path.name == "doc_titles.json":
+                continue
             try:
                 with open(file_path, 'r', encoding='utf-8') as f:
                     chunks = json.load(f)
@@ -129,6 +140,9 @@ class BookIndex:
                     content = chunk.get("content", {})
                     
                     doc_source = meta.get("source", file_path.stem)
+                    doc_so_hieu = meta.get("so_hieu", "")
+                    doc_full_title = doc_titles.get(doc_so_hieu) or doc_source
+                    
                     doc_slug = self._slug(doc_source)
                     doc_id = f"doc:{doc_slug}"
                     
@@ -147,7 +161,7 @@ class BookIndex:
                     
                     # Ensure Document Node has title
                     if doc_id in self.graph.nodes:
-                        self.graph.nodes[doc_id]['search_text'] = self.graph.nodes[doc_id].get('name', doc_source)
+                        self.graph.nodes[doc_id]['search_text'] = doc_full_title
 
                     # Augment Article node with full_text and Tree parents
                     # Tạo node mới nếu chưa tồn tại (quan trọng: KG chỉ có ent: nodes)
@@ -156,9 +170,13 @@ class BookIndex:
                         self.graph.add_node(article_id, type="Article", name=article_name)
                     
                     self.graph.nodes[article_id]['full_text'] = full_text
+                    
+                    # Lưu lại tên đầy đủ của văn bản để Reranker có thể dùng
+                    self.graph.nodes[article_id]['doc_title'] = doc_full_title
+                    
                     # Gắn search_text để FAISS embed trực tiếp nội dung Điều khoản
-                    # Truncate 512 chars (đủ chứa tiêu đề + nội dung chính)
-                    self.graph.nodes[article_id]['search_text'] = full_text[:512]
+                    # Ghép tên đầy đủ của văn bản vào nội dung để FAISS hiểu ngữ cảnh
+                    self.graph.nodes[article_id]['search_text'] = f"{doc_full_title} - {full_text[:512]}"
                     
                     # Link article → document
                     if doc_id in self.graph.nodes:

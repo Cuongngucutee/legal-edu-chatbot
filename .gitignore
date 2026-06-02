@@ -27,7 +27,7 @@ scratch/
 scratch.py
 
 # Outputs - runtime artifacts (regenerated on demand)
-outputs/knowledge_graph/index_cache/
+outputs/knowledge_graph/index_cache
 outputs/offline_eval_log.jsonl
 outputs/doc_map_temp.json
 outputs/benchmark_it2.json
@@ -45,7 +45,6 @@ Thumbs.db
 __pycache__/
 *.pyc
 .venv/
-outputs/
 *.log
 
 # Runtime and debug files

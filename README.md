@@ -47,17 +47,35 @@ legal-edu-chatbot/
 The system orchestrates an advanced retrieval-augmented generation pipeline using dual LLMs:
 
 ```mermaid
-flowchart TD
-    Client["👤 User Client"] -->|Sends Legal Query| API["🛡️ API Gateway"]
-    API -->|Auth & Rate Limit| Router["🚦 Chat Orchestrator"]
-    Router -->|Check Redis| Cache{"📦 Cache Hit?"}
+flowchart LR    
+    Client["👤 User Client<br/>(React 19)"] -->|Sends Legal Query| API["🛡️ FastAPI Gateway"]
+    API -->|Auth & Rate Limit| Cache{"📦 Redis Cache Hit?"}
     Cache -->|Yes| ReturnCache["✅ Return Cached Response"]
-    Cache -->|No| Rewrite["🧠 Query Intent & Rewrite<br/>(Agentic 20B LLM)"]
-    Rewrite --> Hybrid["🔍 Hybrid Search RAG"]
-    Hybrid -->|Vector, BM25, Knowledge Graph| ReRank["📊 Re-Ranker"]
-    ReRank --> Context["📑 Context Builder"]
-    Context --> Generator["🤖 LLM Generator<br/>(Primary 120B LLM)"]
-    Generator -->|Generate Legal Answer| SaveCache["💾 Update Cache"]
+    Cache -->|No| Orchestrator["🚦 Chat Orchestrator"]
+    Orchestrator --> RuleEngine["⚙️ Rule Engine &<br/>Domain Classifier"]
+    RuleEngine --> Rewrite["🧠 Query Intent & Rewrite<br/>(Agentic 20B LLM)"]
+    
+    Rewrite --> HybridSearch["🔍 Hybrid Search (BookRAG)"]
+    
+    subgraph Retrieval["Hybrid Retrieval Process"]
+        direction TB
+        Vector["📊 Vector Search<br/>(FAISS)"]
+        Lexical["📝 Lexical Search<br/>(BM25)"]
+        Graph["🕸️ Graph Traversal<br/>(NetworkX In-memory)"]
+    end
+    
+    HybridSearch --> Vector
+    HybridSearch --> Lexical
+    HybridSearch --> Graph
+    
+    Vector --> ReRank
+    Lexical --> ReRank
+    Graph --> ReRank
+    
+    ReRank["⚖️ Cross-Encoder Reranker<br/>(ms-marco-MiniLM-L-6-v2)"] --> Context["📑 Context Builder"]
+    
+    Context --> Generator["🤖 LLM Generator<br/>(GLM-4.7 / 120B)"]
+    Generator -->|Generate Legal Answer| SaveCache["💾 Update Redis Cache"]
     SaveCache -->|Response| Client
 ```
 
@@ -115,11 +133,11 @@ API_KEY=lawedu-default-key
 DATA_DIR=data/final
 KG_PATH=outputs/knowledge_graph/entity_graph.json
 
-# Pro LLM API (GLM 4.7 320B)
+# Pro LLM API (GLM 320B)
 PRO_LLM_API_BASE=https://api.int2.net/v1
 PRO_LLM_API_KEY=your_api_key_here
 PRO_LLM_MODEL_NAME=glm-4.7
-PRO_LLM_TEMPERATURE=0.1
+PRO_LLM_TEMPERATURE=0.0
 PRO_LLM_MAX_TOKENS=4096
 ```
 

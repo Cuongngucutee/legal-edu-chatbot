@@ -14,7 +14,8 @@ import {
   ArrowRight,
   User,
   Loader2,
-  ExternalLink
+  ExternalLink,
+  ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -55,6 +56,108 @@ const SUGGESTIONS = [
     desc: "Căn cứ pháp lý theo Thông tư 22/2021 về đánh giá học sinh."
   }
 ];
+
+
+function SourceCard({ src, srcIdx, hoveredCitationIdx }: { src: any, srcIdx: number, hoveredCitationIdx: number | null }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isHighlighted = hoveredCitationIdx === srcIdx;
+
+  return (
+    <div
+      id={`source-card-${srcIdx}`}
+      className={`p-4 rounded-xl border transition-all duration-300 cursor-pointer ${
+        isHighlighted
+          ? "bg-cyan-50 border-cyan-400 shadow-md ring-2 ring-cyan-100 transform -translate-y-0.5"
+          : "bg-white border-slate-200 hover:border-slate-300 shadow-sm"
+      }`}
+      onClick={() => setIsExpanded(!isExpanded)}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span
+            className={`w-6.5 h-6.5 rounded-full flex items-center justify-center text-[12px] font-bold font-mono ${
+              isHighlighted ? "bg-cyan-500 text-white" : "bg-blue-50 text-blue-600"
+            }`}
+          >
+            {srcIdx + 1}
+          </span>
+          <p className="text-[14.5px] font-bold text-slate-800 leading-tight">
+            {src.ten_van_ban || "Văn bản chưa xác định"}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 uppercase tracking-wider scale-90">
+            {src.loai_van_ban || "Văn bản"}
+          </span>
+          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-3.5 pt-3.5 border-t border-slate-100 pl-7">
+              {src.so_dieu && (
+                <div className="text-[13px] font-bold text-blue-700 bg-blue-50/50 inline-block px-2.5 py-0.5 rounded border border-blue-100 mb-2">
+                  Điều {src.so_dieu}
+                </div>
+              )}
+              <p className="text-[14.5px] text-slate-600 leading-relaxed text-justify italic bg-slate-50/50 p-3 rounded-lg border border-dashed border-slate-200">
+                "{src.content || src.text || "Nội dung quy định"}"
+              </p>
+            </div>
+
+            {src.tinh_trang && (() => {
+              const tinhTrangLower = src.tinh_trang.toLowerCase();
+              let colorClass = "bg-slate-400";
+              let labelText = src.tinh_trang;
+
+              if (tinhTrangLower === "con_hieu_luc" || tinhTrangLower === "con-hieu-luc" || tinhTrangLower === "con hieu luc") {
+                colorClass = "bg-emerald-500";
+                labelText = "Còn hiệu lực";
+              } else if (tinhTrangLower === "da_sua_doi" || tinhTrangLower === "da-sua-doi" || tinhTrangLower === "da sua doi") {
+                colorClass = "bg-amber-500";
+                labelText = "Đã sửa đổi";
+              } else if (tinhTrangLower === "bi_bai_bo" || tinhTrangLower === "bi-bai-bo" || tinhTrangLower === "bi bai bo") {
+                colorClass = "bg-rose-500";
+                labelText = "Bị bãi bỏ";
+              } else if (tinhTrangLower === "het_hieu_luc" || tinhTrangLower === "het-hieu-luc" || tinhTrangLower === "het hieu luc") {
+                colorClass = "bg-rose-500";
+                labelText = "Hết hiệu lực";
+              } else if (tinhTrangLower === "sap_co_hieu_luc" || tinhTrangLower === "sap-co-hieu-luc" || tinhTrangLower === "sap co hieu luc") {
+                colorClass = "bg-blue-500";
+                labelText = "Sắp có hiệu lực";
+              } else if (tinhTrangLower === "chua_co_hieu_luc" || tinhTrangLower === "chua-co-hieu-luc" || tinhTrangLower === "chua co hieu luc") {
+                colorClass = "bg-slate-400";
+                labelText = "Chưa có hiệu lực";
+              } else if (tinhTrangLower === "het_hieu_luc_mot_phan" || tinhTrangLower === "het-hieu-luc-mot-phan" || tinhTrangLower === "het hieu luc mot phan") {
+                colorClass = "bg-orange-500";
+                labelText = "Hết hiệu lực một phần";
+              } else {
+                labelText = src.tinh_trang.replace(/_/g, " ");
+                labelText = labelText.charAt(0).toUpperCase() + labelText.slice(1);
+              }
+
+              return (
+                <div className="mt-2.5 pl-7 flex items-center gap-1.5 pb-1">
+                  <span className={`w-1.5 h-1.5 rounded-full ${colorClass}`}></span>
+                  <span className="text-[11.5px] font-semibold text-slate-400">
+                    Hiệu lực: {labelText}
+                  </span>
+                </div>
+              );
+            })()}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function App() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -865,86 +968,14 @@ export default function App() {
                             Văn bản luật trích dẫn ({message.sources.length}):
                           </p>
                           <div className="grid grid-cols-1 gap-2.5">
-                            {message.sources.map((src, srcIdx) => {
-                              const isHighlighted = hoveredCitationIdx === srcIdx;
-                              return (
-                                <div
-                                  id={`source-card-${srcIdx}`}
-                                  key={srcIdx}
-                                  className={`p-4 rounded-xl border transition-all duration-300 ${isHighlighted
-                                    ? "bg-cyan-50 border-cyan-400 shadow-md ring-2 ring-cyan-100 transform -translate-y-0.5"
-                                    : "bg-white border-slate-200 hover:border-slate-300 shadow-sm"
-                                    }`}
-                                >
-                                  <div className="flex items-start justify-between gap-3">
-                                    <div className="flex items-center gap-2">
-                                      <span className={`w-6.5 h-6.5 rounded-full flex items-center justify-center text-[12px] font-bold font-mono ${isHighlighted ? "bg-cyan-500 text-white" : "bg-blue-50 text-blue-600"
-                                        }`}>
-                                        {srcIdx + 1}
-                                      </span>
-                                      <p className="text-[14.5px] font-bold text-slate-800 leading-tight">
-                                        {src.ten_van_ban || "Văn bản chưa xác định"}
-                                      </p>
-                                    </div>
-                                    <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 uppercase tracking-wider scale-90">
-                                      {src.loai_van_ban || "Văn bản"}
-                                    </span>
-                                  </div>
-
-                                  <div className="mt-2.5 pl-7">
-                                    {src.so_dieu && (
-                                      <div className="text-[13px] font-bold text-blue-700 bg-blue-50/50 inline-block px-2.5 py-0.5 rounded border border-blue-100">
-                                        Điều {src.so_dieu}
-                                      </div>
-                                    )}
-                                    <p className="text-[14.5px] text-slate-600 leading-relaxed mt-2 text-justify italic bg-slate-50/50 p-2.5 rounded-lg border border-dashed border-slate-200">
-                                      "{src.content || src.text || "Nội dung quy định"}"
-                                    </p>
-                                  </div>
-
-                                  {src.tinh_trang && (() => {
-                                    const tinhTrangLower = src.tinh_trang.toLowerCase();
-                                    let colorClass = "bg-slate-400";
-                                    let labelText = src.tinh_trang;
-
-                                    if (tinhTrangLower === "con_hieu_luc" || tinhTrangLower === "con-hieu-luc" || tinhTrangLower === "con hieu luc") {
-                                      colorClass = "bg-emerald-500";
-                                      labelText = "Còn hiệu lực";
-                                    } else if (tinhTrangLower === "da_sua_doi" || tinhTrangLower === "da-sua-doi" || tinhTrangLower === "da sua doi") {
-                                      colorClass = "bg-amber-500";
-                                      labelText = "Đã sửa đổi";
-                                    } else if (tinhTrangLower === "bi_bai_bo" || tinhTrangLower === "bi-bai-bo" || tinhTrangLower === "bi bai bo") {
-                                      colorClass = "bg-rose-500";
-                                      labelText = "Bị bãi bỏ";
-                                    } else if (tinhTrangLower === "het_hieu_luc" || tinhTrangLower === "het-hieu-luc" || tinhTrangLower === "het hieu luc") {
-                                      colorClass = "bg-rose-500";
-                                      labelText = "Hết hiệu lực";
-                                    } else if (tinhTrangLower === "sap_co_hieu_luc" || tinhTrangLower === "sap-co-hieu-luc" || tinhTrangLower === "sap co hieu luc") {
-                                      colorClass = "bg-blue-500";
-                                      labelText = "Sắp có hiệu lực";
-                                    } else if (tinhTrangLower === "chua_co_hieu_luc" || tinhTrangLower === "chua-co-hieu-luc" || tinhTrangLower === "chua co hieu luc") {
-                                      colorClass = "bg-slate-400";
-                                      labelText = "Chưa có hiệu lực";
-                                    } else if (tinhTrangLower === "het_hieu_luc_mot_phan" || tinhTrangLower === "het-hieu-luc-mot-phan" || tinhTrangLower === "het hieu luc mot phan") {
-                                      colorClass = "bg-orange-500";
-                                      labelText = "Hết hiệu lực một phần";
-                                    } else {
-                                      labelText = src.tinh_trang.replace(/_/g, ' ');
-                                      labelText = labelText.charAt(0).toUpperCase() + labelText.slice(1);
-                                    }
-
-                                    return (
-                                      <div className="mt-2.5 pl-7 flex items-center gap-1.5">
-                                        <span className={`w-1.5 h-1.5 rounded-full ${colorClass}`}></span>
-                                        <span className="text-[11.5px] font-semibold text-slate-400">
-                                          Hiệu lực: {labelText}
-                                        </span>
-                                      </div>
-                                    );
-                                  })()}
-                                </div>
-                              );
-                            })}
+                            {message.sources.map((src, srcIdx) => (
+                              <SourceCard
+                                key={srcIdx}
+                                src={src}
+                                srcIdx={srcIdx}
+                                hoveredCitationIdx={hoveredCitationIdx}
+                              />
+                            ))}
                           </div>
                         </div>
                       )}
